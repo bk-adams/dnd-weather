@@ -1342,8 +1342,8 @@ function determineSpecialWeather() {
         console.log("No special weather event triggered.");
     }
 }
-
-function applyWeatherEffects(weatherType) {
+// #1
+/* function applyWeatherEffects(weatherType) {
     const weatherEffect = findWeatherEffect(weatherType);
     if (!weatherEffect) {
         console.log(`No specific weather effect found for ${weatherType}. Default effects will be applied.`);
@@ -1374,6 +1374,53 @@ function applyWeatherEffects(weatherType) {
         console.log(`applyWeatherEffects(): Total wind speed after terrain adjustment: ${GlobalWeatherConfig.windSpeed} mph`);
     } else {
         GlobalWeatherConfig.windSpeed = Math.max(GlobalWeatherConfig.windSpeedInitial, 0);
+    }
+
+    // Determine the duration and its unit
+    const duration = evalDice(weatherEffect.duration);
+    const durationUnit = weatherEffect.durationUnit || "hours";
+
+    // Calculate total precipitation
+    let totalPrecipitation = 0;
+    if (durationUnit === "days") {
+        for (let day = 0; day < duration; day++) {
+            totalPrecipitation += evalDice(weatherEffect.precipDice);
+        }
+    } else {
+        totalPrecipitation = evalDice(weatherEffect.precipDice);
+    }
+
+    GlobalWeatherConfig.precipAmount = totalPrecipitation;
+    console.log(`Total Inches of Precipitation: ${totalPrecipitation} over ${duration} ${durationUnit}`);
+
+    GlobalWeatherConfig.initialWeatherEventDuration = `${duration} ${durationUnit}`;
+    console.log(`Effects: ${weatherEffect.name}, Duration: ${duration} ${durationUnit}`);
+} */
+// #2
+function applyWeatherEffects(weatherType) {
+    const weatherEffect = findWeatherEffect(weatherType);
+    if (!weatherEffect) {
+        console.log(`No specific weather effect found for ${weatherType}. Default effects will be applied.`);
+        GlobalWeatherConfig.windSpeed = Math.max(GlobalWeatherConfig.windSpeedInitial, 0);  // Ensures wind speed doesn't go negative
+        console.log(`Default effects applied. Preserving initial wind speed: ${GlobalWeatherConfig.windSpeed} mph`);
+        return;
+    }
+
+    GlobalWeatherConfig.initialWeatherEvent = weatherEffect.name;
+
+    // Adjust wind speed based on the weather effect
+    if (weatherEffect.windSpeed) {
+        const adjustedWindSpeed = evalDice(weatherEffect.windSpeed);
+        GlobalWeatherConfig.windSpeed = Math.max(adjustedWindSpeed, 0);  // Prevents negative values
+        console.log(`Wind speed changed due to weather: ${weatherEffect.name}, ${GlobalWeatherConfig.windSpeed} mph`);
+
+        // Retrieve the wind speed adjustment from the terrain configuration
+        const terrainAdjustment = GlobalWeatherConfig.terrainEffects[GlobalWeatherConfig.terrain].windSpeedAdjustment || 0;
+        const totalAdjustment = adjustedWindSpeed + terrainAdjustment;
+        GlobalWeatherConfig.windSpeed = Math.max(totalAdjustment, 0);  // Ensures wind speed doesn't go negative after adjustment
+        console.log(`Total wind speed after terrain adjustment: ${GlobalWeatherConfig.windSpeed} mph`);
+    } else {
+        GlobalWeatherConfig.windSpeed = Math.max(GlobalWeatherConfig.windSpeedInitial, 0);  // Also prevents negative values here
     }
 
     // Determine the duration and its unit
@@ -1473,7 +1520,8 @@ async function displayWeatherConditions(onlyConsole = false) {
     const windEffects = getWindEffects(GlobalWeatherConfig.windSpeed); // This should correctly fetch and format the wind effects
     console.log("Wind Effects to Display:", windEffects);
     const humidityNum = GlobalWeatherConfig.humidity;
-    const season = SimpleCalendar.api.getCurrentSeason();
+    const season = SimpleCalendar.api.getCurrentSeason().name;
+    console.log("season is: ", season);
 
 
     let dateDisplay = "Date not set"; // Default initialization for date display
@@ -1821,6 +1869,7 @@ function setWindDirection() {
 }
 
 function setPrevailingWindDirection(season) {
+    console.log("season is: ", season);
     const windChart = {
         "Fall": [1, 2, 3, 5, 10, 17, 19, 20], // Ending range for each direction
         "Winter": [1, 2, 3, 6, 15, 18, 19, 20],
@@ -2266,4 +2315,49 @@ async function addWeatherReportToSimpleCalendar() {
             console.error("Error adding weather report to Simple Calendar:", error);
         }
     }
+}
+
+function resetWeatherEventDetails() {
+    console.log("resetWeatherEvents called");
+    
+    // Reset terrain
+    GlobalWeatherConfig.flags.onLand = false;
+    GlobalWeatherConfig.flags.atSea = false;
+    GlobalWeatherConfig.flags.inAir = false;
+    GlobalWeatherConfig.flags.inBattle = false;
+    console.log("reset onLand flag = ", GlobalWeatherConfig.flags.onLand)
+    console.log("reset atSea flag = ", GlobalWeatherConfig.flags.atSea)
+    
+    // Resetting event-specific details
+    GlobalWeatherConfig.initialWeatherEvent = "none";
+    GlobalWeatherConfig.initialWeatherEventDuration = 0;
+    GlobalWeatherConfig.continuingWeatherEvent = "none";
+    GlobalWeatherConfig.continuingWeatherEventDuration = 0;
+	
+	// Reset special weather event
+	GlobalWeatherConfig.specialWeather = false;
+	GlobalWeatherConfig.specialWeatherEvent = "none";
+	GlobalWeatherConfig.specialWeatherEventDuration = 0;
+
+    // Resetting precipitation details
+    GlobalWeatherConfig.precipType = "none";
+    GlobalWeatherConfig.precipAmount = 0;
+
+    // Resetting temperature specifics
+    GlobalWeatherConfig.dailyHighTemp = 0;
+    GlobalWeatherConfig.dailyLowTemp = 0;
+    GlobalWeatherConfig.temperature.effective = undefined;  // Reset effective temperature if used
+
+    // Resetting wind details
+    GlobalWeatherConfig.windSpeed = 0;
+    GlobalWeatherConfig.windSpeedInitial = 0; // Ensure the initial wind speed is reset as well
+
+    // Additional resets if necessary
+    GlobalWeatherConfig.humidity = 0; // Reset humidity to a default or recalculated value
+    GlobalWeatherConfig.skyCondition = "clear"; // Reset sky condition to a default state
+
+    //GlobalWeatherConfig.flags.precipContinues = false;
+
+    // Log the reset to ensure it's traceable
+    console.log("Weather event details and related configurations have been reset.");
 }
