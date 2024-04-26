@@ -664,7 +664,7 @@ windChillTable: {
 Hooks.once('ready', function() {
     // Is Simple Calendar loaded?
     if (window.SimpleCalendar) {
-        console.error('ver 1.0.6');
+        console.log("ver 1.0.6");
         console.error('Simple Calendar is available: adding side button for weather.');
         addSidebarButton();
     } else {
