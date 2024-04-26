@@ -1459,7 +1459,7 @@ function formatFractions(text) {
         return "No specific notes for this weather condition.";  // Default message or could return an empty string
     }
     // Replace fractions with their corresponding unicode characters
-    return text.replace(/1\\/2/g, '\u{BD}').replace(/1\\/4/g, '\u{BC}').replace(/3\\/4/g, '\u{BE}');
+    return text.replace(/1\/2/g, '½').replace(/1\/4/g, '¼').replace(/3\/4/g, '¾');
 }
 
 async function displayWeatherConditions(onlyConsole = false) {
