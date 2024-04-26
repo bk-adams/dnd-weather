@@ -13,6 +13,6 @@
     "verified": "11"
   },
   "scripts": [
-    "scripts/greyhawk-weather.js"
+    "scripts/dnd-weather.js"
   ]
 }
