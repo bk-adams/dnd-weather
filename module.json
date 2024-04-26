@@ -1,12 +1,18 @@
 {
   "id": "greyhawk-weather",
   "title": "AD&D Greyhawk Weather",
+  "description": "A module to simulate weather patterns based on the AD&D Greyhawk setting.",
+  "authors": [
+    {
+      "name": "BK Adams"
+    }
+  ],
   "version": "1.0.6",
   "compatibility": {
     "minimum": "11",
     "verified": "11"
   },
   "scripts": [
-        "scripts/greyhawk-weather.js"
-    ]
+    "scripts/greyhawk-weather.js"
+  ]
 }
