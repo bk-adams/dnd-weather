@@ -14,6 +14,11 @@ SimpleCalendar.api.setDate({year: 1999, month: 11, day: 24, hour: 0, minute: 0, 
 SimpleCalendar.api.setDate({year: 1999, month: 11, day: 30, hour: 23, minute: 59, seconds: 59});
 SimpleCalendar.api.pauseClock();
 */
+Hooks.once('ready', async function() {
+    console.log("D&D Weather module is loaded and ready!");
+    // Initialization code here
+});
+
 var GlobalWeatherConfig = {
     year: 568,
     month: "",
