@@ -1473,6 +1473,7 @@ async function displayWeatherConditions(onlyConsole = false) {
     const windEffects = getWindEffects(GlobalWeatherConfig.windSpeed); // This should correctly fetch and format the wind effects
     console.log("Wind Effects to Display:", windEffects);
     const humidityNum = GlobalWeatherConfig.humidity;
+    const season = SimpleCalendar.api.getCurrentSeason();
 
 
     let dateDisplay = "Date not set"; // Default initialization for date display
@@ -1508,6 +1509,8 @@ async function displayWeatherConditions(onlyConsole = false) {
         rainbowDisplay = GlobalWeatherConfig.flags.rainbowType;
     }
 
+    let prevailingWindDirection = setPrevailingWindDirection(season);
+
     let message = `
         <strong>Greyhawk Weather Report for ${dateDisplay}</strong><br>
         Latitude: ${GlobalWeatherConfig.latitude}<br>
@@ -1527,7 +1530,8 @@ async function displayWeatherConditions(onlyConsole = false) {
         Precipitation Continues?: ${GlobalWeatherConfig.flags.precipContinues}<br>
         Rainbow: ${rainbowDisplay}<br>
         Wind Speed: ${windLabel} (${windSpeed} mph)<br>
-        Wind Direction: ${GlobalWeatherConfig.windDirection}<br>
+        Local Wind Direction: ${GlobalWeatherConfig.windDirection}<br>
+        Prevailing Wind Direciton:${GlobalWeatherConfig.prevailingWindDirection}<br>
         Wind Effects: ${windEffects}<br>
         Special Weather Event: ${GlobalWeatherConfig.specialWeatherEvent || "None"}<br>
         <strong>Terrain Notes:</strong> ${terrainNotes}<br>
