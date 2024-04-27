@@ -21,12 +21,12 @@ Hooks.once('ready', async function() {
 
 var GlobalWeatherConfig = {
     year: 568,
-    month: "",
+    month: "Coldeven",
     day: "",
-    latitude: 35,	// City of Greyhawk is at 35 deg. latitude
+    latitude: 32,	// City of Greyhawk is at 35 deg. latitude
 	latitudeTempAdj: 0,
-    terrain: "",
-    altitude: 0,
+    terrain: "Mountains",
+    altitude: 6000,
 	altitudeTempAdj: 0,
     baseDailyTemp: 0,
     dailyHighTemp: 0,
@@ -1103,7 +1103,7 @@ function checkForPrecipitation() {
     calculateWindSpeed();
 
     if (rollForPrecip > precipChance) {
-        console.log(`%cNo Precipitation today!`, "font-weight: bold");
+        console.error(`%cNo Precipitation today!`, "font-weight: bold");
         GlobalWeatherConfig.precipType = "None";
         // Using the previously suggested check to avoid setting wind speed to zero accidentally
         GlobalWeatherConfig.windSpeed = Math.max(GlobalWeatherConfig.windSpeed, GlobalWeatherConfig.windSpeedInitial, 0);
@@ -1678,17 +1678,18 @@ async function generateWeather() {
     displayWeatherConditions();	// show the weather report in the chat
 	//displayWeatherConditions(true);	// DONT show the weather report in the chat, just the console
 
-    // Step 11: Create weather report as Simple Calendar note
-    console.log(`%cSTEP 11 (optional): Create weather report as Simple Calendar note`, "font-weight: bold");
-    await addWeatherReportToSimpleCalendar();  // Make sure the weather is logged in the calendar
-		
-    // Step 12: Determine type of continuing precipitation
-    console.log(`%cSTEP 12: DETERMINE TYPE OF CONTINUING PRECIP`, "font-weight: bold");
+    // Step 11: Determine type of continuing precipitation
+    console.log(`%cSTEP 11: DETERMINE TYPE OF CONTINUING PRECIP`, "font-weight: bold");
+    console.log(`%cCurrent weather effect = `, "font-weight: bold",currentWeatherEffect);
     //if (currentWeatherEffect && currentWeatherEffect.contChance) {
     if (currentWeatherEffect) {        
         console.log("precipitation happened, check to see if it continues");
         precipChanceOfContinuing(currentWeatherEffect);  // Pass the current weather effect to check for continuation
     }
+
+    // Step 12: Create weather report as Simple Calendar note
+    console.log(`%cSTEP 12 (optional): Create weather report as Simple Calendar note`, "font-weight: bold");
+    await addWeatherReportToSimpleCalendar();  // Make sure the weather is logged in the calendar
 
     // Step 13: Reset data
     console.log(`%cSTEP 13: RESET DATA`, "font-weight: bold");
