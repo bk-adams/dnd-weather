@@ -1558,6 +1558,7 @@ async function displayWeatherConditions(onlyConsole = false) {
     }
 
     let prevailingWindDirection = setPrevailingWindDirection(season);
+    //Local Wind Direction: ${GlobalWeatherConfig.windDirection}<br>
 
     let message = `
         <strong>Greyhawk Weather Report for ${dateDisplay}</strong><br>
@@ -1578,8 +1579,7 @@ async function displayWeatherConditions(onlyConsole = false) {
         Precipitation Continues?: ${GlobalWeatherConfig.flags.precipContinues}<br>
         Rainbow: ${rainbowDisplay}<br>
         Wind Speed: ${windLabel} (${windSpeed} mph)<br>
-        Local Wind Direction: ${GlobalWeatherConfig.windDirection}<br>
-        Prevailing Wind Direciton:${GlobalWeatherConfig.prevailingWindDirection}<br>
+        Wind Direciton, Prevailing: ${GlobalWeatherConfig.prevailingWindDirection}<br>
         Wind Effects: ${windEffects}<br>
         Special Weather Event: ${GlobalWeatherConfig.specialWeatherEvent || "None"}<br>
         <strong>Terrain Notes:</strong> ${terrainNotes}<br>
@@ -1753,72 +1753,60 @@ function applyWindChill() {
     }
 }
 
-// Helper function to find the closest wind speed key in the wind chill table
-function findClosestWindSpeed(windSpeed) {
-    const windSpeeds = Object.keys(GlobalWeatherConfig.windChillTable).map(Number);
-    return windSpeeds.reduce((prev, curr) => Math.abs(curr - windSpeed) < Math.abs(prev - windSpeed) ? curr : prev);
-}
-
-// Helper function to find the closest temperature key within a specific wind chill sub-table
-function findClosestTemperature(temp, subTable) {
-    const temperatures = Object.keys(subTable).map(Number);
-    return temperatures.reduce((prev, curr) => Math.abs(curr - temp) < Math.abs(prev - temp) ? curr : prev);
-}
-
-/* #2
-function applyWindChill() {
-    console.log(`Applying wind chill with current wind speed: ${GlobalWeatherConfig.windSpeed} mph and low temp: ${GlobalWeatherConfig.dailyLowTemp}\u{B0}F`);
-    if (GlobalWeatherConfig.dailyLowTemp < 35) {
-        const windSpeed = GlobalWeatherConfig.windSpeed;
-        const temp = GlobalWeatherConfig.dailyLowTemp;
-        const validWindSpeed = findClosestWindSpeed(windSpeed);
-        const windChillSubTable = GlobalWeatherConfig.windChillTable[validWindSpeed];
-        const validTemp = findClosestTemperature(temp, windChillSubTable);
-
-        const adjustedTemp = windChillSubTable[validTemp];
-        GlobalWeatherConfig.temperature.effective = adjustedTemp;
-        console.log(`Wind chill adjusted. New effective temperature: ${adjustedTemp}\u{B0}F using wind speed: ${validWindSpeed} mph.`);
-    } else {
-        console.log("Temperature above 35\u{B0}F, no wind chill adjustment applied.");
-        GlobalWeatherConfig.temperature.effective = 'N/A';
-    }
-}
-
- */
-//#3 applyWindChill function
-/* function applyWindChill() {
-    console.log(`Applying wind chill with current wind speed: ${GlobalWeatherConfig.windSpeed} mph and low temp: ${GlobalWeatherConfig.dailyLowTemp}\u{B0}F`);
-    if (GlobalWeatherConfig.dailyLowTemp < 35) {
-        // Validate that wind speed is correctly logged and used
-        const windSpeed = GlobalWeatherConfig.windSpeed;
-        console.log(`Using wind speed: ${windSpeed} mph for wind chill calculation.`);
-
-        const validWindSpeed = findClosestWindSpeed(windSpeed);
-        const windChillSubTable = GlobalWeatherConfig.windChillTable[validWindSpeed];
-        const validTemp = findClosestTemperature(GlobalWeatherConfig.dailyLowTemp, windChillSubTable);
-
-        const adjustedTemp = windChillSubTable[validTemp];
-        GlobalWeatherConfig.temperature.effective = adjustedTemp;
-        console.log(`Wind chill adjusted. New effective temperature: ${adjustedTemp}\u{B0}F using wind speed: ${validWindSpeed} mph.`);
-    } else {
-        console.log("Temperature above 35\u{B0}F, no wind chill adjustment applied.");
-        GlobalWeatherConfig.temperature.effective = 'N/A';
-    }
-} */
-
-function findClosestWindSpeed(windSpeed) {
+/* function findClosestWindSpeed(windSpeed) {
     const windSpeeds = Object.keys(GlobalWeatherConfig.windChillTable).map(Number);
     const closestSpeed = windSpeeds.reduce((prev, curr) => Math.abs(curr - windSpeed) < Math.abs(prev - windSpeed) ? curr : prev);
     console.log(`Closest wind speed found for ${windSpeed} mph is ${closestSpeed} mph.`);
     return closestSpeed;
 }
+ */
+function findClosestWindSpeed(windSpeed) {
+    const keys = Object.keys(GlobalWeatherConfig.windChillTable);
+    console.log("Keys of windChillTable:", keys);  // Debugging: Check the keys being processed
 
-function findClosestTemperature(temp, subTable) {
+    const windSpeeds = keys.map(Number).filter(num => !isNaN(num));  // Convert keys to numbers and filter out any NaN values
+    console.log("Numerical wind speeds:", windSpeeds);  // Debugging: Check the converted numbers
+
+    if (windSpeeds.length === 0) {
+        console.error("No wind speeds available in the windChillTable.");
+        return undefined; // or handle it another way, perhaps setting a default value
+    }
+
+    const closestSpeed = windSpeeds.reduce((prev, curr) => 
+        Math.abs(curr - windSpeed) < Math.abs(prev - windSpeed) ? curr : prev
+    );
+
+    console.log(`Closest wind speed found for ${windSpeed} mph is ${closestSpeed} mph.`);
+    return closestSpeed;
+}
+
+
+/* function findClosestTemperature(temp, subTable) {
     const temperatures = Object.keys(subTable).map(Number);
     const closestTemp = temperatures.reduce((prev, curr) => Math.abs(curr - temp) < Math.abs(prev - temp) ? curr : prev);
     console.log(`Closest temperature found for ${temp}\u{B0}F is ${closestTemp}\u{B0}F.`);
     return closestTemp;
+} */
+function findClosestTemperature(temp, subTable) {
+    if (!subTable || Object.keys(subTable).length === 0) {
+        console.error("findClosestTemperature was provided an empty or undefined subTable.");
+        return undefined; // Handle error case or set a default value
+    }
+
+    const temperatures = Object.keys(subTable).map(Number).filter(num => !isNaN(num));
+    if (temperatures.length === 0) {
+        console.error("No valid temperature entries found in subTable.");
+        return undefined; // Handle error case or set a default value
+    }
+
+    const closestTemp = temperatures.reduce((prev, curr) => 
+        Math.abs(curr - temp) < Math.abs(prev - temp) ? curr : prev
+    );
+
+    console.log(`Closest temperature found for ${temp}°F is ${closestTemp}°F.`);
+    return closestTemp;
 }
+
 
 function checkForRainbows() {
     // Find the current weather effect to get the rainbow chance
