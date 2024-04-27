@@ -1023,7 +1023,7 @@ function evalDice(diceExpression, returnMax = false) {
         }
     } else {
         // Regular expression to parse standard dice notation, e.g., "1d6+2" or "d20"
-        const regex = /(\\d+)?d(\\d+)([+-]?\\d+)?/i;
+        const regex = /(\d+)?d(\d+)([+-]?\d+)?/i;
         const parts = diceExpression.match(regex);
         if (parts) {
             const count = parseInt(parts[1] || 1, 10); // Default to 1 if no multiplier, e.g., "d20" is equivalent to "1d20"
