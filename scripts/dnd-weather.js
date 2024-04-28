@@ -462,13 +462,13 @@ standardWeatherTable: [
 		IRvisionRng: "x3/4",
         tracking: "-10%/turn* this differs from the PHB rules",
         lostChance: "+10% cumulative",
-        windSpeed: "2d12",
+        windSpeed: "2d12+10",
         notes: "A drop in temperature to 30\u{B0}F or below after a storm may result in icy conditions, " +
 				"affecting travel and dexterity."
     },
     {
         name: "Thunderstorm",
-        precipDice: "8",
+        precipDice: "1d8",
         duration: "1d4",
         durationUnit: "hours",
         movement: "x1/2 (foot, horse, cart)",
@@ -1080,6 +1080,7 @@ function evalDice(diceExpression, returnMax = false) {
 // STEP 2: DETERMINE SKY CONDITIONS
 function determineSkyConditions() {
     const roll = Math.floor(Math.random() * 100) + 1;
+    const d20roll = Math.floor(Math.random() * 20);
     const monthData = GlobalWeatherConfig.baselineData[GlobalWeatherConfig.month];
     const { clear, partlyCloudy, cloudy } = monthData.skyConditions;
 
@@ -1088,6 +1089,8 @@ function determineSkyConditions() {
     else GlobalWeatherConfig.skyCondition = "Cloudy";
 
     console.log(`Sky condition: ${GlobalWeatherConfig.skyCondition}`);
+    GlobalWeatherConfig.initialWindSpeed = d20roll;
+    console.log(`setting initial wind speed to: ${d20roll}`);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // STEP 3: DETERMINE PRECIPITATION FUNCTIONS
@@ -1120,7 +1123,7 @@ function rerollAndAdjustWindSpeed() {
 function calculateWindSpeed() {
     // Roll for base wind speed (typically a d20 roll)
     const windBaseSpeed = Math.floor(Math.random() * 20) + 1;
-    console.log(`Initial wind speed roll (d20): ${windBaseSpeed} mph`);
+    console.log(`Initial wind speed roll (d20), windBaseSpeed set to: ${windBaseSpeed} mph`);
 
     // Retrieve the wind speed adjustment from the terrain configuration
     const terrainAdjustment = GlobalWeatherConfig.terrainEffects[GlobalWeatherConfig.terrain].windSpeedAdjustment || 0;
@@ -1194,7 +1197,7 @@ function determinePrecipitationType(attempt = 1) {
         console.log(`Precipitation type determined: ${matchedType.type}`);
         GlobalWeatherConfig.precipType = matchedType;  // Set the entire object to precipType
         applyWeatherEffects(matchedType);  // Call to apply effects now that we have a matched type
-        adjustWindSpeedForPrecipitationType(matchedType); // Adjust wind speed according to the matched type
+        //adjustWindSpeedForPrecipitationType(matchedType); // Adjust wind speed according to the matched type
         return matchedType;  // Return the entire matched object
     } else {
         console.log("No precipitation type matches the conditions on attempt", attempt, ".");
@@ -1257,22 +1260,26 @@ function determineSpecialWeather() {
 }
 
 // #2
-function applyWeatherEffects(weatherType) {
-    const weatherEffect = findWeatherEffect(weatherType);
+/* function applyWeatherEffects(weatherType) {
+    //const weatherEffect = findWeatherEffect(weatherType);
+    const weatherEffect = weatherType.type; // set to name of weather type
     if (!weatherEffect) {
-        console.log(`No specific weather effect found for ${weatherType.type}. Default effects will be applied.`);
+        console.log(`No specific weather effect found for ${weatherEffect}. Default effects will be applied.`);
         GlobalWeatherConfig.windSpeed = Math.max(GlobalWeatherConfig.windSpeedInitial, 0);  // Ensures wind speed doesn't go negative
         console.log(`Default effects applied. Preserving initial wind speed: ${GlobalWeatherConfig.windSpeed} mph`);
         return;
     }
 
-    GlobalWeatherConfig.initialWeatherEvent = weatherEffect.name;
+    //GlobalWeatherConfig.initialWeatherEvent = weatherEffect.name;
+    GlobalWeatherConfig.initialWeatherEvent = weatherEffect;
+    console.log(`GlobalWeatherConfig.initialWeatherEvent set to: ${weatherEffect}`);
 
-    // Adjust wind speed based on the weather effect
+    // Adjust wind speed based on the weather effect from the standard weather table
+    // weatherEffect is the name of the weather type. need to cross reference the weather type on the standard weather table to find wind speed
     if (weatherEffect.windSpeed) {
         const adjustedWindSpeed = evalDice(weatherEffect.windSpeed);
         GlobalWeatherConfig.windSpeed = Math.max(adjustedWindSpeed, 0);  // Prevents negative values
-        console.log(`Wind speed changed due to weather: ${weatherEffect.name}, ${GlobalWeatherConfig.windSpeed} mph`);
+        console.log(`Wind speed changed due to weather: ${weatherEffect.type}, ${GlobalWeatherConfig.windSpeed} mph`);
 
         // Retrieve the wind speed adjustment from the terrain configuration
         const terrainAdjustment = GlobalWeatherConfig.terrainEffects[GlobalWeatherConfig.terrain].windSpeedAdjustment || 0;
@@ -1303,8 +1310,57 @@ function applyWeatherEffects(weatherType) {
     GlobalWeatherConfig.initialWeatherEventDuration = `${duration} ${durationUnit}`;
     console.log(`Effects: ${weatherEffect.name}, Duration: ${duration} ${durationUnit}`);
 }
+ */
+// #3
+function applyWeatherEffects(weatherType) {
+    // Assuming weatherType is an object from the precipitationTable with properties like type, windSpeed, etc.
+    const weatherTypeName = weatherType.type;
+    console.log(`Applying weather effects for type: ${weatherTypeName}`);
 
-// #2
+    if (!weatherTypeName) {
+        console.log("No specific weather effect found. Default effects will be applied.");
+        GlobalWeatherConfig.windSpeed = Math.max(GlobalWeatherConfig.windSpeedInitial, 0);
+        console.log(`Default effects applied. Preserving initial wind speed: ${GlobalWeatherConfig.windSpeed} mph`);
+        return;
+    }
+
+    GlobalWeatherConfig.initialWeatherEvent = weatherTypeName;
+    console.log(`GlobalWeatherConfig.initialWeatherEvent set to: ${weatherTypeName}`);
+
+    // Find the matching weather details from the standardWeatherTable using the type
+    const standardWeatherDetails = GlobalWeatherConfig.standardWeatherTable.find(item => item.name === weatherTypeName);
+    if (standardWeatherDetails && standardWeatherDetails.windSpeed) {
+        const adjustedWindSpeed = evalDice(standardWeatherDetails.windSpeed);
+        const terrainAdjustment = GlobalWeatherConfig.terrainEffects[GlobalWeatherConfig.terrain].windSpeedAdjustment || 0;
+        const totalAdjustment = adjustedWindSpeed + terrainAdjustment;
+
+        GlobalWeatherConfig.windSpeed = Math.max(totalAdjustment, 0);
+        console.log(`Wind speed changed due to weather: ${weatherTypeName}, new wind speed: ${GlobalWeatherConfig.windSpeed} mph`);
+    } else {
+        console.log("No specific wind speed formula found. Using initial settings.");
+        GlobalWeatherConfig.windSpeed = Math.max(GlobalWeatherConfig.windSpeedInitial, 0);
+    }
+
+    // Determine duration and precipitation if available in the weatherType object
+    if (weatherType.duration && weatherType.precipDice) {
+        const duration = evalDice(weatherType.duration);
+        const durationUnit = weatherType.durationUnit || "hours";
+        let totalPrecipitation = evalDice(weatherType.precipDice);
+
+        if (durationUnit === "days") {
+            totalPrecipitation *= duration; // Total precipitation for all days
+        }
+
+        GlobalWeatherConfig.precipAmount = totalPrecipitation;
+        GlobalWeatherConfig.initialWeatherEventDuration = `${duration} ${durationUnit}`;
+        console.log(`Total Inches of Precipitation: ${totalPrecipitation} over ${duration} ${durationUnit}`);
+        console.log(`Effects: ${weatherTypeName}, Duration: ${duration} ${durationUnit}`);
+    } else {
+        console.log("Duration and precipitation details are missing for the current weather type.");
+    }
+}
+
+
 function precipChanceOfContinuing(weatherEffect) {
     // More detailed logging to debug the issue
     console.log("precipChanceOfContinuing received weatherEffect, defined as: ", weatherEffect);
@@ -1501,7 +1557,7 @@ function findWeatherEffect(weatherType) {
 // MAIN EXECUTION FUNCTION
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 async function generateWeather() {
-	console.log("Starting weather generation for today.");
+	console.error("Starting weather generation for today.");
     
     // Step 0: check terrain, latitude, and altitude
     console.log(`%cSTEP 0: CHECK INPUT`, "font-weight: bold");
@@ -1520,34 +1576,11 @@ async function generateWeather() {
     //getTemperatureExtremes(); // This will also calculate daily high and low temperatures
 
     // Step 2: Determine Sky Conditions
-    console.log(`%cSTEP 2: DETERMINE SKY CONDITIONS`, "font-weight: bold");
+    console.error(`%cSTEP 2: DETERMINE SKY CONDITIONS`, "font-weight: bold");
     determineSkyConditions();
 
-    /* // Step 3a: Check for Precipitation, roll wind speed and determine weather type, if any
-    console.log(`%cSTEP 3a: DETERMINE IF PRECIP OCCURS`, "font-weight: bold");
-
-    let precipitationOccurs = checkForPrecipitation();
-    let currentWeatherEffect;
-
-    if (precipitationOccurs) {
-        console.log('%cPrecip WILL occur. Determining precipitation type.', "font-weight: bold");
-        currentWeatherEffect = determinePrecipitationType();
-        GlobalWeatherConfig.initialWeatherEvent = currentWeatherEffect || "None";
-
-        if (!currentWeatherEffect) {
-            console.log("Precipitation type could not be determined. Setting currentWeatherEffect to None.");
-            calculateWindSpeed();
-        } else {
-            console.log(`%cCurrent weather effect determined: ${currentWeatherEffect.type}`, "font-weight: bold");
-        }
-    } else {
-        console.log('%cNO PRECIPITATION TODAY! Calculate wind speed and adjust for terrain.', "font-weight: bold");
-        calculateWindSpeed();
-        currentWeatherEffect = "None";
-    } */
-
     // Step 3a: Check for Precipitation, roll wind speed and determine weather type, if any
-    console.log(`%cSTEP 3a: DETERMINE IF PRECIP OCCURS`, "font-weight: bold");
+    console.error(`%cSTEP 3a: DETERMINE IF PRECIP OCCURS`, "font-weight: bold");
 
     let precipitationOccurs = checkForPrecipitation();
     let currentWeatherEffect;
@@ -1555,7 +1588,8 @@ async function generateWeather() {
 
     switch (precipitationState) {
         case "OCCURS":
-            console.log('%cPrecip WILL occur. Determining precipitation type.', "font-weight: bold");
+            console.log('%cPrecip rollled but must pass temp/terrain requirements. Determining precipitation type.', "font-weight: bold");
+            // call function determinePrecipitationType()
             currentWeatherEffect = determinePrecipitationType();
             GlobalWeatherConfig.initialWeatherEvent = currentWeatherEffect || "None";
 
@@ -1576,7 +1610,6 @@ async function generateWeather() {
             console.log('Unexpected case in weather determination process.');
             break;
     }
-
 
     // Step 4a: Determine type of continuing precipitation
     console.log(`%cSTEP 4a: DETERMINE TYPE OF CONTINUING PRECIP`, "font-weight: bold");
