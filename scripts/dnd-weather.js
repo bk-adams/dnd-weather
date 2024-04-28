@@ -1227,14 +1227,15 @@ function determinePrecipitationType(attempt = 1) {
             console.log("Final attempt also did not find a valid precipitation type. No precipitation today.");
             //GlobalWeatherConfig.precipType = null;  // Use null for clarity when no type is found
             GlobalWeatherConfig.precipType = "none";  // Use null for clarity when no type is found
-            return null;
+            //return null;
+            return "none";
         }
     }
 }
 
 function adjustWindSpeedForPrecipitationType(precipType) {
     // Example of retrieving wind speed adjustments from standardWeatherTable
-    console.log(`adjusitng wind speed for standard weather table, weather is: ${precipType}`);
+    console.error(`adjusitng wind speed for standard weather table, weather is: ${precipType.type}`);
     const windSpeedAdjustment = GlobalWeatherConfig.standardWeatherTable.find(item => item.type === precipType.type)?.windSpeed || 0;
     calculateWindSpeed(windSpeedAdjustment);
 }
@@ -1659,7 +1660,7 @@ async function generateWeather() {
 	
     // Step 6: Check for Rainbows if precipitation ends
     console.log(`%cSTEP 6: RAINBOW CHECK`, "font-weight: bold");
-    checkForRainbows();
+    checkForRainbows(currentWeatherEffect);
 
     // Step 7: Determine Wind Direction
     console.log(`%cSTEP 7: CHECK FOR WIND DIRECTION`, "font-weight: bold");
@@ -1789,8 +1790,8 @@ function findClosestTemperature(temp, subTable) {
     return closestTemp;
 }
 
-
-function checkForRainbows() {
+// #1
+/* function checkForRainbows() {
     // Find the current weather effect to get the rainbow chance
     const currentWeatherType = GlobalWeatherConfig.precipType;
     const precipitationDetails = GlobalWeatherConfig.precipitationTable.find(p => p.type === currentWeatherType);
@@ -1827,8 +1828,46 @@ function checkForRainbows() {
         GlobalWeatherConfig.flags.rainbowType = null;
         console.log("This weather type does not support rainbow formation.");
     }
-}
+} */
+// #2
+function checkForRainbows(weatherEffect) {
+    // Retrieve the precipitation details based on the passed weatherEffect parameter
+    const precipitationDetails = GlobalWeatherConfig.precipitationTable.find(p => p.type === weatherEffect.type);
+    console.error(`%c checkForRainbows() weather = `, "font-weight: bold",precipitationDetails);
 
+    // Check if there's a valid rainbow chance and the precipitation has ended
+    if (precipitationDetails && precipitationDetails.rainbowChance !== null) {
+        const roll = Math.floor(Math.random() * 100) + 1; // Generate a random number between 0 and 100
+        console.log(`Rainbow type roll vs chance: ${roll},${precipitationDetails.rainbowChance}`);
+        if (roll < precipitationDetails.rainbowChance) {
+            const rainbowTypeRoll = Math.floor(Math.random() * 100) + 1; // Another roll for type of rainbow
+            let rainbowType = "Single rainbow"; // Default to single rainbow
+            if (rainbowTypeRoll <= 89) {
+                rainbowType = "Single rainbow";
+            } else if (rainbowTypeRoll <= 95) {
+                rainbowType = "Double rainbow (may be an omen)";
+            } else if (rainbowTypeRoll <= 98) {
+                rainbowType = "Triple rainbow (almost certainly an omen)";
+            } else if (rainbowTypeRoll == 99) {
+                rainbowType = "Bifrost bridge or clouds in the shape of rain deity";
+            } else {
+                rainbowType = "Rain deity or servant in sky";
+            }
+            GlobalWeatherConfig.flags.rainbowType = rainbowType;  // Update the global configuration to reflect the rainbow type
+            GlobalWeatherConfig.flags.rainbow = true;  // Indicate that a rainbow has formed
+            console.log(`A ${rainbowType} forms as the precipitation ends.`);
+        } else {
+            GlobalWeatherConfig.flags.rainbow = false;  // Indicate no rainbow formed
+            GlobalWeatherConfig.flags.rainbowType = null;  // Clear the rainbow type
+            console.log("No rainbow forms.");
+        }
+    } else {
+        // If there's no valid rainbow chance, ensure the flag is set to false and clear the type
+        GlobalWeatherConfig.flags.rainbow = false;
+        GlobalWeatherConfig.flags.rainbowType = null;
+        console.log("This weather type does not support rainbow formation.");
+    }
+}
 
 function setWindDirection() {
     const direction = ["North", "Northeast", "East", "Southeast", "South", "Southwest", "West", "Northwest"];
