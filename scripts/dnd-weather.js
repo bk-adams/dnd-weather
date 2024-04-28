@@ -642,7 +642,7 @@ terrainEffects: {
     "Plains": { precipAdj: 0, temperatureAdjustment: { day: 0, night: 0 }, windSpeedAdjustment: 5, specialWeather: "01-50: Tornado, 51-00: Earthquake", notes: " No monsoon or tropical storm permitted" },
     "Desert": { precipAdj: -30, temperatureAdjustment: { day: 10, night: -10 }, windSpeedAdjustment: 5, specialWeather: "01-25: Flash flood, 26-50: Sandstorm, 51-65: Oasis, 66-85: Mirage oasis, 86-00: Earthquake", notes: "No fog, mist, " +
 			"blizzard, monsoon, tropical storm, gale, or hurricane permitted." },
-    "Mountains": { precipAdj: 0, temperatureAdjustment: { day: 0, night: 0 }, windSpeedAdjustment: 10, specialWeather: "01-20: Wind storm, 21-50: Rock avalanche, 51-75: Snow avalanche, 76-80: Volcano, 81-00: Earthquake", notes: "" },
+    "Mountains": { precipAdj: 0, temperatureAdjustment: { day: 0, night: 0 }, windSpeedAdjustment: 0, specialWeather: "01-20: Wind storm, 21-50: Rock avalanche, 51-75: Snow avalanche, 76-80: Volcano, 81-00: Earthquake", notes: "" },
     "Seacoast": { precipAdj: 5, temperatureAdjustment: { coldCurrent: -5, warmCurrent: 5 }, windSpeedAdjustment: 5, specialWeather: "01-80: Earthquake, 81-94: Tsunami, 95-00: Undersea volcano", notes: "Duration of fog and mist doubled." },
     "At sea": { precipAdj: 15, temperatureAdjustment: { coldCurrent: -10, warmCurrent: 5 }, windSpeedAdjustment: 10, specialWeather: "01-20: Tsunami, 21-40: Undersea volcano, 41-00: Undersea earthquake", notes: "Duration of fog and mist doubled." }
 	},
@@ -1123,7 +1123,8 @@ function rerollAndAdjustWindSpeed() {
 	console.log(`rerollAndAdjustWindSpeed(): Wind speed after reroll and adjustment: ${GlobalWeatherConfig.windSpeed} mph`);
 }
 
-function calculateWindSpeed() {
+//#1
+/* function calculateWindSpeed() {
     // Roll for base wind speed (typically a d20 roll)
     const windBaseSpeed = Math.floor(Math.random() * 20) + 1;
     let windSpeedAdjByTerrain;
@@ -1146,63 +1147,46 @@ function calculateWindSpeed() {
     windSpeedAdjByTerrain = windBaseSpeed + finalAdjustment;
     console.error(`calculateWindSpeed() is setting Total wind speed after adjustment: ${GlobalWeatherConfig.windSpeed} mph`);
     return windSpeedAdjByTerrain;
+} */
+// #2
+function calculateWindSpeed() {
+    // Roll for base wind speed (typically a d20 roll)
+    const windBaseSpeed = Math.floor(Math.random() * 20) + 1;
+    console.log(`Initial wind speed roll (d20): ${windBaseSpeed} mph`);
+
+    // Retrieve the wind speed adjustment from the terrain configuration
+    const terrainAdjustment = GlobalWeatherConfig.terrainEffects[GlobalWeatherConfig.terrain].windSpeedAdjustment || 0;
+    const altitudeAdjustment = calculateAltitudeAdjustment(GlobalWeatherConfig.altitude, GlobalWeatherConfig.terrain);
+
+    // Check if the terrain adjustment is an array and randomly pick one if so
+    let finalAdjustment = terrainAdjustment;
+    if (Array.isArray(terrainAdjustment)) {
+        finalAdjustment = terrainAdjustment[Math.floor(Math.random() * terrainAdjustment.length)];
+    }
+
+    console.log(`Wind speed adjustment due to terrain (${GlobalWeatherConfig.terrain}): ${finalAdjustment}`);
+    console.log(`Additional altitude-based adjustment for wind speed: ${altitudeAdjustment} mph`);
+
+    // Apply the chosen terrain adjustment and the altitude-based adjustment to the base wind speed
+    GlobalWeatherConfig.windSpeedInitial = windBaseSpeed;
+    GlobalWeatherConfig.windSpeed = windBaseSpeed + finalAdjustment + altitudeAdjustment;
+    const windSpeedAdjByTerrain = GlobalWeatherConfig.windSpeed;
+    console.error(`calculateWindSpeed() is setting Total wind speed after adjustment: ${GlobalWeatherConfig.windSpeed} mph`);
+    return windSpeedAdjByTerrain;
+}
+
+function calculateAltitudeAdjustment(altitude, terrain) {
+    // Check if the terrain is 'Mountains' and adjust the wind speed based on altitude
+    if (terrain === "Mountains") {
+        const elevationFactor = Math.floor(altitude / 1000); // Divide altitude by 1000 and floor it to get increments of 1000 feet
+        return 5 * elevationFactor; // Return additional wind speed of +5 mph per 1000 feet
+    }
+    return 0; // No adjustment if not in the Mountains
 }
 
 function adjustTemperatureForWindChill() {
     // Implement wind chill calculation here, modify temperatures based on wind speed and current temperature
 }
-
-// #3
-/* function determinePrecipitationType(attempt = 1) {
-    const roll = Math.floor(Math.random() * 100) + 1;
-    console.log('%c%s%c: Rolled for precipitation type: %d', 'color: orange; font-weight: bold;', 'determinePrecipitationType', 'color: initial;', roll);
-
-    let exclusionReasons = [];
-
-    if (roll === 100) {
-        console.log("Rolled 100, special weather effects will be applied.");
-        applySpecialWeatherEffects();  // Handle special weather that might also affect wind speed
-        return GlobalWeatherConfig.specialWeatherType; // Assuming this sets a type in GlobalWeatherConfig
-    }
-
-    let matchedType = null;
-    for (const type of GlobalWeatherConfig.precipitationTable) {
-        if (roll >= type.rollMin && roll <= type.rollMax) {
-            if (type.notAllowedIn.includes(GlobalWeatherConfig.terrain)) {
-                const reason = `Excluding type ${type.type} due to terrain restrictions (${GlobalWeatherConfig.terrain}).`;
-                console.log(reason);
-                exclusionReasons.push(reason);
-                continue;
-            }
-            if ((type.tempMin !== null && GlobalWeatherConfig.dailyHighTemp < type.tempMin) ||
-                (type.tempMax !== null && GlobalWeatherConfig.dailyHighTemp > type.tempMax)) {
-                const reason = `Excluding type ${type.type} due to temperature constraints (current: ${GlobalWeatherConfig.dailyHighTemp}\u{B0}F, required: ${type.tempMin || "N/A"} - ${type.tempMax || "N/A"}\u{B0}F).`;
-                console.log(reason);
-                exclusionReasons.push(reason);
-                continue;
-            }
-            matchedType = type;
-            break;
-        }
-    }
-
-    if (matchedType) {
-        console.log(`Precipitation type determined: ${matchedType.type}`);
-        GlobalWeatherConfig.precipType = matchedType.type;
-        applyWeatherEffects(matchedType.type);  // Call to apply effects now that we have a matched type
-        return matchedType.type;
-    } else {
-        console.log("No precipitation type matches the conditions on attempt", attempt, ".");
-        if (attempt < 2) { // Allow only one re-roll to avoid infinite loops
-            console.log("Re-rolling for precipitation type due to exclusions.");
-            return determinePrecipitationType(attempt + 1);
-        } else {
-            console.log("Final attempt also did not find a valid precipitation type. No precipitation today.");
-            GlobalWeatherConfig.precipType = "None";
-            return null;
-        }
-    }
-} */
 
 // #4
 function determinePrecipitationType(attempt = 1) {
@@ -1228,7 +1212,7 @@ function determinePrecipitationType(attempt = 1) {
             }
             if ((type.tempMin !== null && GlobalWeatherConfig.dailyHighTemp < type.tempMin) ||
                 (type.tempMax !== null && GlobalWeatherConfig.dailyHighTemp > type.tempMax)) {
-                const reason = `Excluding type ${type.type} due to temperature constraints (current: ${GlobalWeatherConfig.dailyHighTemp}°F, required: ${type.tempMin || "N/A"} - ${type.tempMax || "N/A"}°F).`;
+                const reason = `Excluding type ${type.type} due to temperature constraints (current: ${GlobalWeatherConfig.dailyHighTemp}°F, required: ${type.tempMin || "null"} - ${type.tempMax || "null"} °F).`;
                 console.log(reason);
                 exclusionReasons.push(reason);
                 continue;
