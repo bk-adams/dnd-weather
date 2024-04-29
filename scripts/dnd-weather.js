@@ -1227,7 +1227,6 @@ function adjustWindSpeedForPrecipitationType(precipType) {
     }
 }
 
-
 // High Winds Table
 function getEffectsByWindSpeed(windSpeed) {
     for (let effect of windEffects) {
@@ -1259,61 +1258,7 @@ function determineSpecialWeather() {
     }
 }
 
-// #2
-/* function applyWeatherEffects(weatherType) {
-    //const weatherEffect = findWeatherEffect(weatherType);
-    const weatherEffect = weatherType.type; // set to name of weather type
-    if (!weatherEffect) {
-        console.log(`No specific weather effect found for ${weatherEffect}. Default effects will be applied.`);
-        GlobalWeatherConfig.windSpeed = Math.max(GlobalWeatherConfig.windSpeedInitial, 0);  // Ensures wind speed doesn't go negative
-        console.log(`Default effects applied. Preserving initial wind speed: ${GlobalWeatherConfig.windSpeed} mph`);
-        return;
-    }
-
-    //GlobalWeatherConfig.initialWeatherEvent = weatherEffect.name;
-    GlobalWeatherConfig.initialWeatherEvent = weatherEffect;
-    console.log(`GlobalWeatherConfig.initialWeatherEvent set to: ${weatherEffect}`);
-
-    // Adjust wind speed based on the weather effect from the standard weather table
-    // weatherEffect is the name of the weather type. need to cross reference the weather type on the standard weather table to find wind speed
-    if (weatherEffect.windSpeed) {
-        const adjustedWindSpeed = evalDice(weatherEffect.windSpeed);
-        GlobalWeatherConfig.windSpeed = Math.max(adjustedWindSpeed, 0);  // Prevents negative values
-        console.log(`Wind speed changed due to weather: ${weatherEffect.type}, ${GlobalWeatherConfig.windSpeed} mph`);
-
-        // Retrieve the wind speed adjustment from the terrain configuration
-        const terrainAdjustment = GlobalWeatherConfig.terrainEffects[GlobalWeatherConfig.terrain].windSpeedAdjustment || 0;
-        const totalAdjustment = adjustedWindSpeed + terrainAdjustment;
-        GlobalWeatherConfig.windSpeed = Math.max(totalAdjustment, 0);  // Ensures wind speed doesn't go negative after adjustment
-        console.log(`Total wind speed after terrain adjustment: ${GlobalWeatherConfig.windSpeed} mph`);
-    } else {
-        GlobalWeatherConfig.windSpeed = Math.max(GlobalWeatherConfig.windSpeedInitial, 0);  // Also prevents negative values here
-    }
-
-    // Determine the duration and its unit
-    const duration = evalDice(weatherEffect.duration);
-    const durationUnit = weatherEffect.durationUnit || "hours";
-
-    // Calculate total precipitation
-    let totalPrecipitation = 0;
-    if (durationUnit === "days") {
-        for (let day = 0; day < duration; day++) {
-            totalPrecipitation += evalDice(weatherEffect.precipDice);
-        }
-    } else {
-        totalPrecipitation = evalDice(weatherEffect.precipDice);
-    }
-
-    GlobalWeatherConfig.precipAmount = totalPrecipitation;
-    console.log(`Total Inches of Precipitation: ${totalPrecipitation} over ${duration} ${durationUnit}`);
-
-    GlobalWeatherConfig.initialWeatherEventDuration = `${duration} ${durationUnit}`;
-    console.log(`Effects: ${weatherEffect.name}, Duration: ${duration} ${durationUnit}`);
-}
- */
-// #3
 function applyWeatherEffects(weatherType) {
-    // Assuming weatherType is an object from the precipitationTable with properties like type, windSpeed, etc.
     const weatherTypeName = weatherType.type;
     console.log(`Applying weather effects for type: ${weatherTypeName}`);
 
@@ -1332,7 +1277,8 @@ function applyWeatherEffects(weatherType) {
     if (standardWeatherDetails && standardWeatherDetails.windSpeed) {
         const adjustedWindSpeed = evalDice(standardWeatherDetails.windSpeed);
         const terrainAdjustment = GlobalWeatherConfig.terrainEffects[GlobalWeatherConfig.terrain].windSpeedAdjustment || 0;
-        const totalAdjustment = adjustedWindSpeed + terrainAdjustment;
+        const altitudeAdjustment = calculateAltitudeAdjustment(GlobalWeatherConfig.altitude, GlobalWeatherConfig.terrain); // Apply altitude adjustment if in mountains
+        const totalAdjustment = adjustedWindSpeed + terrainAdjustment + altitudeAdjustment;
 
         GlobalWeatherConfig.windSpeed = Math.max(totalAdjustment, 0);
         console.log(`Wind speed changed due to weather: ${weatherTypeName}, new wind speed: ${GlobalWeatherConfig.windSpeed} mph`);
@@ -1359,7 +1305,6 @@ function applyWeatherEffects(weatherType) {
         console.log("Duration and precipitation details are missing for the current weather type.");
     }
 }
-
 
 function precipChanceOfContinuing(weatherEffect) {
     // More detailed logging to debug the issue
