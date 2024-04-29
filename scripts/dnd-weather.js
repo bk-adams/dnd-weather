@@ -1090,7 +1090,7 @@ function determineSkyConditions() {
 
     console.log(`Sky condition: ${GlobalWeatherConfig.skyCondition}`);
     GlobalWeatherConfig.initialWindSpeed = d20roll;
-    console.log(`setting initial wind speed to: ${d20roll}`);
+    console.log(`setting initial wind speed to: `,d20roll);
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // STEP 3: DETERMINE PRECIPITATION FUNCTIONS
@@ -1429,10 +1429,19 @@ async function displayWeatherConditions(currentWeatherEffect, onlyConsole = fals
         recordTempDisplay = `Record Temperature: ${GlobalWeatherConfig.recordTemperatureType} for ${GlobalWeatherConfig.tempRecordDuration} days<br>`;
     }
 
-    let rainbowDisplay = "No";
+  /*   let rainbowDisplay = "No";
     if (GlobalWeatherConfig.flags.rainbow && GlobalWeatherConfig.flags.rainbowType) {
         rainbowDisplay = GlobalWeatherConfig.flags.rainbowType;
+    } */
+    let rainbowDisplay = "No rainbow formed";
+    if (GlobalWeatherConfig.flags.rainbow) {
+        if (GlobalWeatherConfig.flags.rainbowType) {
+            rainbowDisplay = GlobalWeatherConfig.flags.rainbowType;  // Display the type of rainbow that formed
+        } else {
+            rainbowDisplay = "Conditions for a rainbow were met, but no specific type formed";  // Indicates that rainbow conditions were met, but no type was assigned
+        }
     }
+
 
     let prevailingWindDirection = setPrevailingWindDirection(season);
     //Local Wind Direction: ${GlobalWeatherConfig.windDirection}<br>
@@ -1462,7 +1471,6 @@ async function displayWeatherConditions(currentWeatherEffect, onlyConsole = fals
         Precipitation Amount: ${precipitationAmount}<br>
         Precipitation Duration: ${precipitationDuration}<br>
         Precipitation Continues ?: ${GlobalWeatherConfig.flags.precipContinues}<br>
-        Precipitation Continues Type: ${GlobalWeatherConfig.flags.continuingWeatherEvent}<br>
         Rainbow: ${rainbowDisplay}<br>
         Wind Speed: ${windLabel} (${windSpeed} mph)<br>
         Wind Direciton, Prevailing: ${GlobalWeatherConfig.prevailingWindDirection}<br>
@@ -1514,7 +1522,7 @@ async function generateWeather() {
 
 
     // Step 1: Determine Temperature Extremes and Adjustments
-    console.log(`%cSTEP 1: DETERMINE TEMPERATURES`, "font-weight: bold");
+    console.error(`%cSTEP 1: DETERMINE TEMPERATURES`, "font-weight: bold");
 	calculateInitialDailyTemperatures();
 	//applyTemperatureExtremes();
 	
