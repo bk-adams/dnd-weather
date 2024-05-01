@@ -1129,26 +1129,8 @@ function determineSkyConditions(month) {
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/* // STEP 3: DETERMINE PRECIPITATION FUNCTIONS
-function checkForPrecipitation() {
-    const monthData = GlobalWeatherConfig.baselineData[GlobalWeatherConfig.month];
-    const terrainEffect = GlobalWeatherConfig.terrainEffects[GlobalWeatherConfig.terrain];
-    const rollForPrecip = Math.floor(Math.random() * 100) + 1;
-    const precipChance = monthData.chanceOfPrecip + (terrainEffect.precipAdj || 0);
-
-    console.log("Precipitation roll: ", rollForPrecip, "vs. precip chance: ", precipChance);
-
-    if (rollForPrecip <= precipChance) {
-        return true;
-    } else {
-        GlobalWeatherConfig.precipType = "None";
-        console.log("No precipitation today. Using initial wind speed:", GlobalWeatherConfig.windSpeed);
-        return false;
-    }
-}
- */
-// new version
 // STEP 3: DETERMINE PRECIPITATION FUNCTIONS
+// new version
 function checkForPrecipitation(month, terrain) {
     const monthData = GlobalWeatherConfig.baselineData[month];
     const terrainEffect = GlobalWeatherConfig.terrainEffects[terrain];
@@ -1166,7 +1148,6 @@ function checkForPrecipitation(month, terrain) {
     }
 }
 
-
 // New function to reroll and adjust wind speed based on terrain
 function rerollAndAdjustWindSpeed() {
     const windSpeedRoll = evalDice("d20"); // Assume d20 is a placeholder for your wind speed dice roll
@@ -1176,8 +1157,7 @@ function rerollAndAdjustWindSpeed() {
 	console.log(`rerollAndAdjustWindSpeed(): Wind speed after reroll and adjustment: ${GlobalWeatherConfig.windSpeed} mph`);
 }
 
-
-function calculateWindSpeed() {
+/* function calculateWindSpeed() {
     // Roll for base wind speed (typically a d20 roll)
     const windBaseSpeed = Math.floor(Math.random() * 20) + 1;
     console.log(`Initial wind speed roll (d20), windBaseSpeed set to: ${windBaseSpeed} mph`);
@@ -1201,6 +1181,15 @@ function calculateWindSpeed() {
     const windSpeedAdjByTerrain = GlobalWeatherConfig.windSpeed;
     console.error(`calculateWindSpeed() is setting Total wind speed after adjustment: ${GlobalWeatherConfig.windSpeed} mph`);
     return windSpeedAdjByTerrain;
+} */
+// new version
+function calculateWindSpeed(terrainEffect) {
+    const baseWindSpeed = Math.floor(Math.random() * 20) + 1; // Roll d20 for base wind speed
+    const terrainAdjustment = terrainEffect.windSpeedAdjustment || 0;
+    console.log(`Base wind speed: ${baseWindSpeed} mph, Terrain adjustment: ${terrainAdjustment}`);
+    const adjustedWindSpeed = baseWindSpeed + terrainAdjustment; // Adjust wind speed for terrain
+    console.log(`Adjusted wind speed for terrain: ${adjustedWindSpeed} mph`);
+    return adjustedWindSpeed;
 }
 
 function calculateAltitudeAdjustment(altitude, terrain) {
@@ -1562,7 +1551,7 @@ async function displayWeatherConditions(weatherData, season, settings, onlyConso
         Humidity: ${humidity}<br>
         Record High Temperature: ${recordTempHigh}\u{B0}F<br>
         Record Low Temperature: ${recordTempLow}\u{B0}F<br>
-        Precipitation Type: ${precipitationType}<br>
+        Precipitation Type: ${precipitationType.type}<br>
         Precipitation Amount: ${precipitationAmount}<br>
         Precipitation Duration: ${precipitationDuration}<br>
         Precipitation Continues?: ${continues}<br>
@@ -1632,9 +1621,9 @@ async function generateWeather() {
         // Step 3a: Check for Precipitation
         console.error(`%cSTEP 3a: DETERMINE IF PRECIP OCCURS`, "font-weight: bold");
         weatherData.precipitationFlag = await checkForPrecipitation(settings.month, settings.terrain);
-        console.log("Precipitation check:", weatherData.precipitationFlag);
+        console.log("Precipitation flag set to: ", weatherData.precipitationFlag);
 
-        // Step 3b: Determine Precipitation Type
+        /* // Step 3b: Determine Precipitation Type
         console.error(`%cSTEP 3b: DETERMINE PRECIP TYPE`, "font-weight: bold");
         if (weatherData.precipitationFlag) {
             weatherData.precipitationType = await determinePrecipitationType(settings.terrain, weatherData.highTemp);
@@ -1650,7 +1639,7 @@ async function generateWeather() {
             console.log("Weather effects determined:", weatherData.precipitationAmount, weatherData.precipitationDuration, weatherData.windSpeed);
 
         } else {
-            // Step 3d: If no precipitation, calculate wind speed as per the rules
+            // Step 3d: If no precipitation, calculate wind speed as per the rules and adjust for terrain
             weatherData.precipitationType = "No precip today.";
             console.error(`%cSTEP 3d: No precip found, rolld d20-1 for wind speed and adjust for terrain`, "font-weight: bold");
             const baseWindSpeed = Math.floor(Math.random() * 20); // Roll d20 for base wind speed
@@ -1658,6 +1647,27 @@ async function generateWeather() {
             console.log("Wind speed terrain adjustment = ", terrainAdjustment);
             weatherData.windSpeed = baseWindSpeed + terrainAdjustment; // Adjust wind speed for terrain
             console.log("No precipitation today. Wind speed set to:", weatherData.windSpeed);
+        }
+ */
+        // Step 3b: Determine Precipitation Type
+        console.error(`%cSTEP 3b: DETERMINE PRECIP TYPE`, "font-weight: bold");
+        if (weatherData.precipitationFlag) {
+            weatherData.precipitationType = await determinePrecipitationType(settings.terrain, weatherData.highTemp);
+            console.log("Precipitation type determined:", weatherData.precipitationType);
+            
+            // Step 3C: Determine precip amount, duration, and wind speed
+            console.error(`%cSTEP 3C: DETERMINE PRECIP AMT, DURATION & WIND SPEED`, "font-weight: bold");
+            const weatherEffects = applyWeatherEffects(weatherData.precipitationType, GlobalWeatherConfig.standardWeatherTable, GlobalWeatherConfig.terrainEffects[settings.terrain]);
+            weatherData.precipitationAmount = weatherEffects.precipitationAmount;
+            weatherData.precipitationDuration = weatherEffects.precipitationDuration;
+            weatherData.windSpeed = weatherEffects.windSpeed;
+            console.log("Weather effects determined:", weatherData.precipitationAmount, weatherData.precipitationDuration, weatherData.windSpeed);
+        } else {
+            // Step 3d: If no precipitation, calculate wind speed as per the rules and adjust for terrain
+            weatherData.precipitationType = "No precip today.";
+            console.error(`%cSTEP 3d: No precip found, roll d20-1 for wind speed and adjust for terrain`, "font-weight: bold");
+            weatherData.windSpeed = calculateWindSpeed(GlobalWeatherConfig.terrainEffects[settings.terrain]);
+            console.log("No precipitation today. Adjusted wind speed set to:", weatherData.windSpeed);
         }
 
         // Step 4: Update Heat and Humidity Effects
@@ -1836,11 +1846,11 @@ function checkForRainbows(weatherEffect, precipitationTable) {
             console.log(`Rainbow formed: ${rainbowResult.rainbowType}`);
         } else {
             console.log("No rainbow formed.");
-            return rainbowResult.rainbowType = "No rainbow formed.";
+            return rainbowResult.rainbowType = "None formed.";
         }
     } else {
         console.log("This weather type does not support rainbow formation or rainbow details missing.");
-        return rainbowResult.rainbowType = "Rainbow formation not possible.";
+        return rainbowResult.rainbowType = "Formation not possible.";
     }
 
     return rainbowResult;
