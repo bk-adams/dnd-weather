@@ -1407,6 +1407,7 @@ async function displayWeatherConditions(weatherData, season, settings, onlyConso
         windEffects = 'None', specialWeatherEvent = 'None', notes = 'No additional notes'
     } = weatherData;
 
+
     const windLabel = getWindSpeedLabel(windSpeed);  // Assume this function correctly labels the wind speed
 
     let dateDisplay = "Date not set";
@@ -1426,10 +1427,10 @@ async function displayWeatherConditions(weatherData, season, settings, onlyConso
         Sunset: ${sunset}<br>
         High Temperature: ${highTemp}\u{B0}F<br>
         Low Temperature: ${lowTemp}\u{B0}F<br>
-        Wind Chill: ${windChill}<br>
+        Wind Chill: ${windChill !== 'N/A' ? windChill + '°F' : 'N/A'}<br>
         Humidity: ${humidity}<br>
-        Record High Temperature: ${recordTempHigh}\u{B0}F<br>
-        Record Low Temperature: ${recordTempLow}\u{B0}F<br>
+        Record High Temperature: ${recordTempHigh !== 'N/A' ? recordTempHigh + '°F' : 'N/A'}<br>
+        Record Low Temperature: ${recordTempLow !== 'N/A' ? recordTempLow + '°F' : 'N/A'}<br>
         Precipitation Type: ${precipitationType.type}<br>
         Precipitation Amount: ${precipitationAmount}<br>
         Precipitation Duration: ${precipitationDuration}<br>
@@ -1439,9 +1440,9 @@ async function displayWeatherConditions(weatherData, season, settings, onlyConso
         Wind Direction: ${windDirection}<br>
         Wind Effects: ${windEffects}<br>
         Special Weather Event: ${specialWeatherEvent}<br>
-        ${notes}
+        Notes: ${notes !== 'No additional notes' ? notes : 'N/A'}
     `;
-
+    
     console.log(message.replace(/<br>/g, "\n").replace(/<strong>|<\/strong>/g, "").replace(/\s+\n/g, "\n"));
     if (!onlyConsole && typeof ChatMessage === "function") {
         ChatMessage.create({ content: message, speaker: ChatMessage.getSpeaker({ alias: "Weather System" }) });
@@ -1762,7 +1763,7 @@ function setWindDirection() {
 }
 
 // new version
-function setPrevailingWindDirection(season, roll = Math.floor(Math.random() * 20) + 1) {
+/* function setPrevailingWindDirection(season, roll = Math.floor(Math.random() * 20) + 1) {
     console.log("season is: ", season);
     const windChart = {
         "Fall": [1, 2, 3, 5, 10, 17, 19, 20],
@@ -1776,6 +1777,69 @@ function setPrevailingWindDirection(season, roll = Math.floor(Math.random() * 20
     if (!windChart[season]) {
         console.error(`Season '${season}' is not valid. Defaulting to 'Fall'.`);
         season = "Fall";
+    }
+    
+    console.log(`Rolled a ${roll} for prevailing wind direction in ${season}.`);
+    
+    // Find the matching direction index
+    let directionIndex = windChart[season].findIndex(rangeEnd => roll <= rangeEnd);
+    directionIndex = directionIndex !== -1 ? directionIndex : directions.length - 1;
+
+    const prevailingDirection = directions[directionIndex];
+    console.log(`Prevailing wind direction for ${season}: ${prevailingDirection}`);
+
+    return prevailingDirection;  // Return the direction instead of setting it globally
+} */
+// #2
+/* function setPrevailingWindDirection(season, roll = Math.floor(Math.random() * 20) + 1) {
+    console.log("season is: ", season);
+    const windChart = {
+        "Winter": [1, 2, 3, 6, 15, 18, 19, 20],
+        "Spring": [2, 3, 4, 5, 7, 10, 17, 20],
+        "Low Summer": [2, 3, 4, 5, 7, 10, 17, 20],
+        "High Summer": [2, 3, 4, 5, 7, 10, 17, 20],
+        "Autumn": [1, 2, 3, 5, 10, 17, 19, 20]
+    };
+    const directions = ["South", "Southwest", "West", "Northwest", "North", "Northeast", "East", "Southeast"];
+
+    // Map "Low Summer" and "High Summer" to "Summer" for wind chart checks
+    let effectiveSeason = season.includes("Summer") ? "Summer" : season;
+    
+    if (!windChart[effectiveSeason]) {
+        console.error(`Season '${season}' is not valid. Defaulting to 'Autumn'.`);
+        effectiveSeason = "Autumn";
+    }
+    
+    console.log(`Rolled a ${roll} for prevailing wind direction in ${effectiveSeason}.`);
+    
+    // Find the matching direction index
+    let directionIndex = windChart[effectiveSeason].findIndex(rangeEnd => roll <= rangeEnd);
+    directionIndex = directionIndex !== -1 ? directionIndex : directions.length - 1;
+
+    const prevailingDirection = directions[directionIndex];
+    console.log(`Prevailing wind direction for ${season}: ${prevailingDirection}`);
+
+    return prevailingDirection;  // Return the direction instead of setting it globally
+} */
+// #3
+function setPrevailingWindDirection(season, roll = Math.floor(Math.random() * 20) + 1) {
+    console.log("season is: ", season);
+    const windChart = {
+        "Winter": [1, 2, 3, 6, 15, 18, 19, 20],
+        "Spring": [2, 3, 4, 5, 7, 10, 17, 20],
+        "Summer": [2, 3, 4, 5, 7, 10, 17, 20], // Mapped both Low Summer and High Summer to "Summer"
+        "Autumn": [1, 2, 3, 5, 10, 17, 19, 20]
+    };
+    const directions = ["South", "Southwest", "West", "Northwest", "North", "Northeast", "East", "Southeast"];
+
+    // Check and map specific summer types to a generic "Summer" for the wind chart
+    if (season === "Low Summer" || season === "High Summer") {
+        season = "Summer";
+    }
+
+    if (!windChart[season]) {
+        console.error(`Season '${season}' is not valid. Defaulting to 'Autumn'.`);
+        season = "Autumn";
     }
     
     console.log(`Rolled a ${roll} for prevailing wind direction in ${season}.`);
@@ -2332,7 +2396,6 @@ function compileWeatherNotes(weatherData) {
 
     return compiledNotes;
 }
-
 
 function determineSeason(month) {
     const seasons = {
