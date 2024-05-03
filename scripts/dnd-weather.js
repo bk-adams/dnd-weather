@@ -1153,6 +1153,7 @@ function calculateWindSpeed(weatherName, terrainName, altitude) {
     
         const totalWindSpeed = baseWindSpeed + terrainAdjustment;
         console.log(`Wind speed adjusted for 'none' in ${terrainName}: ${totalWindSpeed} mph`);
+        if (totalWindSpeed < 0) { (totalWindSpeed = 0); }
         return totalWindSpeed;
     }
     
@@ -1172,9 +1173,7 @@ function calculateWindSpeed(weatherName, terrainName, altitude) {
     let altitudeAdjustment = (terrainName === "Mountains" && terrainEffects.windSpeedAdjustment === "dynamic") ? Math.floor(altitude / 1000) * 5 : 0;
     let totalWindSpeed = baseWindSpeed + (terrainEffects.windSpeedAdjustment !== "dynamic" ? terrainEffects.windSpeedAdjustment || 0 : altitudeAdjustment);
     
-    if (totalWindSpeed < 0) {
-        (totalWindSpeed = 0);
-    }
+    if (totalWindSpeed < 0) { (totalWindSpeed = 0); }
 
     console.log(`Total wind speed: ${totalWindSpeed} mph`);
     return totalWindSpeed;
@@ -1359,7 +1358,7 @@ function formatFractions(text) {
 }
 
 async function displayWeatherConditions(weatherData, season, settings, onlyConsole = false) {
-    const { latitude, altitude, terrain } = settings;
+    const { latitude, altitude, terrain, month } = settings;
     // Using default objects for precipitationType and rainbow to safely access nested properties
     const {
         skyCondition = 'Not available', sunrise = 'Not available', sunset = 'Not available',
@@ -1382,6 +1381,7 @@ async function displayWeatherConditions(weatherData, season, settings, onlyConso
     let message = `
         <strong>Greyhawk Weather Report for ${dateDisplay}</strong><br>
         Season: ${season}<br>
+        Month: ${GlobalWeatherConfig.calendarLabels[month] || month}<br>
         Latitude: ${latitude}<br>
         Terrain: ${terrain}<br>
         Altitude: ${altitude} feet<br>
