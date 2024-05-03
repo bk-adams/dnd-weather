@@ -1414,13 +1414,13 @@ async function displayWeatherConditions(weatherData, season, settings, onlyConso
         Record High Temperature: ${recordTempHigh !== 'N/A' ? recordTempHigh + '°F' : 'N/A'}<br>
         Record Low Temperature: ${recordTempLow !== 'N/A' ? recordTempLow + '°F' : 'N/A'}<br>
         Precipitation Type: ${precipitationType.type}<br>
-        Precipitation Amount: ${precipitationAmount}<br>
-        Precipitation Duration: ${precipitationDuration}<br>
+        Precipitation Amount: ${precipitationAmount !== 'None' ? precipitationAmount : 'N/A'}<br>
+        Precipitation Duration: ${precipitationDuration !== 'None' ? precipitationDuration : 'N/A'}<br>
         Precipitation Continues?: ${continues}<br>
         Rainbow: ${rainbow.hasRainbow ? rainbow.rainbowType : 'None'}<br>
         Wind Speed: ${windLabel} (${windSpeed} mph)<br>
         Wind Direction: ${windDirection}<br>
-        Wind Effects: ${windEffects}<br>
+        Wind Effects: ${windEffects !== 'None' ? windEffects : 'N/A'}<br>
         Special Weather Event: ${specialWeatherEvent}<br>
         Notes: ${notes !== 'No additional notes' ? notes : 'N/A'}
     `;
