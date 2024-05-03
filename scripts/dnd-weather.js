@@ -671,19 +671,10 @@ windChillTable: {
 // event.ctrlKey
 
 document.addEventListener('keydown', function(event) {
-    // Shift+G for 'G'enerate weather
-    if (event.shiftKey && event.key === 'G') {
-        console.log("Shift+G was pressed");
-        //requestWeatherSettings();  // Call weather input function
-        generateWeather();
-    }
-
-/*     // Example: Alt+G
-    if (event.altKey && event.key === 'G') {
+    if (event.altKey && event.key === 'g') { // Ensure key detection is lowercase
         console.log("Alt+G was pressed");
-        anotherFunction();  // Another function to call
+        generateWeather();  // Call the generateWeather function
     }
- */
 });
 
 // Function to call when the weather button is clicked
