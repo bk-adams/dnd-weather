@@ -25,8 +25,8 @@ var GlobalWeatherConfig = {
     day: "",
     latitude: 32,	// City of Greyhawk is at 35 deg. latitude
 	latitudeTempAdj: 0,
-    terrain: "Mountains",
-    altitude: 6000,
+    terrain: "Forest",
+    altitude: 1000,
 	altitudeTempAdj: 0,
     baseDailyTemp: 0,
     dailyHighTemp: 0,
@@ -1130,7 +1130,7 @@ function determineSkyConditions(month) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // STEP 3: DETERMINE PRECIPITATION FUNCTIONS
 // new version
-function checkForPrecipitation(month, terrain) {
+/* function checkForPrecipitation(month, terrain) {
     const monthData = GlobalWeatherConfig.baselineData[month];
     const terrainEffect = GlobalWeatherConfig.terrainEffects[terrain];
     const rollForPrecip = Math.floor(Math.random() * 100) + 1;
@@ -1144,6 +1144,21 @@ function checkForPrecipitation(month, terrain) {
         GlobalWeatherConfig.precipType = "None";
         console.log("No precipitation today. Using initial wind speed:", GlobalWeatherConfig.windSpeed);
         return false;
+    }
+} */
+function checkForPrecipitation(month, terrain) {
+    const monthData = GlobalWeatherConfig.baselineData[month];
+    const terrainEffect = GlobalWeatherConfig.terrainEffects[terrain];
+    const rollForPrecip = Math.floor(Math.random() * 100) + 1;
+    const precipChance = monthData.chanceOfPrecip + (terrainEffect.precipAdj || 0);
+
+    console.log("Precipitation roll: ", rollForPrecip, "vs. precip chance: ", precipChance);
+
+    if (rollForPrecip <= precipChance) {
+        return { hasPrecipitation: true, type: "Determined by subsequent function" }; // type to be determined by another function
+    } else {
+        console.log("No precipitation today.");
+        return { hasPrecipitation: false, type: "none" };
     }
 }
 
@@ -1193,9 +1208,12 @@ function calculateWindSpeed(weatherName, terrainName, altitude) {
     // Adjust wind speed for terrain, particularly dynamic adjustments in mountainous regions
     let altitudeAdjustment = (terrainName === "Mountains" && terrainEffects.windSpeedAdjustment === "dynamic") ? Math.floor(altitude / 1000) * 5 : 0;
     let totalWindSpeed = baseWindSpeed + (terrainEffects.windSpeedAdjustment !== "dynamic" ? terrainEffects.windSpeedAdjustment || 0 : altitudeAdjustment);
+    
+    if (totalWindSpeed < 0) {
+        (totalWindSpeed = 0);
+    }
 
     console.log(`Total wind speed: ${totalWindSpeed} mph`);
-
     return totalWindSpeed;
 }
 
@@ -1486,13 +1504,22 @@ async function generateWeather() {
         weatherData.skyCondition = await determineSkyConditions(settings.month);
         console.log("Sky conditions determined:", weatherData.skyCondition);
 
-        // Step 3a: Check for Precipitation
+/*      // Step 3a: Check for Precipitation
         console.log(`%cSTEP 3a: DETERMINE IF PRECIP OCCURS`, "color: green; font-weight: bold");
         weatherData.precipitationFlag = await checkForPrecipitation(settings.month, settings.terrain);
+        console.log("Precipitation flag set to: ", weatherData.precipitationFlag); */
+
+        // Step 3a: Check for Precipitation
+        console.log(`%cSTEP 3a: DETERMINE IF PRECIP OCCURS`, "color: green; font-weight: bold");
+        const precipitationCheck = await checkForPrecipitation(settings.month, settings.terrain);
+        weatherData.precipitationFlag = precipitationCheck.hasPrecipitation;
+        weatherData.precipitationType = precipitationCheck.type; // Ensure this is handled correctly downstream
         console.log("Precipitation flag set to: ", weatherData.precipitationFlag);
+        console.log("Precipitation type determined as: ", weatherData.precipitationType);
 
         // Step 3b: Determine Precipitation Type if flag is true
-        if (weatherData.precipitationFlag) {console.log(`%cSTEP 3b: DETERMINE PRECIP TYPE`, "color: green; font-weight: bold");}
+        //if (weatherData.precipitationFlag) {console.log(`%cSTEP 3b: DETERMINE PRECIP TYPE`, "color: green; font-weight: bold");}
+        console.log(`%cSTEP 3b: Determine precip type or if no precip, skip to wind speed only`, "color: green; font-weight: bold");
         if (weatherData.precipitationFlag) {
             const precipTypeResult = determinePrecipitationType(settings.terrain, weatherData.highTemp);
             // it's possible due to terrain or temperature that the precip flag has to be changed from true to false, so check for that possiblity
@@ -1513,7 +1540,7 @@ async function generateWeather() {
             }
         } else {
             // Step 3d: If no precipitation, calculate wind speed as per the rules and adjust for terrain
-            console.log(`%cSTEP 3d: No precip found, calculating wind speed`, "color: green; font-weight: bold");
+            console.log(`%cSTEP 3d: No precip found, calculating wind speed`, "color: red; font-weight: bold");
 
             // Ensure there's a valid precipitation type or default to 'none'
             const weatherType = weatherData.precipitationType ? weatherData.precipitationType.type : "none";
@@ -1547,7 +1574,7 @@ async function generateWeather() {
             weatherData.rainbow = await checkForRainbows(weatherData.precipitationType.type);
         } else {
             console.log("No precipitation type set, skipping rainbow check.");
-            weatherData.rainbow = { hasRainbow: false, rainbowType: null };
+            weatherData.rainbow = { hasRainbow: false, rainbowType: "None" };
         }
         console.log("Rainbow check:", weatherData.rainbow);
 
@@ -1683,50 +1710,6 @@ function findClosestTemperature(temp, subTable) {
     return closestTemp;
 }
 
-// new version
-/* function checkForRainbows(weatherEffectType, precipitationTable) {
-    if (!weatherEffectType || !precipitationTable) {
-        console.log("Invalid input provided to checkForRainbows function.");
-        return { hasRainbow: false, rainbowType: null };
-    }
-
-    const precipitationDetails = precipitationTable.find(p => p.type === weatherEffectType);
-    console.log("Weather details for rainbow check:", precipitationDetails);
-
-    let rainbowResult = {
-        hasRainbow: false,
-        rainbowType: null
-    };
-
-    if (precipitationDetails && precipitationDetails.rainbowChance) {
-        const roll = Math.floor(Math.random() * 100) + 1; // Random roll between 1 and 100
-        console.log(`Rainbow chance roll: ${roll} vs required chance: ${precipitationDetails.rainbowChance}`);
-        if (roll < precipitationDetails.rainbowChance) {
-            const rainbowTypeRoll = Math.floor(Math.random() * 100) + 1; // Determining type of rainbow
-            if (rainbowTypeRoll <= 89) {
-                rainbowResult.rainbowType = "Single rainbow";
-            } else if (rainbowTypeRoll <= 95) {
-                rainbowResult.rainbowType = "Double rainbow (may be an omen)";
-            } else if (rainbowTypeRoll <= 98) {
-                rainbowResult.rainbowType = "Triple rainbow (almost certainly an omen)";
-            } else if (rainbowTypeRoll == 99) {
-                rainbowResult.rainbowType = "Bifrost bridge or clouds in the shape of rain deity";
-            } else {
-                rainbowResult.rainbowType = "Rain deity or servant in sky";
-            }
-            rainbowResult.hasRainbow = true;
-            console.log(`Rainbow formed: ${rainbowResult.rainbowType}`);
-        } else {
-            console.log("No rainbow formed.");
-            rainbowResult.rainbowType = "None formed";
-        }
-    } else {
-        console.log("This weather type does not support rainbow formation or rainbow details missing.");
-        rainbowResult.rainbowType = "Formation not possible";
-    }
-
-    return rainbowResult;
-} */
 function checkForRainbows(weatherType) {
     let x = weatherType;
     console.log("checkForRainbows() passed weatherType parameter = ", x);
@@ -1933,40 +1916,7 @@ function updateTerrainFlags(terrain) {
 
     console.log(`Terrain flags updated: onLand=${GlobalWeatherConfig.flags.onLand}, atSea=${GlobalWeatherConfig.flags.atSea}`);
 }
-// #1
-/* function updateHumidityAndEffects() {
-    let currentTemperature = GlobalWeatherConfig.dailyHighTemp; // Using high temp for the day.
-    let effectsDescription = "No significant heat and humidity effects."; // Default message
 
-    if (currentTemperature > 75) {
-        // Generate a realistic humidity value between 50% and 90%
-        //let humidity = 50 + Math.floor(Math.random() * 41); // 50 to 90%
-        // by the rules, roll d100 for humidity
-        let humidity = evalDice("d100"); // roll d100
-        console.log("rolling d100 for humidity percent = ", humidity);
-
-        let tempHumiditySum = currentTemperature + humidity;
-        console.log(`Current Temperature: ${currentTemperature}\u{B0}F, Humidity: ${humidity}%, Humidity Sum: ${tempHumiditySum}\u{B0}F`);
-
-        // Determine the effects based on the sum of temperature and humidity
-        if (tempHumiditySum >= 140 && tempHumiditySum <= 160) {
-            effectsDescription = "Move Normal, AC 0, To hit 0, Dexterity -1, Vision Normal, Rest per hour: 2 turns, Spell failure chance: 5%";
-        } else if (tempHumiditySum > 160 && tempHumiditySum <= 180) {
-            effectsDescription = "Move x3/4, AC 0, To hit -1, Dexterity -1, Vision x3/4, Rest per hour: 3 turns, Spell failure chance: 10%";
-        } else if (tempHumiditySum > 180 && tempHumiditySum <= 200) {
-            effectsDescription = "Move x1/2, AC -1, To hit -2, Dexterity -2, Vision x1/2, Rest per hour: 4 turns, Spell failure chance: 15%";
-        } else if (tempHumiditySum > 200) {
-            effectsDescription = "Move x1/4, AC -2, To hit -3, Dexterity -3, Vision x1/4, Rest per hour: 5 turns, Spell failure chance: 20%";
-        }
-    } else {
-        console.log("Temperature is not high enough for heat and humidity effects.");
-    }
-
-    // Store the effects description in the GlobalWeatherConfig for access elsewhere
-    GlobalWeatherConfig.humidityEffects = effectsDescription;
-    console.log(effectsDescription);
-    return effectsDescription; // Return the effects for potential immediate use
-} */
 function updateHumidityAndEffects(highTemp) {
     let effectsDescription = "No significant heat and humidity effects."; // Default message
     let humidity = 0; // Default humidity value
