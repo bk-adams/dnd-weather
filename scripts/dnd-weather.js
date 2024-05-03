@@ -636,7 +636,7 @@ precipitationTable: [
 terrainEffects: {
     "Rough terrain or Hills": { precipAdj: 0, temperatureAdjustment: { day: 0, night: 0 }, windSpeedAdjustment: [5, -5], specialWeather: "01-80: Windstorm, 81-00: Earthquake", notes: "" },
     "Forest": { precipAdj: 0, temperatureAdjustment: { day: -5, night: -5 }, windSpeedAdjustment: -5, specialWeather: "01-80: Quicksand, 81-00: Earthquake", notes: "" },
-    "Forest, Slyvan": {
+    "Forest, Sylvan": {
         precipAdj: -30,  // Lower than usual to reduce precipitation chances
         temperatureAdjustment: { day: 0, night: 0 },  // Neutral to avoid extremes
         windSpeedAdjustment: -5,  // Standard wind conditions
@@ -895,7 +895,7 @@ function calculateInitialDailyTemperatures(month, latitude, altitude, terrain) {
     // Calculate initial temperatures with terrain adjustment
     let dailyHigh = monthData.baseDailyTemp + evalDice(monthData.dailyHighAdj) + terrainAdjustment.day;
     let dailyLow = monthData.baseDailyTemp + evalDice(monthData.dailyLowAdj) + terrainAdjustment.night;
-    console.log(`Initial high w/daily adjustment: ${dailyHigh}\u{B0}F, initial low w/daily adjustment: ${dailyLow}\u{B0}F`, "color: blue");
+    console.log(`terrain: ${terrain} Initial high w/daily adj: ${dailyHigh}\u{B0}F, initial low w/daily adj: ${dailyLow}\u{B0}F`, "color: blue");
 
     // Apply latitude adjustment
     const latitudeAdjustment = (40 - latitude) * 2;
@@ -1125,23 +1125,7 @@ function determineSkyConditions(month) {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // STEP 3: DETERMINE PRECIPITATION FUNCTIONS
-// new version
-/* function checkForPrecipitation(month, terrain) {
-    const monthData = GlobalWeatherConfig.baselineData[month];
-    const terrainEffect = GlobalWeatherConfig.terrainEffects[terrain];
-    const rollForPrecip = Math.floor(Math.random() * 100) + 1;
-    const precipChance = monthData.chanceOfPrecip + (terrainEffect.precipAdj || 0);
 
-    console.log("Precipitation roll: ", rollForPrecip, "vs. precip chance: ", precipChance);
-
-    if (rollForPrecip <= precipChance) {
-        return true;
-    } else {
-        GlobalWeatherConfig.precipType = "None";
-        console.log("No precipitation today. Using initial wind speed:", GlobalWeatherConfig.windSpeed);
-        return false;
-    }
-} */
 function checkForPrecipitation(month, terrain) {
     const monthData = GlobalWeatherConfig.baselineData[month];
     const terrainEffect = GlobalWeatherConfig.terrainEffects[terrain];
@@ -1760,66 +1744,6 @@ function setWindDirection() {
     console.log(`Wind direction: ${GlobalWeatherConfig.windDirection}`);
 }
 
-// new version
-/* function setPrevailingWindDirection(season, roll = Math.floor(Math.random() * 20) + 1) {
-    console.log("season is: ", season);
-    const windChart = {
-        "Fall": [1, 2, 3, 5, 10, 17, 19, 20],
-        "Winter": [1, 2, 3, 6, 15, 18, 19, 20],
-        "Spring": [2, 3, 4, 5, 7, 10, 17, 20],
-        "Summer": [2, 3, 4, 5, 7, 10, 17, 20]
-    };
-    const directions = ["South", "Southwest", "West", "Northwest", "North", "Northeast", "East", "Southeast"];
-
-    // Validate season or default to Fall
-    if (!windChart[season]) {
-        console.error(`Season '${season}' is not valid. Defaulting to 'Fall'.`);
-        season = "Fall";
-    }
-    
-    console.log(`Rolled a ${roll} for prevailing wind direction in ${season}.`);
-    
-    // Find the matching direction index
-    let directionIndex = windChart[season].findIndex(rangeEnd => roll <= rangeEnd);
-    directionIndex = directionIndex !== -1 ? directionIndex : directions.length - 1;
-
-    const prevailingDirection = directions[directionIndex];
-    console.log(`Prevailing wind direction for ${season}: ${prevailingDirection}`);
-
-    return prevailingDirection;  // Return the direction instead of setting it globally
-} */
-// #2
-/* function setPrevailingWindDirection(season, roll = Math.floor(Math.random() * 20) + 1) {
-    console.log("season is: ", season);
-    const windChart = {
-        "Winter": [1, 2, 3, 6, 15, 18, 19, 20],
-        "Spring": [2, 3, 4, 5, 7, 10, 17, 20],
-        "Low Summer": [2, 3, 4, 5, 7, 10, 17, 20],
-        "High Summer": [2, 3, 4, 5, 7, 10, 17, 20],
-        "Autumn": [1, 2, 3, 5, 10, 17, 19, 20]
-    };
-    const directions = ["South", "Southwest", "West", "Northwest", "North", "Northeast", "East", "Southeast"];
-
-    // Map "Low Summer" and "High Summer" to "Summer" for wind chart checks
-    let effectiveSeason = season.includes("Summer") ? "Summer" : season;
-    
-    if (!windChart[effectiveSeason]) {
-        console.error(`Season '${season}' is not valid. Defaulting to 'Autumn'.`);
-        effectiveSeason = "Autumn";
-    }
-    
-    console.log(`Rolled a ${roll} for prevailing wind direction in ${effectiveSeason}.`);
-    
-    // Find the matching direction index
-    let directionIndex = windChart[effectiveSeason].findIndex(rangeEnd => roll <= rangeEnd);
-    directionIndex = directionIndex !== -1 ? directionIndex : directions.length - 1;
-
-    const prevailingDirection = directions[directionIndex];
-    console.log(`Prevailing wind direction for ${season}: ${prevailingDirection}`);
-
-    return prevailingDirection;  // Return the direction instead of setting it globally
-} */
-// #3
 function setPrevailingWindDirection(season, roll = Math.floor(Math.random() * 20) + 1) {
     console.log("season is: ", season);
     const windChart = {
@@ -2390,50 +2314,6 @@ function getPrecipitationDetails(weatherEffect) {
     };
 }
 
-/* function compileWeatherNotes(weatherTypeEntry) {
-    // Extract the type of weather from the precipitationTable entry
-    const weatherTypeName = weatherTypeEntry.type;
-
-    // Access tables from GlobalWeatherConfig
-    const standardWeatherTable = GlobalWeatherConfig.standardWeatherTable;
-    const specialWeatherTable = GlobalWeatherConfig.specialWeatherTable;
-
-    // Access current terrain effects based on the current terrain setting
-    const currentTerrain = GlobalWeatherConfig.terrain;
-    const terrainEffect = GlobalWeatherConfig.terrainEffects[currentTerrain];
-
-    // Filter the standard weather table for the given weather type
-    const standardWeatherNotes = standardWeatherTable
-        .filter(condition => condition.name && condition.name.includes(weatherTypeName))
-        .map(condition => condition.notes)
-        .filter(note => note)
-        .join("<br>");
-
-    // Filter the special weather table for the given weather type
-    const specialWeatherNotes = specialWeatherTable
-        .filter(effect => effect.phenomenon && effect.phenomenon.includes(weatherTypeName))
-        .map(effect => effect.notes)
-        .filter(note => note)
-        .join("<br>");
-
-    // Compile the terrain note
-    const terrainNote = terrainEffect && terrainEffect.notes ? terrainEffect.notes : "";
-
-    // Compile the notes into a single formatted string for HTML, only including sections with content
-    let compiledNotes = "";
-    if (standardWeatherNotes) {
-        compiledNotes += `<div><em><strong>Standard Weather Notes:</strong></em></div><div>${standardWeatherNotes}</div>`;
-    }
-    if (specialWeatherNotes) {
-        compiledNotes += `<div><br><em><strong>Special Weather Notes:</strong></em></div><div>${specialWeatherNotes}</div>`;
-    }
-    if (terrainNote) {
-        compiledNotes += `<div><br><em><strong>Terrain Notes:</strong></em></div><div>${terrainNote}</div>`;
-    }
-
-    return compiledNotes;
-} */
-// new version
 function compileWeatherNotes(weatherData) {
     const weatherTypeEntry = weatherData.precipitation;  // Assuming this holds the precipitation type details
     const weatherTypeName = weatherTypeEntry ? weatherTypeEntry.type : "";
