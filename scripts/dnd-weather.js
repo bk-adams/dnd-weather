@@ -1142,7 +1142,7 @@ function calculateWindSpeed(weatherName, terrainName, altitude) {
             terrainAdjustment = Math.floor(altitude / 1000) * 5;  // Increase wind speed by 5 mph for every 1000 feet of elevation
         }
     
-        const totalWindSpeed = baseWindSpeed + terrainAdjustment;
+        let totalWindSpeed = baseWindSpeed + terrainAdjustment;
         console.log(`Wind speed adjusted for 'none' in ${terrainName}: ${totalWindSpeed} mph`);
         if (totalWindSpeed < 0) { (totalWindSpeed = 0); }
         return totalWindSpeed;
