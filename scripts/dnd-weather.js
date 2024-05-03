@@ -1212,38 +1212,6 @@ function adjustTemperatureForWindChill() {
     // Implement wind chill calculation here, modify temperatures based on wind speed and current temperature
 }
 
-/* function determinePrecipitationType(terrain, currentHighTemp) {
-    const roll = Math.floor(Math.random() * 100) + 1;
-    console.log(`Rolled for precipitation type: ${roll}`);
-
-    let precipitationFlag = false;
-    let matchedType = null;
-
-    for (const type of GlobalWeatherConfig.precipitationTable) {
-        if (roll >= type.rollMin && roll <= type.rollMax) {
-            if (type.notAllowedIn.includes(terrain)) {
-                console.log(`Excluding type ${type.type} due to terrain restrictions (${terrain}).`);
-                continue;
-            }
-            if ((type.tempMin !== null && currentHighTemp < type.tempMin) ||
-                (type.tempMax !== null && currentHighTemp > type.tempMax)) {
-                console.log(`Excluding type ${type.type} due to temperature constraints (current: ${currentHighTemp}°F, required: ${type.tempMin || "null"} to ${type.tempMax || "null"}°F).`);
-                continue;
-            }
-            matchedType = type;
-            break;
-        }
-    }
-
-    if (matchedType) {
-        console.log(`Precipitation type determined: ${matchedType.type}`);
-        precipitationFlag = true;
-        return { precipitationFlag: true, type: matchedType };
-    } else {
-        console.log("No valid precipitation type found. No precipitation today.");
-        return { precipitationFlag: false, type: "none" };
-    }
-} */
 function determinePrecipitationType(terrain, currentHighTemp) {
     const roll = Math.floor(Math.random() * 100) + 1;
     console.log(`Rolled for precipitation type: ${roll}`);
@@ -1482,23 +1450,23 @@ async function generateWeather() {
             terrain: settings.terrain,
             latitude: settings.latitude,
             altitude: settings.altitude,
-            highTemp: null,
-            lowTemp: null,
-            skyCondition: null,
-            precipitationType: null,
-            precipitationAmount: null,
-            precipitationDuration: null,
+            highTemp: 0,
+            lowTemp: 0,
+            skyCondition: "Not available",
+            precipitationType: "None",
+            precipitationAmount: 0,
+            precipitationDuration: 0,
             precipitationFlag: false,
-            windSpeed: null,
-            windDirection: null,
-            sunrise: null,
-            sunset: null,
-            windChill: null,
-            humidity: null,
-            recordHigh: null,
-            recordLow: null,
-            rainbow: null,
-            notes: null
+            windSpeed: 0,
+            windDirection: "Not available",
+            sunrise: "Not available",
+            sunset: "Not available",
+            windChill: 0,
+            humidity: 0,
+            recordHigh: "N/A",
+            recordLow: "N/A",
+            rainbow: { hasRainbow: false, rainbowType: "None" },
+            notes: "No additional notes"
         };
 
         console.log("Settings received:", settings);
