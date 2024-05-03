@@ -636,6 +636,13 @@ precipitationTable: [
 terrainEffects: {
     "Rough terrain or Hills": { precipAdj: 0, temperatureAdjustment: { day: 0, night: 0 }, windSpeedAdjustment: [5, -5], specialWeather: "01-80: Windstorm, 81-00: Earthquake", notes: "" },
     "Forest": { precipAdj: 0, temperatureAdjustment: { day: -5, night: -5 }, windSpeedAdjustment: -5, specialWeather: "01-80: Quicksand, 81-00: Earthquake", notes: "" },
+    "Forest, Slyvan": {
+        precipAdj: -30,  // Lower than usual to reduce precipitation chances
+        temperatureAdjustment: { day: 0, night: 0 },  // Neutral to avoid extremes
+        windSpeedAdjustment: -5,  // Standard wind conditions
+        specialWeather: "",  // No special weather effects unless specifically desired
+        notes: "Influenced by Faerie, ensuring temperate conditions and minimal precipitation."
+    },
     "Jungle": { precipAdj: 10, temperatureAdjustment: { day: 5, night: 5 }, windSpeedAdjustment: -10, specialWeather: "01-05: Volcano, 06-60: Rain forest downpour, 61-80: Quicksand, 81-00: Earthquake", notes: "" },
     "Swamp or marsh": { precipAdj: 5, temperatureAdjustment: { day: 5, night: 5 }, windSpeedAdjustment: -5, specialWeather: "01-25: Quicksand, 26-80: Sun shower, 81-00: Earthquake", notes: "In Cold Marshes, temperature adjustment is -5" },
     "Dust": { precipAdj: -25, temperatureAdjustment: { day: 10, night: -10 }, windSpeedAdjustment: 0, specialWeather: "01-40: Flash flood, 41-70: Dust storm, 71-85: Tornado, 86-00: Earthquake", notes: "No fog, gale, or hurricane permitted." },
@@ -849,7 +856,7 @@ function updateWeatherDisplay() {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // STEP 1: DETERMINE TEMPERATURE FUNCTIONS
 
-function calculateInitialDailyTemperatures(month, latitude, altitude, terrain) {
+/* function calculateInitialDailyTemperatures(month, latitude, altitude, terrain) {
     const monthData = GlobalWeatherConfig.baselineData[month];
     console.log(`Base temperature for month ${month}: ${monthData.baseDailyTemp}\u{B0}F`, "color: green; font-weight: bold");
 
@@ -876,8 +883,43 @@ function calculateInitialDailyTemperatures(month, latitude, altitude, terrain) {
     console.log(`Final temperatures after all adjustments - High: ${dailyHigh}\u{B0}F, Low: ${dailyLow}\u{B0}F`, "color: orange; font-weight: bold");
 
     return { highTemp: dailyHigh, lowTemp: dailyLow };
-}
+} */
 
+function calculateInitialDailyTemperatures(month, latitude, altitude, terrain) {
+    const monthData = GlobalWeatherConfig.baselineData[month];
+    console.log(`Base temperature for month ${month}: ${monthData.baseDailyTemp}\u{B0}F`, "color: green; font-weight: bold");
+
+    // Calculate terrain adjustments
+    const terrainAdjustment = GlobalWeatherConfig.terrainEffects[terrain]?.temperatureAdjustment || {day: 0, night: 0};
+
+    // Calculate initial temperatures with terrain adjustment
+    let dailyHigh = monthData.baseDailyTemp + evalDice(monthData.dailyHighAdj) + terrainAdjustment.day;
+    let dailyLow = monthData.baseDailyTemp + evalDice(monthData.dailyLowAdj) + terrainAdjustment.night;
+    console.log(`Initial high w/daily adjustment: ${dailyHigh}\u{B0}F, initial low w/daily adjustment: ${dailyLow}\u{B0}F`, "color: blue");
+
+    // Apply latitude adjustment
+    const latitudeAdjustment = (40 - latitude) * 2;
+    console.log(`Applying latitude adjustment: ${latitudeAdjustment}\u{B0}F`, "color: purple; font-weight: bold");
+    dailyHigh += latitudeAdjustment;
+    dailyLow += latitudeAdjustment;
+
+    // Apply altitude adjustment
+    const altitudeAdjustment = -Math.floor(altitude / 1000) * 3;
+    console.log(`Applying altitude adjustment: ${altitudeAdjustment}\u{B0}F`, "color: green");
+    dailyHigh += altitudeAdjustment;
+    dailyLow += altitudeAdjustment;
+
+    // Special case for "Forest, Sylvan"
+    if (terrain === "Forest, Sylvan") {
+        dailyHigh = Math.min(dailyHigh, 75);
+        dailyLow = Math.max(dailyLow, 33);
+        console.log("Applying special Sylvan forest temperature limits.");
+    }
+
+    console.log(`Final temperatures after all adjustments - High: ${dailyHigh}\u{B0}F, Low: ${dailyLow}\u{B0}F`, "color: orange; font-weight: bold");
+
+    return { highTemp: dailyHigh, lowTemp: dailyLow };
+}
 
 /* function applyTemperatureExtremes() {
     const monthData = GlobalWeatherConfig.baselineData[GlobalWeatherConfig.month];
