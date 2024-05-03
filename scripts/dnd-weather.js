@@ -23,10 +23,10 @@ var GlobalWeatherConfig = {
     year: 568,
     month: "Coldeven",
     day: "",
-    latitude: 32,	// City of Greyhawk is at 35 deg. latitude
+    latitude: 30,	// City of Greyhawk is at 35 deg. latitude
 	latitudeTempAdj: 0,
-    terrain: "Mountains",
-    altitude: 6000,
+    terrain: "Forest, Sylvan",
+    altitude: 1000,
 	altitudeTempAdj: 0,
     baseDailyTemp: 0,
     dailyHighTemp: 0,
@@ -856,7 +856,7 @@ function updateWeatherDisplay() {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // STEP 1: DETERMINE TEMPERATURE FUNCTIONS
 
-/* function calculateInitialDailyTemperatures(month, latitude, altitude, terrain) {
+function calculateInitialDailyTemperatures(month, latitude, altitude, terrain, season) {
     const monthData = GlobalWeatherConfig.baselineData[month];
     console.log(`Base temperature for month ${month}: ${monthData.baseDailyTemp}\u{B0}F`, "color: green; font-weight: bold");
 
@@ -866,60 +866,43 @@ function updateWeatherDisplay() {
     // Calculate initial temperatures with terrain adjustment
     let dailyHigh = monthData.baseDailyTemp + evalDice(monthData.dailyHighAdj) + terrainAdjustment.day;
     let dailyLow = monthData.baseDailyTemp + evalDice(monthData.dailyLowAdj) + terrainAdjustment.night;
-    console.log(`Initial high w/daily adjustment: ${dailyHigh}\u{B0}F, initial low w/daily adjustment: ${dailyLow}\u{B0}F`, "color: blue");
 
     // Apply latitude adjustment
     const latitudeAdjustment = (40 - latitude) * 2;
-    console.log(`Applying latitude adjustment: ${latitudeAdjustment}\u{B0}F`, "color: purple; font-weight: bold");
     dailyHigh += latitudeAdjustment;
     dailyLow += latitudeAdjustment;
 
     // Apply altitude adjustment
     const altitudeAdjustment = -Math.floor(altitude / 1000) * 3;
-    console.log(`Applying altitude adjustment: ${altitudeAdjustment}\u{B0}F`, "color: green");
-    dailyHigh += altitudeAdjustment;
-    dailyLow += altitudeAdjustment;
-
-    console.log(`Final temperatures after all adjustments - High: ${dailyHigh}\u{B0}F, Low: ${dailyLow}\u{B0}F`, "color: orange; font-weight: bold");
-
-    return { highTemp: dailyHigh, lowTemp: dailyLow };
-} */
-
-function calculateInitialDailyTemperatures(month, latitude, altitude, terrain) {
-    const monthData = GlobalWeatherConfig.baselineData[month];
-    console.log(`Base temperature for month ${month}: ${monthData.baseDailyTemp}\u{B0}F`, "color: green; font-weight: bold");
-
-    // Calculate terrain adjustments
-    const terrainAdjustment = GlobalWeatherConfig.terrainEffects[terrain]?.temperatureAdjustment || {day: 0, night: 0};
-
-    // Calculate initial temperatures with terrain adjustment
-    let dailyHigh = monthData.baseDailyTemp + evalDice(monthData.dailyHighAdj) + terrainAdjustment.day;
-    let dailyLow = monthData.baseDailyTemp + evalDice(monthData.dailyLowAdj) + terrainAdjustment.night;
-    console.log(`terrain: ${terrain} Initial high w/daily adj: ${dailyHigh}\u{B0}F, initial low w/daily adj: ${dailyLow}\u{B0}F`, "color: blue");
-
-    // Apply latitude adjustment
-    const latitudeAdjustment = (40 - latitude) * 2;
-    console.log(`Applying latitude adjustment: ${latitudeAdjustment}\u{B0}F`, "color: purple; font-weight: bold");
-    dailyHigh += latitudeAdjustment;
-    dailyLow += latitudeAdjustment;
-
-    // Apply altitude adjustment
-    const altitudeAdjustment = -Math.floor(altitude / 1000) * 3;
-    console.log(`Applying altitude adjustment: ${altitudeAdjustment}\u{B0}F`, "color: green");
     dailyHigh += altitudeAdjustment;
     dailyLow += altitudeAdjustment;
 
     // Special case for "Forest, Sylvan"
     if (terrain === "Forest, Sylvan") {
-        dailyHigh = Math.min(dailyHigh, 75);
-        dailyLow = Math.max(dailyLow, 33);
-        console.log("Applying special Sylvan forest temperature limits.");
+        if (season === "Winter") {
+            dailyLow = Math.round(monthData.baseDailyTemp + 0.25 * evalDice(monthData.dailyLowAdj));
+        } else if (season === "Spring" || season === "Autumn") {
+            dailyHigh = Math.round(monthData.baseDailyTemp + 0.25 * evalDice(monthData.dailyHighAdj));
+            dailyLow = Math.round(monthData.baseDailyTemp + 0.5 * evalDice(monthData.dailyLowAdj));
+        } else if (season === "Summer" || season === "Low Summer" || season === "High Summer") {
+            dailyHigh = Math.round(monthData.baseDailyTemp + 0.5 * evalDice(monthData.dailyHighAdj));
+            dailyLow = Math.round(monthData.baseDailyTemp + 0.5 * evalDice(monthData.dailyLowAdj));
+        }
+
+        if (dailyHigh < dailyLow) { // Ensure the high is always higher than the low
+            let temp = dailyHigh;
+            dailyHigh = dailyLow;
+            dailyLow = temp;
+        }
+
+        console.log("Sylvan forest temperatures modified and rounded according to season.");
     }
 
     console.log(`Final temperatures after all adjustments - High: ${dailyHigh}\u{B0}F, Low: ${dailyLow}\u{B0}F`, "color: orange; font-weight: bold");
 
     return { highTemp: dailyHigh, lowTemp: dailyLow };
 }
+
 
 /* function applyTemperatureExtremes() {
     const monthData = GlobalWeatherConfig.baselineData[GlobalWeatherConfig.month];
@@ -1477,7 +1460,7 @@ async function generateWeather() {
 
         // Step 1: Determine Temperature Extremes and Adjustments
         console.log(`%cSTEP 1: DETERMINE TEMPERATURES`, "color: green; font-weight: bold");
-        const temperatures = await calculateInitialDailyTemperatures(settings.month, settings.latitude, settings.altitude, settings.terrain);
+        const temperatures = await calculateInitialDailyTemperatures(settings.month, settings.latitude, settings.altitude, settings.terrain, season);
         weatherData.highTemp = temperatures.highTemp;
         weatherData.lowTemp = temperatures.lowTemp;
         console.log("Temperatures determined:", weatherData.highTemp, weatherData.lowTemp);
