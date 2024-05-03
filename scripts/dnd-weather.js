@@ -1363,7 +1363,7 @@ async function displayWeatherConditions(weatherData, season, settings, onlyConso
     const {
         skyCondition = 'Not available', sunrise = 'Not available', sunset = 'Not available',
         highTemp = 'N/A', lowTemp = 'N/A', windChill = 'N/A', humidity = 'N/A',
-        humidityEffects = 'No significant heat and humidity effects', // Default value if not set
+        humidityEffects = 'No significant effects', // Default value if not set
         recordTempHigh = 'N/A', recordTempLow = 'N/A',
         precipitationType = { type: 'None' }, precipitationAmount = 'None', precipitationDuration = 'None',
         continues = 'No', rainbow = { hasRainbow: false, rainbowType: 'None' }, windSpeed = 0, windDirection = 'Not available',
@@ -2020,7 +2020,7 @@ function updateTerrainFlags(terrain) {
 }
 
 function updateHumidityAndEffects(highTemp) {
-    let effectsDescription = "No significant heat and humidity effects."; // Default message
+    let effectsDescription = "Nothing significant."; // Default message
     let humidity = 0; // Default humidity value
 
     if (highTemp > 75) {
