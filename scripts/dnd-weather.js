@@ -1363,6 +1363,7 @@ async function displayWeatherConditions(weatherData, season, settings, onlyConso
     const {
         skyCondition = 'Not available', sunrise = 'Not available', sunset = 'Not available',
         highTemp = 'N/A', lowTemp = 'N/A', windChill = 'N/A', humidity = 'N/A',
+        humidityEffects = 'No significant heat and humidity effects', // Default value if not set
         recordTempHigh = 'N/A', recordTempLow = 'N/A',
         precipitationType = { type: 'None' }, precipitationAmount = 'None', precipitationDuration = 'None',
         continues = 'No', rainbow = { hasRainbow: false, rainbowType: 'None' }, windSpeed = 0, windDirection = 'Not available',
@@ -1392,6 +1393,7 @@ async function displayWeatherConditions(weatherData, season, settings, onlyConso
         Low Temperature: ${lowTemp}\u{B0}F<br>
         Wind Chill: ${windChill !== 'N/A' ? windChill + '°F' : 'N/A'}<br>
         Humidity: ${humidity}<br>
+        Humidity Effects: ${humidityEffects}<br>  <!-- Added humidity effects -->
         Record High Temperature: ${recordTempHigh !== 'N/A' ? recordTempHigh + '°F' : 'N/A'}<br>
         Record Low Temperature: ${recordTempLow !== 'N/A' ? recordTempLow + '°F' : 'N/A'}<br>
         Precipitation Type: ${precipitationType.type}<br>
