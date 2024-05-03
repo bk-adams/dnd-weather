@@ -25,8 +25,8 @@ var GlobalWeatherConfig = {
     day: "",
     latitude: 32,	// City of Greyhawk is at 35 deg. latitude
 	latitudeTempAdj: 0,
-    terrain: "Forest",
-    altitude: 1000,
+    terrain: "Mountains",
+    altitude: 6000,
 	altitudeTempAdj: 0,
     baseDailyTemp: 0,
     dailyHighTemp: 0,
@@ -1505,11 +1505,6 @@ async function generateWeather() {
         weatherData.skyCondition = await determineSkyConditions(settings.month);
         console.log("Sky conditions determined:", weatherData.skyCondition);
 
-/*      // Step 3a: Check for Precipitation
-        console.log(`%cSTEP 3a: DETERMINE IF PRECIP OCCURS`, "color: green; font-weight: bold");
-        weatherData.precipitationFlag = await checkForPrecipitation(settings.month, settings.terrain);
-        console.log("Precipitation flag set to: ", weatherData.precipitationFlag); */
-
         // Step 3a: Check for Precipitation
         console.log(`%cSTEP 3a: DETERMINE IF PRECIP OCCURS`, "color: green; font-weight: bold");
         const precipitationCheck = await checkForPrecipitation(settings.month, settings.terrain);
@@ -1597,8 +1592,13 @@ async function generateWeather() {
         }
  */
         // Step 9: Compile notes
-        console.log(`%cSTEP 9: Compile notes`, "color: green; font-weight: bold");
-        weatherData.notes = compileWeatherNotes(weatherData.precipitationType.type, settings.terrain, weatherData.windSpeed);
+        console.log(`%cSTEP 9a: Compile weather notes`, "color: green; font-weight: bold");
+        weatherData.notes = compileWeatherNotes(weatherData.precipitationType.type, settings.terrain);
+
+        console.log(`%cSTEP 9b: Compile wind notes`, "color: green; font-weight: bold");
+        weatherData.windEffects = compileWindNotes(weatherData.windSpeed);
+
+        weatherData.windSpeed
         
         // Step 10: Display Weather Report
         console.log(`%cSTEP 10: COMPLETE WEATHER REPORT`, "color: green; font-weight: bold");
@@ -2421,7 +2421,7 @@ function determineSeason(month) {
     return seasons[month] || "Unknown";
 }
 
-function compileWeatherNotes(weatherType, terrain, windSpeed) {
+/* function compileWeatherNotes(weatherType, terrain, windSpeed) {
     let notes = [];
 
     // Check standard weather table for notes
@@ -2450,4 +2450,48 @@ function compileWeatherNotes(weatherType, terrain, windSpeed) {
 
     // Combine all notes into a single string
     return notes.join(". ") || "No specific notes for current conditions.";
+} */
+
+function compileWeatherNotes(weatherType, terrain) {
+    let notes = [];
+
+    // Check standard weather table for notes
+    const weatherNote = GlobalWeatherConfig.standardWeatherTable.find(item => item.name === weatherType)?.notes;
+    if (weatherNote) {
+        notes.push(weatherNote);
+    }
+
+    // Check special weather table for notes
+    const specialWeatherNote = GlobalWeatherConfig.specialWeatherTable.find(item => item.phenomenon === weatherType)?.notes;
+    if (specialWeatherNote) {
+        notes.push(specialWeatherNote);
+    }
+
+    // Check terrain effects table for notes
+    const terrainNote = GlobalWeatherConfig.terrainEffects[terrain]?.notes;
+    if (terrainNote) {
+        notes.push(terrainNote);
+    }
+
+    // Combine all notes into a single string
+    return notes.join(". ") || "No specific notes for current conditions.";
+}
+
+function compileWindNotes(windSpeed) {
+    // Locate the appropriate wind effects from the highWindsTable based on the wind speed
+    const windEffects = GlobalWeatherConfig.highWindsTable.find(
+        item => windSpeed >= item.minSpeed && windSpeed <= item.maxSpeed
+    );
+
+    // Extract the effects based on the environment (onLand, atSea, inAir, inBattle)
+    let notes = [];
+    if (windEffects) {
+        if (windEffects.effects.onLand) notes.push(`On Land: ${windEffects.effects.onLand}`);
+        if (windEffects.effects.atSea) notes.push(`At Sea: ${windEffects.effects.atSea}`);
+        if (windEffects.effects.inAir) notes.push(`In Air: ${windEffects.effects.inAir}`);
+        if (windEffects.effects.inBattle) notes.push(`In Battle: ${windEffects.effects.inBattle}`);
+    }
+
+    // Join all notes with a semicolon to separate them if multiple notes exist, or provide a default message
+    return notes.length > 0 ? notes.join("; ") : "No significant wind effects.";
 }
