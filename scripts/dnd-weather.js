@@ -857,44 +857,7 @@ function updateWeatherDisplay() {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // STEP 1: DETERMINE TEMPERATURE FUNCTIONS
-/* function calculateInitialDailyTemperatures() {
-    const monthData = GlobalWeatherConfig.baselineData[GlobalWeatherConfig.month];
-    console.log(`Base temperature for month ${GlobalWeatherConfig.month}: ${monthData.baseDailyTemp}\u{B0}F`, "color: green; font-weight: bold");
-	
-	// set global temp variable
-	GlobalWeatherConfig.baseDailyTemp = monthData.baseDailyTemp;
 
-    let dailyHigh = monthData.baseDailyTemp + evalDice(monthData.dailyHighAdj);
-    let dailyLow = monthData.baseDailyTemp + evalDice(monthData.dailyLowAdj);
-    console.log(`%cInitial high w/daily adjustment: ${dailyHigh}\u{B0}F, initial low w/daily adjustment: ${dailyLow}\u{B0}F`, "color: blue");
-
-    // Store initial temperatures
-    GlobalWeatherConfig.dailyHighTemp = dailyHigh;
-    GlobalWeatherConfig.dailyLowTemp = dailyLow;
-	
-	// Latitude adjustment
-    const latitudeAdjustment = (40 - GlobalWeatherConfig.latitude) * 2;
-    console.log(`pplying latitude adjustment: ${latitudeAdjustment}\u{B0}F`, "color: purple; font-weight: bold");
-    GlobalWeatherConfig.dailyHighTemp += latitudeAdjustment;
-    GlobalWeatherConfig.dailyLowTemp += latitudeAdjustment;
-    console.log(`%cTemperatures after latitude adjustment - High: ${GlobalWeatherConfig.dailyHighTemp}\u{B0}F, Low: ${GlobalWeatherConfig.dailyLowTemp}\u{B0}F`, "color: purple");
-	GlobalWeatherConfig.latitudeTempAdj = latitudeAdjustment;
-
-    // Altitude adjustment
-    const altitudeAdjustment = -Math.floor(GlobalWeatherConfig.altitude / 1000) * 3;
-    console.log(`pplying altitude adjustment: ${altitudeAdjustment}\u{B0}F`, "color: green");
-    GlobalWeatherConfig.dailyHighTemp += altitudeAdjustment;
-    GlobalWeatherConfig.dailyLowTemp += altitudeAdjustment;
-    console.log(`%cTemperatures after altitude adjustment - High: ${GlobalWeatherConfig.dailyHighTemp}\u{B0}F, Low: ${GlobalWeatherConfig.dailyLowTemp}\u{B0}F`, "color: green");
-
-    console.log(`inal temperatures after all adjustments - High: ${GlobalWeatherConfig.dailyHighTemp}\u{B0}F, Low: ${GlobalWeatherConfig.dailyLowTemp}\u{B0}F`, "color: orange; font-weight: bold");
-	
-	GlobalWeatherConfig.altitudeTempAdj = altitudeAdjustment;
-
-    // Apply extremes after calculating the initial values
-    //applyTemperatureExtremes();
-} */
-// new version
 function calculateInitialDailyTemperatures(month, latitude, altitude, terrain) {
     const monthData = GlobalWeatherConfig.baselineData[month];
     console.log(`Base temperature for month ${month}: ${monthData.baseDailyTemp}\u{B0}F`, "color: green; font-weight: bold");
@@ -1874,7 +1837,7 @@ function calculateLatitude(type, value) {
     return adjustedLatitude;
 }
 
-async function requestWeatherSettings() {
+/* async function requestWeatherSettings() {
     return new Promise((resolve, reject) => {
         const formHtml = `
             <form>
@@ -1927,6 +1890,75 @@ async function requestWeatherSettings() {
                             altitude: parseFloat(html.find('#altitude').val()) * 1000,
                             latitude: calculateLatitude(html.find('#latitudeType').val(), parseInt(html.find('#latitude').val().trim(), 10))
                         };
+                        resolve(settings);
+                    }
+                },
+                cancel: {
+                    label: "Cancel",
+                    callback: () => {
+                        console.log("Weather settings update canceled.");
+                        reject(new Error("Weather setting update was canceled by the user."));
+                    }
+                }
+            },
+            default: "submit"
+        });
+        dialog.render(true);
+    });
+} */
+async function requestWeatherSettings() {
+    return new Promise((resolve, reject) => {
+        const formHtml = `
+            <form>
+                <div>
+                    <label for="useSimpleCalendar">Generate Simple Calendar Note:</label>
+                    <input type="checkbox" id="useSimpleCalendar" name="useSimpleCalendar" ${GlobalWeatherConfig.useSimpleCalendar ? 'checked' : ''}>
+                </div>
+                <div>
+                    <label for="month">Month/Festival:</label>
+                    <select id="month" name="month">
+                        ${Object.keys(GlobalWeatherConfig.calendarLabels).map(month => `<option value="${month}" ${GlobalWeatherConfig.month === month ? 'selected' : ''}>${GlobalWeatherConfig.calendarLabels[month]}</option>`).join('')}
+                    </select>
+                </div>
+                <div>
+                    <label for="terrain">Terrain:</label>
+                    <select id="terrain" name="terrain">
+                        ${Object.keys(GlobalWeatherConfig.terrainEffects).map(terrain => `<option value="${terrain}" ${GlobalWeatherConfig.terrain === terrain ? 'selected' : ''}>${terrain}</option>`).join('')}
+                    </select>
+                </div>
+                <div>
+                    <label for="altitude">Altitude (in thousands of feet):</label>
+                    <input type="number" id="altitude" name="altitude" step="0.1" value="${GlobalWeatherConfig.altitude / 1000}" min="0" max="30">
+                </div>
+                <div>
+                    <label for="latitude">Latitude:</label>
+                    <input type="text" id="latitude" name="latitude" value="${GlobalWeatherConfig.latitude}">
+                </div>
+            </form>
+        `;
+
+        let dialog = new Dialog({
+            title: "Enter Weather Settings",
+            content: formHtml,
+            buttons: {
+                submit: {
+                    label: "Submit",
+                    callback: (html) => {
+                        const settings = {
+                            useSimpleCalendar: html.find('#useSimpleCalendar').is(':checked'),
+                            month: html.find('#month').val(),
+                            terrain: html.find('#terrain').val(),
+                            altitude: parseFloat(html.find('#altitude').val()) * 1000,
+                            latitude: html.find('#latitude').val().trim()
+                        };
+
+                        // Update GlobalWeatherConfig with the new settings
+                        GlobalWeatherConfig.useSimpleCalendar = settings.useSimpleCalendar;
+                        GlobalWeatherConfig.month = settings.month;
+                        GlobalWeatherConfig.terrain = settings.terrain;
+                        GlobalWeatherConfig.altitude = settings.altitude;
+                        GlobalWeatherConfig.latitude = settings.latitude;
+
                         resolve(settings);
                     }
                 },
@@ -2421,37 +2453,6 @@ function determineSeason(month) {
     return seasons[month] || "Unknown";
 }
 
-/* function compileWeatherNotes(weatherType, terrain, windSpeed) {
-    let notes = [];
-
-    // Check standard weather table for notes
-    const weatherNote = GlobalWeatherConfig.standardWeatherTable.find(item => item.name === weatherType)?.notes;
-    if (weatherNote) {
-        notes.push(weatherNote);
-    }
-
-    // Check special weather table for notes
-    const specialWeatherNote = GlobalWeatherConfig.specialWeatherTable.find(item => item.phenomenon === weatherType)?.notes;
-    if (specialWeatherNote) {
-        notes.push(specialWeatherNote);
-    }
-
-    // Check terrain effects table for notes
-    const terrainNote = GlobalWeatherConfig.terrainEffects[terrain]?.notes;
-    if (terrainNote) {
-        notes.push(terrainNote);
-    }
-
-    // Check high winds table for notes based on wind speed
-    const windNote = GlobalWeatherConfig.highWindsTable.find(item => windSpeed >= item.minSpeed && windSpeed <= item.maxSpeed)?.effects.onLand;
-    if (windNote) {
-        notes.push(windNote);
-    }
-
-    // Combine all notes into a single string
-    return notes.join(". ") || "No specific notes for current conditions.";
-} */
-
 function compileWeatherNotes(weatherType, terrain) {
     let notes = [];
 
@@ -2486,10 +2487,10 @@ function compileWindNotes(windSpeed) {
     // Extract the effects based on the environment (onLand, atSea, inAir, inBattle)
     let notes = [];
     if (windEffects) {
-        if (windEffects.effects.onLand) notes.push(`On Land: ${windEffects.effects.onLand}`);
-        if (windEffects.effects.atSea) notes.push(`At Sea: ${windEffects.effects.atSea}`);
-        if (windEffects.effects.inAir) notes.push(`In Air: ${windEffects.effects.inAir}`);
-        if (windEffects.effects.inBattle) notes.push(`In Battle: ${windEffects.effects.inBattle}`);
+        if (windEffects.effects.onLand) notes.push(`<br>On Land: ${windEffects.effects.onLand}`);
+        if (windEffects.effects.atSea) notes.push(`<br>At Sea: ${windEffects.effects.atSea}`);
+        if (windEffects.effects.inAir) notes.push(`<br>In Air: ${windEffects.effects.inAir}`);
+        if (windEffects.effects.inBattle) notes.push(`<br>In Battle: ${windEffects.effects.inBattle}`);
     }
 
     // Join all notes with a semicolon to separate them if multiple notes exist, or provide a default message
