@@ -1595,8 +1595,12 @@ async function generateWeather() {
             return; // Handle this error appropriately
         }
  */
-        // Step 9: Display Weather Report
-        console.log(`%cSTEP 9: COMPLETE WEATHER REPORT`, "color: green; font-weight: bold");
+        // Step 9: Compile notes
+        console.log(`%cSTEP 9: Compile notes`, "color: green; font-weight: bold");
+        weatherData.notes = compileWeatherNotes(weatherData.precipitationType.type, settings.terrain, weatherData.windSpeed);
+        
+        // Step 10: Display Weather Report
+        console.log(`%cSTEP 10: COMPLETE WEATHER REPORT`, "color: green; font-weight: bold");
         if (!weatherData.precipitationType || typeof weatherData.precipitationType !== 'object') {
             console.log("Precipitation type is not properly set, using default values.");
             weatherData.precipitationType = { type: 'None' }; // Ensure it's always an object
@@ -2352,4 +2356,35 @@ function determineSeason(month) {
     
     // Validate month and return the corresponding season, default to 'Unknown' if the month is not valid
     return seasons[month] || "Unknown";
+}
+
+function compileWeatherNotes(weatherType, terrain, windSpeed) {
+    let notes = [];
+
+    // Check standard weather table for notes
+    const weatherNote = GlobalWeatherConfig.standardWeatherTable.find(item => item.name === weatherType)?.notes;
+    if (weatherNote) {
+        notes.push(weatherNote);
+    }
+
+    // Check special weather table for notes
+    const specialWeatherNote = GlobalWeatherConfig.specialWeatherTable.find(item => item.phenomenon === weatherType)?.notes;
+    if (specialWeatherNote) {
+        notes.push(specialWeatherNote);
+    }
+
+    // Check terrain effects table for notes
+    const terrainNote = GlobalWeatherConfig.terrainEffects[terrain]?.notes;
+    if (terrainNote) {
+        notes.push(terrainNote);
+    }
+
+    // Check high winds table for notes based on wind speed
+    const windNote = GlobalWeatherConfig.highWindsTable.find(item => windSpeed >= item.minSpeed && windSpeed <= item.maxSpeed)?.effects.onLand;
+    if (windNote) {
+        notes.push(windNote);
+    }
+
+    // Combine all notes into a single string
+    return notes.join(". ") || "No specific notes for current conditions.";
 }
