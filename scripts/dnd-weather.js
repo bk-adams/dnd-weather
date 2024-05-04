@@ -1433,6 +1433,15 @@ async function displayWeatherConditions(weatherData, season, settings, onlyConso
         dateDisplay = `${currentDate.weekday}, ${currentDate.month} ${currentDate.day}, ${currentDate.year} CY`;
     }
 
+    // Correcting how the phases are defined to properly create a string
+    //let lunaPhase = `Phase of Luna on ${day} of ${month}: ${getMoonPhase("Luna", month, day)}`;
+    let lunaPhase = `${getMoonPhase("Luna", month, day)}`;
+    //let celenePhase = `Phase of Celene on ${day} of ${month}: ${getMoonPhase("Celene", month, day)}`;
+    let celenePhase = `${getMoonPhase("Celene", month, day)}`;
+
+    console.log(lunaPhase);
+    console.log(celenePhase);
+
     let message = `
         <strong>Greyhawk Weather Report for ${dateDisplay}</strong><br>
         Season: ${season}<br>
@@ -1443,6 +1452,8 @@ async function displayWeatherConditions(weatherData, season, settings, onlyConso
         Sky Condition: ${skyCondition.skyCondition}<br>
         Sunrise: ${sunrise}<br>
         Sunset: ${sunset}<br>
+        Phase of Luna: ${lunaPhase}<br>
+        Phase of Celene: ${celenePhase}<br>
         High Temperature: ${highTemp}\u{B0}F<br>
         Low Temperature: ${lowTemp}\u{B0}F<br>
         Wind Chill: ${windChill !== 'N/A' ? windChill + '°F' : 'N/A'}<br>
@@ -2452,4 +2463,97 @@ function compileWindNotes(windSpeed) {
 
     // Join all notes with a semicolon to separate them if multiple notes exist, or provide a default message
     return notes.length > 0 ? notes.join("; ") : "No significant wind effects.";
+}
+
+/* const moonPhases = {
+    Luna: {
+        "Needfest": ["New", "New", "New", "New"],
+        "Fireseek": ["1/4", "Full", "3/4", "New"],
+        "Readying": ["1/4", "Full", "3/4", "New"],
+        "Coldeven": ["1/4", "Full", "3/4", "New"],
+        "Growfest": ["1/4", "1/4", "1/4", "1/4"],
+        "Planting": ["Full", "3/4", "New", "1/4"],
+        "Flocktime": ["Full", "3/4", "New", "1/4"],
+        "Wealsun": ["Full", "3/4", "New", "1/4"],
+        "Richfest": ["Full", "Full", "Full", "Full"],
+        "Reaping": ["1/4", "Full", "3/4", "New"],
+        "Goodmonth": ["1/4", "Full", "3/4", "New"],
+        "Harvester": ["1/4", "Full", "3/4", "New"],
+        "Brewfest": ["3/4", "3/4", "3/4", "3/4"],
+        "Patchwall": ["1/4", "Full", "3/4", "New"],
+        "Ready'reat": ["1/4", "Full", "3/4", "New"],
+        "Sunsebb": ["1/4", "Full", "3/4", "New"]
+    },
+    Celene: {
+        "Needfest": ["Full", "Full", "Full", "Full"],
+        "Fireseek": ["3/4", "New", "1/4", "Full"],
+        "Readying": ["New", "1/4", "Full", "3/4"],
+        "Coldeven": ["1/4", "Full", "3/4", "New"],
+        "Growfest": ["Full", "Full", "Full", "Full"],
+        "Planting": ["Full", "3/4", "New", "1/4"],
+        "Flocktime": ["Full", "3/4", "New", "1/4"],
+        "Wealsun": ["Full", "3/4", "New", "1/4"],
+        "Richfest": ["Full", "3/4", "New", "1/4"],
+        "Reaping": ["3/4", "New", "1/4", "Full"],
+        "Goodmonth": ["New", "1/4", "Full", "3/4"],
+        "Harvester": ["1/4", "Full", "3/4", "New"],
+        "Brewfest": ["Full", "3/4", "New", "1/4"],
+        "Patchwall": ["3/4", "New", "1/4", "Full"],
+        "Ready'reat": ["New", "1/4", "Full", "3/4"],
+        "Sunsebb": ["1/4", "Full", "3/4", "New"]
+    }
+}; */
+
+/* function getMoonPhase(moon, month, day) {
+    const phases = moonPhases[moon][month];
+    const phaseIndex = Math.floor((day-1) / 7); // Assuming each phase lasts about a week
+    return phases[phaseIndex] || phases[phases.length - 1]; // Return last phase if day is beyond the range of defined phases
+} */
+
+const moonPhases = {
+    Luna: {
+        "Needfest": {4: "New"},
+        "Fireseek": {4: "1/4", 11: "Full", 18: "3/4", 25: "New"},
+        "Readying": {4: "1/4", 11: "Full", 18: "3/4", 25: "New"},
+        "Coldeven": {4: "1/4", 11: "Full", 18: "3/4", 25: "New"},
+        "Growfest": {4: "1/4"},
+        "Planting": {4: "Full", 11: "3/4", 18: "New", 25: "1/4"},
+        "Flocktime": {4: "Full", 11: "3/4", 18: "New", 25: "1/4"},
+        "Wealsun": {4: "Full", 11: "3/4", 18: "New", 25: "1/4"},
+        "Richfest": {4: "Full"},
+        "Reaping": {4: "3/4", 11: "New", 18: "1/4", 25: "Full"},
+        "Goodmonth": {4: "3/4", 11: "New", 18: "1/4", 25: "Full"},
+        "Harvester": {4: "3/4", 11: "New", 18: "1/4", 25: "Full"},
+        "Brewfest": {4: "3/4"},
+        "Patchwall": {4: "New", 11: "1/4", 18: "Full", 25: "3/4"},
+        "Ready'reat": {4: "New", 11: "1/4", 18: "Full", 25: "3/4"},
+        "Sunsebb": {4: "New", 11: "1/4", 18: "Full", 25: "3/4"},
+        // Add other months and special cases as needed
+    },
+    Celene: {
+        "Needfest": {4: "Full"},
+        "Fireseek": {19: "3/4"},
+        "Readying": {11: "New"},
+        "Coldeven": {4: "1/4"},
+        "Growfest": {4: "Full"},
+        "Planting": {4: "Full"},
+        "Flocktime": {4: "Full"},
+        "Wealsun": {4: "Full"},
+        "Richfest": {4: "Full"},
+        "Reaping": {19: "3/4"},
+        "Goodmonth": {11: "New"},
+        "Harvester": {4: "1/4"},
+        "Brewfest": {4: "Full"},
+        "Patchwall": {19: "3/4"},
+        "Ready'reat": {11: "New"},
+        "Sunsebb": {4: "1/4"},
+        // Add other months and special cases as needed
+    }
+};
+
+function getMoonPhase(moon, month, day) {
+    const monthData = moonPhases[moon][month];
+    const days = Object.keys(monthData).map(Number).sort((a, b) => a - b);
+    const phaseDay = days.find(d => day <= d) || days[0];
+    return monthData[phaseDay];
 }
