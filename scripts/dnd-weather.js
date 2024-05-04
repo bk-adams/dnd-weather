@@ -1782,8 +1782,6 @@ function calculateLatitude(type, value) {
     return adjustedLatitude;
 }
 
-// ${Object.keys(monthDays).map(month => `<option value="${month}" ${month === GlobalWeatherConfig.month ? 'selected' : ''}>${month}</option>`).join('')}
-
 async function requestWeatherSettings() {
     return new Promise((resolve, reject) => {
         // Define monthDays and weekDays within the function scope
@@ -1804,7 +1802,7 @@ async function requestWeatherSettings() {
                 <div>
                     <label for="year">Year:</label>
                     <select id="year" name="year">
-                        ${Array.from(new Array(10), (_, i) => GlobalWeatherConfig.year - 5 + i).map(year => `<option value="${year}" ${year === GlobalWeatherConfig.year ? 'selected' : ''}>${year}</option>`).join('')}
+                        ${Array.from(new Array(30), (_, i) => GlobalWeatherConfig.year - 5 + i).map(year => `<option value="${year}" ${year === GlobalWeatherConfig.year ? 'selected' : ''}>${year}</option>`).join('')}
                     </select>
                 </div>
                 <div>
@@ -1831,7 +1829,15 @@ async function requestWeatherSettings() {
                     <input type="number" id="altitude" name="altitude" step="0.1" value="${GlobalWeatherConfig.altitude / 1000}" min="0" max="30">
                 </div>
                 <div>
-                    <label for="latitude">Latitude:</label>
+                    <label for="latitudeType">Latitude Input Type:</label>
+                    <select id="latitudeType" name="latitudeType">
+                        <option value="latitude" selected>Direct Latitude</option>
+                        <option value="milesNorth">Miles North of Greyhawk</option>
+                        <option value="milesSouth">Miles South of Greyhawk</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="latitude">Latitude or Distance:</label>
                     <input type="text" id="latitude" name="latitude" value="${GlobalWeatherConfig.latitude}">
                 </div>
             </form>
@@ -1851,6 +1857,19 @@ async function requestWeatherSettings() {
                     const dayOfWeekLabel = document.getElementById('dayOfWeek');
                     dayOfWeekLabel.textContent = weekDays[(select.value - 1) % 7];
                 }
+                function calculateLatitude(type, distance) {
+                    const baseLatitude = 35; // Greyhawk city is at 35 degrees latitude
+                    const milesPerDegree = 70; // Approximate number of miles per degree of latitude
+                    let calculatedLatitude;
+                    if (type === "milesNorth") {
+                        calculatedLatitude = baseLatitude + (distance / milesPerDegree);
+                    } else if (type === "milesSouth") {
+                        calculatedLatitude = baseLatitude - (distance / milesPerDegree);
+                    } else {
+                        calculatedLatitude = parseFloat(distance); // Assume direct latitude input
+                    }
+                    return Math.round(calculatedLatitude); // Round the latitude to the nearest whole number
+                }
             </script>
         `;
 
@@ -1868,8 +1887,16 @@ async function requestWeatherSettings() {
                             day: parseInt(html.find('#day').val(), 10),
                             terrain: html.find('#terrain').val(),
                             altitude: parseFloat(html.find('#altitude').val()) * 1000,
-                            latitude: html.find('#latitude').val().trim()
+                            latitudeType: html.find('#latitudeType').val(),
+                            latitudeInput: html.find('#latitude').val().trim()
                         };
+
+                        // Calculate adjusted latitude if needed
+                        if (settings.latitudeType !== 'latitude' && settings.latitudeInput && !isNaN(settings.latitudeInput)) {
+                            settings.latitude = calculateLatitude(settings.latitudeType, parseFloat(settings.latitudeInput));
+                        } else {
+                            settings.latitude = parseFloat(settings.latitudeInput); // Direct latitude input
+                        }
 
                         // Update GlobalWeatherConfig with the new settings
                         GlobalWeatherConfig.useSimpleCalendar = settings.useSimpleCalendar;
@@ -1879,7 +1906,7 @@ async function requestWeatherSettings() {
                         GlobalWeatherConfig.terrain = settings.terrain;
                         GlobalWeatherConfig.altitude = settings.altitude;
                         GlobalWeatherConfig.latitude = settings.latitude;
-
+                        
                         resolve(settings);
                     }
                 },
@@ -1895,6 +1922,8 @@ async function requestWeatherSettings() {
         dialog.render(true);
     });
 }
+
+
 
 
 function updateGlobalWeatherConfig(month, terrain, altitude, latitude) {
