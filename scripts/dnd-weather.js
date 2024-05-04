@@ -1802,7 +1802,7 @@ async function requestWeatherSettings() {
                 <div>
                     <label for="year">Year:</label>
                     <select id="year" name="year">
-                        ${Array.from(new Array(30), (_, i) => GlobalWeatherConfig.year - 5 + i).map(year => `<option value="${year}" ${year === GlobalWeatherConfig.year ? 'selected' : ''}>${year}</option>`).join('')}
+                        ${Array.from(new Array(38), (_, i) => GlobalWeatherConfig.year - 5 + i).map(year => `<option value="${year}" ${year === GlobalWeatherConfig.year ? 'selected' : ''}>${year}</option>`).join('')}
                     </select>
                 </div>
                 <div>
