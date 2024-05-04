@@ -22,11 +22,11 @@ Hooks.once('ready', async function() {
 var GlobalWeatherConfig = {
     year: 568,
     month: "Coldeven",
-    day: "",
-    latitude: 30,	// City of Greyhawk is at 35 deg. latitude
+    day: "11",
+    latitude: 32,	// City of Greyhawk is at 35 deg. latitude
 	latitudeTempAdj: 0,
-    terrain: "Forest, Sylvan",
-    altitude: 1000,
+    terrain: "Mountains",
+    altitude: 6000,
 	altitudeTempAdj: 0,
     baseDailyTemp: 0,
     dailyHighTemp: 0,
@@ -1358,7 +1358,7 @@ function formatFractions(text) {
 }
 
 async function displayWeatherConditions(weatherData, season, settings, onlyConsole = false) {
-    const { latitude, altitude, terrain, month } = settings;
+    const { latitude, altitude, terrain, month, year, day } = settings;
     // Using default objects for precipitationType and rainbow to safely access nested properties
     const {
         skyCondition = 'Not available', sunrise = 'Not available', sunset = 'Not available',
@@ -1373,7 +1373,8 @@ async function displayWeatherConditions(weatherData, season, settings, onlyConso
 
     const windLabel = getWindSpeedLabel(windSpeed);  // Assume this function correctly labels the wind speed
 
-    let dateDisplay = "Date not set";
+    //let dateDisplay = "Date not set";
+    const dateDisplay = `${month} ${day}, ${year}`;
     if (GlobalWeatherConfig.useSimpleCalendar && SimpleCalendar.api.currentDateTime) {
         const currentDate = SimpleCalendar.api.currentDateTime();
         dateDisplay = `${currentDate.weekday}, ${currentDate.month} ${currentDate.day}, ${currentDate.year} CY`;
@@ -1779,77 +1780,19 @@ function calculateLatitude(type, value) {
     return adjustedLatitude;
 }
 
-/* async function requestWeatherSettings() {
-    return new Promise((resolve, reject) => {
-        const formHtml = `
-            <form>
-                <div>
-                    <label for="useSimpleCalendar">Generate Simple Calendar Note:</label>
-                    <input type="checkbox" id="useSimpleCalendar" name="useSimpleCalendar" ${GlobalWeatherConfig.useSimpleCalendar ? 'checked' : ''}>
-                </div>
-                <div>
-                    <label for="month">Month/Festival:</label>
-                    <select id="month" name="month">
-                        ${Object.keys(GlobalWeatherConfig.calendarLabels).map(month => `<option value="${month}" ${GlobalWeatherConfig.month === month ? 'selected' : ''}>${GlobalWeatherConfig.calendarLabels[month]}</option>`).join('')}
-                    </select>
-                </div>
-                <div>
-                    <label for="terrain">Terrain:</label>
-                    <select id="terrain" name="terrain">
-                        ${Object.keys(GlobalWeatherConfig.terrainEffects).map(terrain => `<option value="${terrain}" ${GlobalWeatherConfig.terrain === terrain ? 'selected' : ''}>${terrain}</option>`).join('')}
-                    </select>
-                </div>
-                <div>
-                    <label for="altitude">Altitude (in thousands of feet):</label>
-                    <input type="number" id="altitude" name="altitude" step="0.1" value="${GlobalWeatherConfig.altitude / 1000}" min="0" max="30">
-                </div>
-                <div>
-                    <label for="latitudeType">Latitude Input Type:</label>
-                    <select id="latitudeType" name="latitudeType">
-                        <option value="latitude" selected>Choose Latitude</option>
-                        <option value="milesNorth">Miles North of the city of Greyhawk</option>
-                        <option value="milesSouth">Miles South of the city of Greyhawk</option>
-                    </select>
-                </div>
-                <div>
-                    <label for="latitude">Latitude or Distance:</label>
-                    <input type="text" id="latitude" name="latitude" value="${GlobalWeatherConfig.latitude}">
-                </div>
-            </form>
-        `;
+// ${Object.keys(monthDays).map(month => `<option value="${month}" ${month === GlobalWeatherConfig.month ? 'selected' : ''}>${month}</option>`).join('')}
 
-        let dialog = new Dialog({
-            title: "Enter Weather Settings",
-            content: formHtml,
-            buttons: {
-                submit: {
-                    label: "Submit",
-                    callback: (html) => {
-                        const settings = {
-                            useSimpleCalendar: html.find('#useSimpleCalendar').is(':checked'),
-                            month: html.find('#month').val(),
-                            terrain: html.find('#terrain').val(),
-                            altitude: parseFloat(html.find('#altitude').val()) * 1000,
-                            latitude: calculateLatitude(html.find('#latitudeType').val(), parseInt(html.find('#latitude').val().trim(), 10))
-                        };
-                        resolve(settings);
-                    }
-                },
-                cancel: {
-                    label: "Cancel",
-                    callback: () => {
-                        console.log("Weather settings update canceled.");
-                        reject(new Error("Weather setting update was canceled by the user."));
-                    }
-                }
-            },
-            default: "submit"
-        });
-        dialog.render(true);
-    });
-} */
 async function requestWeatherSettings() {
     return new Promise((resolve, reject) => {
+        // Define monthDays and weekDays within the function scope
+        const monthDays = {
+            "Needfest": 7, "Fireseek": 28, "Readying": 28, "Coldeven": 28, "Growfest": 7,
+            "Planting": 28, "Flocktime": 28, "Wealsun": 28, "Richfest": 7,
+            "Reaping": 28, "Goodmonth": 28, "Harvester": 28, "Brewfest": 7,
+            "Patchwall": 28, "Ready'reat": 28, "Sunsebb": 28
+        };
+        const weekDays = ["Starday", "Sunday", "Moonday", "Godsday", "Waterday", "Earthday", "Freeday"];
+
         const formHtml = `
             <form>
                 <div>
@@ -1857,15 +1800,28 @@ async function requestWeatherSettings() {
                     <input type="checkbox" id="useSimpleCalendar" name="useSimpleCalendar" ${GlobalWeatherConfig.useSimpleCalendar ? 'checked' : ''}>
                 </div>
                 <div>
+                    <label for="year">Year:</label>
+                    <select id="year" name="year">
+                        ${Array.from(new Array(10), (_, i) => GlobalWeatherConfig.year - 5 + i).map(year => `<option value="${year}" ${year === GlobalWeatherConfig.year ? 'selected' : ''}>${year}</option>`).join('')}
+                    </select>
+                </div>
+                <div>
                     <label for="month">Month/Festival:</label>
-                    <select id="month" name="month">
+                    <select id="month" name="month" onchange="updateDayOptions(this.value)">
                         ${Object.keys(GlobalWeatherConfig.calendarLabels).map(month => `<option value="${month}" ${GlobalWeatherConfig.month === month ? 'selected' : ''}>${GlobalWeatherConfig.calendarLabels[month]}</option>`).join('')}
                     </select>
                 </div>
                 <div>
+                    <label for="day">Day:</label>
+                    <select id="day" name="day" onchange="updateDayOfWeek(this)">
+                        ${Array.from({ length: monthDays[GlobalWeatherConfig.month] }, (_, i) => `<option value="${i+1}" ${i+1 === GlobalWeatherConfig.day ? 'selected' : ''}>${i+1}</option>`).join('')}
+                    </select>
+                    <span id="dayOfWeek">${weekDays[(GlobalWeatherConfig.day-1) % 7]}</span>
+                </div>
+                <div>
                     <label for="terrain">Terrain:</label>
                     <select id="terrain" name="terrain">
-                        ${Object.keys(GlobalWeatherConfig.terrainEffects).map(terrain => `<option value="${terrain}" ${GlobalWeatherConfig.terrain === terrain ? 'selected' : ''}>${terrain}</option>`).join('')}
+                        ${Object.keys(GlobalWeatherConfig.terrainEffects).map(terrain => `<option value="${terrain}" ${terrain === GlobalWeatherConfig.terrain ? 'selected' : ''}>${terrain}</option>`).join('')}
                     </select>
                 </div>
                 <div>
@@ -1877,6 +1833,23 @@ async function requestWeatherSettings() {
                     <input type="text" id="latitude" name="latitude" value="${GlobalWeatherConfig.latitude}">
                 </div>
             </form>
+            <script>
+                function updateDayOptions(selectedMonth) {
+                    const monthDays = ${JSON.stringify(monthDays)};
+                    const daysCount = monthDays[selectedMonth];
+                    const daySelect = document.getElementById('day');
+                    daySelect.innerHTML = '';
+                    for (let i = 1; i <= daysCount; i++) {
+                        daySelect.options[daySelect.options.length] = new Option(i, i);
+                    }
+                    updateDayOfWeek(daySelect);
+                }
+                function updateDayOfWeek(select) {
+                    const weekDays = ${JSON.stringify(weekDays)};
+                    const dayOfWeekLabel = document.getElementById('dayOfWeek');
+                    dayOfWeekLabel.textContent = weekDays[(select.value - 1) % 7];
+                }
+            </script>
         `;
 
         let dialog = new Dialog({
@@ -1888,7 +1861,9 @@ async function requestWeatherSettings() {
                     callback: (html) => {
                         const settings = {
                             useSimpleCalendar: html.find('#useSimpleCalendar').is(':checked'),
+                            year: parseInt(html.find('#year').val(), 10),
                             month: html.find('#month').val(),
+                            day: parseInt(html.find('#day').val(), 10),
                             terrain: html.find('#terrain').val(),
                             altitude: parseFloat(html.find('#altitude').val()) * 1000,
                             latitude: html.find('#latitude').val().trim()
@@ -1896,7 +1871,9 @@ async function requestWeatherSettings() {
 
                         // Update GlobalWeatherConfig with the new settings
                         GlobalWeatherConfig.useSimpleCalendar = settings.useSimpleCalendar;
+                        GlobalWeatherConfig.year = settings.year;
                         GlobalWeatherConfig.month = settings.month;
+                        GlobalWeatherConfig.day = settings.day;
                         GlobalWeatherConfig.terrain = settings.terrain;
                         GlobalWeatherConfig.altitude = settings.altitude;
                         GlobalWeatherConfig.latitude = settings.latitude;
@@ -1907,7 +1884,6 @@ async function requestWeatherSettings() {
                 cancel: {
                     label: "Cancel",
                     callback: () => {
-                        console.log("Weather settings update canceled.");
                         reject(new Error("Weather setting update was canceled by the user."));
                     }
                 }
@@ -1917,6 +1893,7 @@ async function requestWeatherSettings() {
         dialog.render(true);
     });
 }
+
 
 function updateGlobalWeatherConfig(month, terrain, altitude, latitude) {
     //GlobalWeatherConfig.year = year;
