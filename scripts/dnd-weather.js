@@ -1434,13 +1434,16 @@ async function displayWeatherConditions(weatherData, season, settings, onlyConso
     }
 
     // Correcting how the phases are defined to properly create a string
-    //let lunaPhase = `Phase of Luna on ${day} of ${month}: ${getMoonPhase("Luna", month, day)}`;
     let lunaPhase = `${getMoonPhase("Luna", month, day)}`;
-    //let celenePhase = `Phase of Celene on ${day} of ${month}: ${getMoonPhase("Celene", month, day)}`;
     let celenePhase = `${getMoonPhase("Celene", month, day)}`;
 
-    console.log(lunaPhase);
-    console.log(celenePhase);
+/*  let lunaDetails = getMoonPhase("Luna", month, day);
+    let lunaPhase = `Current: ${lunaDetails.currentPhase}, Previous: ${lunaDetails.previousPhase}, Next: ${lunaDetails.nextPhase}`;
+
+    // Get the moon phase details for Celene
+    let celeneDetails = getMoonPhase("Celene", month, day);
+    let celenePhase = `Current: ${celeneDetails.currentPhase}, Previous: ${celeneDetails.previousPhase}, Next: ${celeneDetails.nextPhase}`; */
+
 
     let message = `
         <strong>Greyhawk Weather Report for ${dateDisplay}</strong><br>
@@ -2506,9 +2509,69 @@ const moonPhases = {
     }
 };
 
-function getMoonPhase(moon, month, day) {
+/* function getMoonPhase(moon, month, day) {
     const monthData = moonPhases[moon][month];
     const days = Object.keys(monthData).map(Number).sort((a, b) => a - b);
     const phaseDay = days.find(d => day <= d) || days[0];
     return monthData[phaseDay];
+} */
+
+/* function getMoonPhase(moon, month, day) {
+    const monthData = moonPhases[moon][month];
+    const days = Object.keys(monthData).map(Number).sort((a, b) => a - b);
+
+    let currentPhase = null;
+    let previousPhaseDay = null;
+    let nextPhaseDay = null;
+
+    for (let i = 0; i < days.length; i++) {
+        if (day === days[i]) {
+            currentPhase = monthData[days[i]]; // Exact match on a phase day
+            previousPhaseDay = days[i - 1] || "Start of cycle";
+            nextPhaseDay = days[i + 1] || "End of cycle";
+            break;
+        } else if (day < days[i]) {
+            previousPhaseDay = days[i - 1] || "Start of cycle";
+            nextPhaseDay = days[i];
+            const previousPhase = monthData[previousPhaseDay] || "Previous month's last phase";
+            const nextPhase = monthData[nextPhaseDay];
+            currentPhase = `Transiting from ${previousPhase} to ${nextPhase}`;
+            break;
+        }
+    }
+
+    if (!nextPhaseDay) { // If day is beyond the last specified phase day
+        previousPhaseDay = days[days.length - 1];
+        nextPhaseDay = "End of cycle";
+        const lastPhase = monthData[previousPhaseDay];
+        currentPhase = `Transiting from ${lastPhase} to Next month's first phase`;
+    }
+
+    return {
+        currentPhase: currentPhase,
+        previousPhase: previousPhaseDay !== "Start of cycle" ? `${previousPhaseDay} (${monthData[previousPhaseDay]})` : previousPhaseDay,
+        nextPhase: nextPhaseDay !== "End of cycle" ? `${nextPhaseDay} (${monthData[nextPhaseDay]})` : nextPhaseDay,
+    };
 }
+
+// Example usage
+console.log(getMoonPhase("Luna", "Fireseek", 7));
+console.log(getMoonPhase("Luna", "Fireseek", 11));
+ */
+
+function getMoonPhase(moon, month, day) {
+    const monthData = moonPhases[moon][month];
+    const days = Object.keys(monthData).map(Number).sort((a, b) => a - b);
+    const phaseDay = days.find(d => day <= d);
+    
+    if (phaseDay === undefined) {
+        // If no phase day is found, it means the given day is beyond the last defined phase day
+        const lastPhaseDay = days[days.length - 1];
+        return monthData[lastPhaseDay] + "+"; // Indicate transition past the last known phase
+    } else if (day === phaseDay) {
+        return monthData[phaseDay]; // Exact match on a phase day
+    } else {
+        return monthData[phaseDay] + "+"; // Indicate transition towards this phase
+    }
+}
+
