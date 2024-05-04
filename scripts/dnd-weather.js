@@ -2465,51 +2465,6 @@ function compileWindNotes(windSpeed) {
     return notes.length > 0 ? notes.join("; ") : "No significant wind effects.";
 }
 
-/* const moonPhases = {
-    Luna: {
-        "Needfest": ["New", "New", "New", "New"],
-        "Fireseek": ["1/4", "Full", "3/4", "New"],
-        "Readying": ["1/4", "Full", "3/4", "New"],
-        "Coldeven": ["1/4", "Full", "3/4", "New"],
-        "Growfest": ["1/4", "1/4", "1/4", "1/4"],
-        "Planting": ["Full", "3/4", "New", "1/4"],
-        "Flocktime": ["Full", "3/4", "New", "1/4"],
-        "Wealsun": ["Full", "3/4", "New", "1/4"],
-        "Richfest": ["Full", "Full", "Full", "Full"],
-        "Reaping": ["1/4", "Full", "3/4", "New"],
-        "Goodmonth": ["1/4", "Full", "3/4", "New"],
-        "Harvester": ["1/4", "Full", "3/4", "New"],
-        "Brewfest": ["3/4", "3/4", "3/4", "3/4"],
-        "Patchwall": ["1/4", "Full", "3/4", "New"],
-        "Ready'reat": ["1/4", "Full", "3/4", "New"],
-        "Sunsebb": ["1/4", "Full", "3/4", "New"]
-    },
-    Celene: {
-        "Needfest": ["Full", "Full", "Full", "Full"],
-        "Fireseek": ["3/4", "New", "1/4", "Full"],
-        "Readying": ["New", "1/4", "Full", "3/4"],
-        "Coldeven": ["1/4", "Full", "3/4", "New"],
-        "Growfest": ["Full", "Full", "Full", "Full"],
-        "Planting": ["Full", "3/4", "New", "1/4"],
-        "Flocktime": ["Full", "3/4", "New", "1/4"],
-        "Wealsun": ["Full", "3/4", "New", "1/4"],
-        "Richfest": ["Full", "3/4", "New", "1/4"],
-        "Reaping": ["3/4", "New", "1/4", "Full"],
-        "Goodmonth": ["New", "1/4", "Full", "3/4"],
-        "Harvester": ["1/4", "Full", "3/4", "New"],
-        "Brewfest": ["Full", "3/4", "New", "1/4"],
-        "Patchwall": ["3/4", "New", "1/4", "Full"],
-        "Ready'reat": ["New", "1/4", "Full", "3/4"],
-        "Sunsebb": ["1/4", "Full", "3/4", "New"]
-    }
-}; */
-
-/* function getMoonPhase(moon, month, day) {
-    const phases = moonPhases[moon][month];
-    const phaseIndex = Math.floor((day-1) / 7); // Assuming each phase lasts about a week
-    return phases[phaseIndex] || phases[phases.length - 1]; // Return last phase if day is beyond the range of defined phases
-} */
-
 const moonPhases = {
     Luna: {
         "Needfest": {4: "New"},
