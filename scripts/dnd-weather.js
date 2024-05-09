@@ -1245,7 +1245,7 @@ function adjustTemperatureForWindChill() {
     // Implement wind chill calculation here, modify temperatures based on wind speed and current temperature
 }
 
-function determinePrecipitationType(terrain, currentHighTemp) {
+/* function determinePrecipitationType(terrain, currentHighTemp) {
     const roll = Math.floor(Math.random() * 100) + 1;
     console.log(`Rolled for precipitation type: ${roll}`);
 
@@ -1264,6 +1264,32 @@ function determinePrecipitationType(terrain, currentHighTemp) {
 
     console.log("No valid precipitation type found, setting type to 'none'.");
     return { precipitationFlag: false, type: "none" };  // Return "none" when no suitable type is found
+} */
+function determinePrecipitationType(terrain, currentHighTemp) {
+    let attempt = 0;
+    while (attempt < 2) {
+        const roll = Math.floor(Math.random() * 100) + 1;
+        console.log(`Attempt ${attempt + 1}: Rolled for precipitation type: ${roll}`);
+
+        for (const type of GlobalWeatherConfig.precipitationTable) {
+            if (roll >= type.rollMin && roll <= type.rollMax) {
+                if (type.notAllowedIn.includes(terrain) ||
+                    (type.tempMin !== null && currentHighTemp < type.tempMin) ||
+                    (type.tempMax !== null && currentHighTemp > type.tempMax)) {
+                    console.log(`Excluding type ${type.type} due to restrictions (terrain: ${terrain}, temp: ${currentHighTemp}°F).`);
+                    break; // Exit the for loop to allow for a second roll
+                }
+                console.log(`Precipitation type determined: ${type.type}`);
+                return { precipitationFlag: true, type: type };
+            }
+        }
+
+        attempt++;
+        if (attempt === 2) {
+            console.log("No valid precipitation type found after second attempt, setting type to 'none'.");
+            return { precipitationFlag: false, type: "none" };  // Return "none" when no suitable type is found
+        }
+    }
 }
 
 // High Winds Table
@@ -1545,7 +1571,7 @@ async function generateWeather() {
         weatherData.precipitationType = precipitationCheck.type; // Ensure this is handled correctly downstream
         console.log("Precipitation flag set to: ", weatherData.precipitationFlag);
         console.log("Precipitation type determined as: ", weatherData.precipitationType);
-
+/* 
         // Step 3b: Determine Precipitation Type if flag is true
         //if (weatherData.precipitationFlag) {console.log(`%cSTEP 3b: DETERMINE PRECIP TYPE`, "color: green; font-weight: bold");}
         console.log(`%cSTEP 3b: Determine precip type or if no precip, skip to wind speed only`, "color: green; font-weight: bold");
@@ -1580,6 +1606,67 @@ async function generateWeather() {
             console.log("No precipitation today. Adjusted wind speed set to:", weatherData.windSpeed);
         }
 
+ */        
+/*         // Step 3b: Determine Precipitation Type if flag is true
+        console.log(`%cSTEP 3b: Determine precip type or if no precip, skip to wind speed only`, "color: green; font-weight: bold");
+        if (weatherData.precipitationFlag) {
+            const precipTypeResult = determinePrecipitationType(settings.terrain, weatherData.highTemp);
+            if (precipTypeResult.precipitationFlag) {
+                weatherData.precipitationType = precipTypeResult.type;
+                console.log("Precipitation type determined and flag:", weatherData.precipitationType, weatherData.precipitationFlag);
+
+                // Step 3c: Determine precip amount, duration, and wind speed if precip is still true
+                console.log(`%cSTEP 3c: DETERMINE PRECIP AMT, DURATION & WIND SPEED`, "color: green; font-weight: bold");
+                console.log("About to call applyWeatherEffects() with:", weatherData.precipitationType.type);
+                const weatherEffects = applyWeatherEffects(weatherData.precipitationType.type, settings.terrain, settings.altitude);
+                weatherData.precipitationAmount = weatherEffects.precipitationAmount;
+                weatherData.precipitationDuration = weatherEffects.precipitationDuration;
+                console.log("Weather effects determined:", weatherData.precipitationAmount, weatherData.precipitationDuration);
+            } else {
+                console.log("Precipitation type is 'none', skipping related effects.");
+            }
+        }
+        // Calculate wind speed independently of precipitation
+
+        const weatherType = weatherData.precipitationType ? weatherData.precipitationType.type : "none";
+        console.log(`%cSTEP 3d: Calculating wind speed`, "color: red; font-weight: bold");
+        console.log("About to calculate wind speed with:", weatherType);
+        weatherData.windSpeed = calculateWindSpeed(weatherType, settings.terrain, settings.altitude);
+        
+        console.log("Wind speed set to:", weatherData.windSpeed); */
+
+        // Step 3b: Determine Precipitation Type if flag is true
+        console.log(`%cSTEP 3b: Determine precip type or if no precip, skip to wind speed only`, "color: green; font-weight: bold");
+        if (weatherData.precipitationFlag) {
+            const precipTypeResult = determinePrecipitationType(settings.terrain, weatherData.highTemp);
+            if (precipTypeResult.precipitationFlag) {
+                weatherData.precipitationType = precipTypeResult.type;
+                console.log("Precipitation type determined and flag:", weatherData.precipitationType, weatherData.precipitationFlag);
+
+                // Step 3c: Determine precip amount, duration, and wind speed if precip is still true
+                console.log(`%cSTEP 3c: DETERMINE PRECIP AMT, DURATION & WIND SPEED`, "color: green; font-weight: bold");
+                console.log("About to call applyWeatherEffects() with:", weatherData.precipitationType.type);
+                const weatherEffects = applyWeatherEffects(weatherData.precipitationType.type, settings.terrain, settings.altitude);
+                weatherData.precipitationAmount = weatherEffects.precipitationAmount;
+                weatherData.precipitationDuration = weatherEffects.precipitationDuration;
+                weatherData.windSpeed = weatherEffects.windSpeed; // Wind speed calculated here
+                console.log("Weather effects determined:", weatherData.precipitationAmount, weatherData.precipitationDuration, weatherData.windSpeed);
+            } else {
+                console.log("Precipitation type is 'none', skipping related effects.");
+                // Skip to calculating wind speed if no valid precipitation type was determined
+                console.log(`%cSTEP 3d: No valid precip found, calculating wind speed`, "color: red; font-weight: bold");
+                weatherData.windSpeed = calculateWindSpeed("none", settings.terrain, settings.altitude);
+                console.log("Wind speed set to:", weatherData.windSpeed);
+            }
+        } else {
+            // Directly calculate wind speed if no precipitation is anticipated
+            console.log(`%cSTEP 3d: No precip found, calculating wind speed`, "color: red; font-weight: bold");
+            const weatherType = "none";
+            console.log("About to calculate wind speed with:", weatherType);
+            weatherData.windSpeed = calculateWindSpeed(weatherType, settings.terrain, settings.altitude);
+            console.log("Wind speed set to:", weatherData.windSpeed);
+        }
+
         // Step 4: Update Heat and Humidity Effects
         console.log(`%cSTEP 4: CHECK FOR HUMIDITY`, "color: blue; font-weight: bold");
         if (weatherData.highTemp) {
@@ -1593,8 +1680,8 @@ async function generateWeather() {
 
         // Step 5: Wind Chill Calculation
         console.log(`%cSTEP 5: CALCULATE WIND CHILL`, "color: blue; font-weight: bold");
-        weatherData.windChill = await applyWindChill(weatherData.lowTemp, weatherData.windSpeed, GlobalWeatherConfig.windChillTable);
         console.log("Wind chill calculated:", weatherData.windChill);
+        weatherData.windChill = await applyWindChill(weatherData.lowTemp, weatherData.windSpeed, GlobalWeatherConfig.windChillTable);
 
         // Step 6: Rainbows Check
         console.log(`%cSTEP 6: RAINBOW CHECK`, "color: green; font-weight: bold");
