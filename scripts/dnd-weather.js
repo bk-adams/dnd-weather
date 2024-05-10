@@ -645,7 +645,8 @@ terrainEffects: {
         notes: "Influenced by Faerie, ensuring temperate conditions and minimal precipitation."
     },
     "Jungle": { precipAdj: 10, temperatureAdjustment: { day: 5, night: 5 }, windSpeedAdjustment: -10, specialWeather: "01-05: Volcano, 06-60: Rain forest downpour, 61-80: Quicksand, 81-00: Earthquake", notes: "" },
-    "Swamp or marsh": { precipAdj: 5, temperatureAdjustment: { day: 5, night: 5 }, windSpeedAdjustment: -5, specialWeather: "01-25: Quicksand, 26-80: Sun shower, 81-00: Earthquake", notes: "In Cold Marshes, temperature adjustment is -5" },
+    "Swamp or marsh": { precipAdj: 5, temperatureAdjustment: { day: 5, night: 5 }, windSpeedAdjustment: -5, specialWeather: "01-25: Quicksand, 26-80: Sun shower, 81-00: Earthquake", notes: "" },
+    "Swamp or marsh, cold": { precipAdj: 5, temperatureAdjustment: { day: -5, night: -5 }, windSpeedAdjustment: -5, specialWeather: "01-25: Quicksand, 26-80: Sun shower, 81-00: Earthquake", notes: "" },
     "Dust": { precipAdj: -25, temperatureAdjustment: { day: 10, night: -10 }, windSpeedAdjustment: 0, specialWeather: "01-40: Flash flood, 41-70: Dust storm, 71-85: Tornado, 86-00: Earthquake", notes: "No fog, gale, or hurricane permitted." },
     "Plains": { precipAdj: 0, temperatureAdjustment: { day: 0, night: 0 }, windSpeedAdjustment: 5, specialWeather: "01-50: Tornado, 51-00: Earthquake", notes: " No monsoon or tropical storm permitted" },
     "Desert": { precipAdj: -30, temperatureAdjustment: { day: 10, night: -10 }, windSpeedAdjustment: 5, specialWeather: "01-25: Flash flood, 26-50: Sandstorm, 51-65: Oasis, 66-85: Mirage oasis, 86-00: Earthquake", notes: "No fog, mist, " +
@@ -861,12 +862,13 @@ function updateWeatherDisplay() {
 
 function calculateInitialDailyTemperatures(month, latitude, altitude, terrain, season) {
     const monthData = GlobalWeatherConfig.baselineData[month];
-    console.log(`Base temperature for month ${month}: ${monthData.baseDailyTemp}\u{B0}F`, "color: green; font-weight: bold");
+    console.log(`%cBase temperature for month ${month}: ${monthData.baseDailyTemp}\u{B0}F`, "color: green; font-weight: normal");
 
     // Calculate terrain adjustments
     const terrainAdjustment = GlobalWeatherConfig.terrainEffects[terrain]?.temperatureAdjustment || {day: 0, night: 0};
 
     // Calculate initial temperatures with terrain adjustment
+    console.log(`terrain temp adjustments: ${terrainAdjustment.day}, ${terrainAdjustment.night}`);
     let dailyHigh = monthData.baseDailyTemp + evalDice(monthData.dailyHighAdj) + terrainAdjustment.day;
     let dailyLow = monthData.baseDailyTemp + evalDice(monthData.dailyLowAdj) + terrainAdjustment.night;
 
