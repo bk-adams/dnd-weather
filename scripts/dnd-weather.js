@@ -1461,11 +1461,11 @@ async function displayWeatherConditions(weatherData, season, settings, onlyConso
         Precipitation Amount: ${precipitationAmount !== 'None' ? precipitationAmount : 'N/A'}<br>
         Precipitation Duration: ${precipitationDuration !== 'None' ? precipitationDuration : 'N/A'}<br>
         Precipitation Continues?: ${continues}<br>
+        Special Weather Event: ${specialWeatherEvent}<br>
         Rainbow: ${rainbow.hasRainbow ? rainbow.rainbowType : 'None'}<br>
         Wind Speed: ${windLabel} (${windSpeed} mph)<br>
         Wind Direction: ${windDirection}<br>
         Wind Effects: ${windEffects}<br>
-        Special Weather Event: ${specialWeatherEvent}<br>
         Notes: ${notes !== 'No additional notes' ? notes : 'N/A'}
     `;
     
@@ -1617,7 +1617,7 @@ async function generateWeather() {
  */
         // Step 9: Compile notes
         console.log(`%cSTEP 9a: Compile weather notes`, "color: green; font-weight: bold");
-        weatherData.notes = compileWeatherNotes(weatherData.precipitationType.type, settings.terrain);
+        weatherData.notes = compileWeatherNotes(weatherData.precipitationType.type, settings.terrain, GlobalWeatherConfig.month, GlobalWeatherConfig.day);
 
         console.log(`%cSTEP 9b: Compile wind notes`, "color: green; font-weight: bold");
         weatherData.windEffects = compileWindNotes(weatherData.windSpeed);
@@ -2364,7 +2364,7 @@ function getPrecipitationDetails(weatherEffect) {
     };
 }
 
-function compileWeatherNotes(weatherData) {
+/* function compileWeatherNotes(weatherData) {
     const weatherTypeEntry = weatherData.precipitation;  // Assuming this holds the precipitation type details
     const weatherTypeName = weatherTypeEntry ? weatherTypeEntry.type : "";
 
@@ -2392,7 +2392,7 @@ function compileWeatherNotes(weatherData) {
     if (terrainNote) compiledNotes += `<div><br><em><strong>Terrain Notes:</strong></em></div><div>${terrainNote}</div>`;
 
     return compiledNotes;
-}
+} */
 
 function determineSeason(month) {
     const seasons = {
@@ -2419,40 +2419,6 @@ function determineSeason(month) {
 }
 
 /* function compileWeatherNotes(weatherType, terrain) {
-    let notes = [];
-
-    // Check standard weather table for notes including additional details
-    const weatherDetails = GlobalWeatherConfig.standardWeatherTable.find(item => item.name === weatherType);
-    if (weatherDetails) {
-        let detailsNotes = [
-            weatherDetails.notes,
-            `Movement: ${weatherDetails.movement}`,
-            `Normal Vision Range: ${weatherDetails.NormVisionRng}`,
-            `IR Vision Range: ${weatherDetails.IRvisionRng}`,
-            `Tracking: ${weatherDetails.tracking}`,
-            `Lost Chance: ${weatherDetails.lostChance}`
-        ].filter(detail => detail).join(". "); // Only add details that are present
-        notes.push(detailsNotes);
-    }
-
-    // Check special weather table for notes
-    const specialWeatherNote = GlobalWeatherConfig.specialWeatherTable.find(item => item.phenomenon === weatherType)?.notes;
-    if (specialWeatherNote) {
-        notes.push(specialWeatherNote);
-    }
-
-    // Check terrain effects table for notes
-    const terrainNote = GlobalWeatherConfig.terrainEffects[terrain]?.notes;
-    if (terrainNote) {
-        notes.push(terrainNote);
-    }
-
-    // Combine all notes into a single string
-    return notes.join(". ") || "No specific notes for current conditions.";
-}
- */
-
-function compileWeatherNotes(weatherType, terrain) {
     let notes = [];
 
     // Check standard weather table for extended details
@@ -2489,6 +2455,55 @@ function compileWeatherNotes(weatherType, terrain) {
     const terrainNote = GlobalWeatherConfig.terrainEffects[terrain]?.notes;
     if (terrainNote) {
         notes.push(terrainNote);
+    }
+
+    // Combine all notes into a single string
+    return notes.join(". ") || "No specific notes for current conditions.";
+}
+ */
+function compileWeatherNotes(weatherType, terrain, month, day) {
+    let notes = [];
+
+    // Check standard weather table for extended details
+    const weatherDetails = GlobalWeatherConfig.standardWeatherTable.find(item => item.name === weatherType);
+    if (weatherDetails) {
+        let detailsNotes = [
+            weatherDetails.notes,
+            `Movement: ${weatherDetails.movement}`,
+            `Normal Vision Range: ${weatherDetails.NormVisionRng}`,
+            `IR Vision Range: ${weatherDetails.IRvisionRng}`,
+            `Tracking: ${weatherDetails.tracking}`,
+            `Lost Chance: ${weatherDetails.lostChance}`
+        ].filter(detail => detail).join(". "); // Filter out empty details
+        notes.push(detailsNotes);
+    }
+
+    // Check special weather table for extended details
+    const specialWeatherDetails = GlobalWeatherConfig.specialWeatherTable.find(item => item.phenomenon === weatherType);
+    if (specialWeatherDetails) {
+        let specialNotes = [
+            specialWeatherDetails.notes,
+            `Precipitation: ${specialWeatherDetails.precipitation}`,
+            `Duration: ${specialWeatherDetails.duration}`,
+            `Effect on Vision: ${specialWeatherDetails.effectOnVision}`,
+            `Effect on IR Vision: ${specialWeatherDetails.effectOnIRVision}`,
+            `Tracking: ${specialWeatherDetails.effectOnTracking}`,
+            `Chance of Getting Lost: ${specialWeatherDetails.chanceOfGettingLost}`,
+            `Speed: ${specialWeatherDetails.speed}`
+        ].filter(detail => detail).join(". ");
+        notes.push(specialNotes);
+    }
+
+    // Check terrain effects table for notes
+    const terrainNote = GlobalWeatherConfig.terrainEffects[terrain]?.notes;
+    if (terrainNote) {
+        notes.push(terrainNote);
+    }
+
+    // Include lycanthrope activity based on moon phases
+    const lycanthropeActivity = evaluateLycanthropeActivity(month, day);
+    if (lycanthropeActivity) {
+        notes.push(`Lycanthrope Activity: ${lycanthropeActivity}`);
     }
 
     // Combine all notes into a single string
@@ -2571,3 +2586,36 @@ function getMoonPhase(moon, month, day) {
     }
 }
 
+function evaluateLycanthropeActivity(month, day) {
+    const lunaPhase = getMoonPhase('Luna', month, day);
+    const celenePhase = getMoonPhase('Celene', month, day);
+
+    const lycanthropeResponses = {
+        normal: 'Normal.',
+        heightened: 'Heightened.',
+        maximum: 'Maximum.'
+    };
+
+    // Check for Midsummer's Night which is a special case (you need to define the exact date)
+    if (month === 'Richfest' && day === 4) {
+        return lycanthropeResponses.maximum;
+    }
+
+    // Determine activity based on Luna's phases
+    if (lunaPhase.includes('Full')) {
+        // If both moons are full
+        if (celenePhase.includes('Full')) {
+            return lycanthropeResponses.maximum;
+        }
+        // 90% affected by Luna
+        return lycanthropeResponses.heightened;
+    }
+
+    // Additional 10% affected by Celene only
+    if (celenePhase.includes('Full')) {
+        return lycanthropeResponses.heightened;
+    }
+
+    // Normal activity for other phases
+    return lycanthropeResponses.normal;
+}
