@@ -1446,11 +1446,11 @@ async function displayWeatherConditions(weatherData, season, settings, onlyConso
         recordTempHigh = 'N/A', recordTempLow = 'N/A',
         precipitationType = { type: 'None' }, precipitationAmount = 'None', precipitationDuration = 'None',
         continues = 'No', rainbow = { hasRainbow: false, rainbowType: 'None' }, windSpeed = 0, windDirection = 'Not available',
-        windEffects = 'None', specialWeatherEvent = 'None', notes = 'No additional notes'
+        specialWeatherEvent = 'None', notes = 'No additional notes'
     } = weatherData;
 
-
     const windLabel = getWindSpeedLabel(windSpeed);  // Assume this function correctly labels the wind speed
+    const windEffects = compileWindNotes(windSpeed); // This function should return 'None' if there are no effects
 
     //let dateDisplay = "Date not set";
     const dateDisplay = `${month} ${day}, ${year}`;
@@ -1462,14 +1462,6 @@ async function displayWeatherConditions(weatherData, season, settings, onlyConso
     // Correcting how the phases are defined to properly create a string
     let lunaPhase = `${getMoonPhase("Luna", month, day)}`;
     let celenePhase = `${getMoonPhase("Celene", month, day)}`;
-
-/*  let lunaDetails = getMoonPhase("Luna", month, day);
-    let lunaPhase = `Current: ${lunaDetails.currentPhase}, Previous: ${lunaDetails.previousPhase}, Next: ${lunaDetails.nextPhase}`;
-
-    // Get the moon phase details for Celene
-    let celeneDetails = getMoonPhase("Celene", month, day);
-    let celenePhase = `Current: ${celeneDetails.currentPhase}, Previous: ${celeneDetails.previousPhase}, Next: ${celeneDetails.nextPhase}`; */
-
 
     let message = `
         <strong>Greyhawk Weather Report for ${dateDisplay}</strong><br>
@@ -1497,7 +1489,7 @@ async function displayWeatherConditions(weatherData, season, settings, onlyConso
         Rainbow: ${rainbow.hasRainbow ? rainbow.rainbowType : 'None'}<br>
         Wind Speed: ${windLabel} (${windSpeed} mph)<br>
         Wind Direction: ${windDirection}<br>
-        Wind Effects: ${windEffects !== 'None' ? windEffects : 'N/A'}<br>
+        Wind Effects: ${windEffects}<br>
         Special Weather Event: ${specialWeatherEvent}<br>
         Notes: ${notes !== 'No additional notes' ? notes : 'N/A'}
     `;
@@ -2597,14 +2589,14 @@ function compileWindNotes(windSpeed) {
     // Extract the effects based on the environment (onLand, atSea, inAir, inBattle)
     let notes = [];
     if (windEffects) {
-        if (windEffects.effects.onLand) notes.push(`<br>On Land: ${windEffects.effects.onLand}`);
-        if (windEffects.effects.atSea) notes.push(`<br>At Sea: ${windEffects.effects.atSea}`);
-        if (windEffects.effects.inAir) notes.push(`<br>In Air: ${windEffects.effects.inAir}`);
-        if (windEffects.effects.inBattle) notes.push(`<br>In Battle: ${windEffects.effects.inBattle}`);
+        if (windEffects.effects.onLand !== "No effect") notes.push(`<br>On Land: ${windEffects.effects.onLand}`);
+        if (windEffects.effects.atSea !== "No effect") notes.push(`At Sea: ${windEffects.effects.atSea}`);
+        if (windEffects.effects.inAir !== "No effect") notes.push(`In Air: ${windEffects.effects.inAir}`);
+        if (windEffects.effects.inBattle !== "No effect") notes.push(`In Battle: ${windEffects.effects.inBattle}`);
     }
 
-    // Join all notes with a semicolon to separate them if multiple notes exist, or provide a default message
-    return notes.length > 0 ? notes.join("; ") : "No significant wind effects.";
+    // Check if there are any significant effects to note
+    return notes.length > 0 ? notes.join("<br>") : "N/A";
 }
 
 const moonPhases = {
