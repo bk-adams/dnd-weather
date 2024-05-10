@@ -1137,60 +1137,6 @@ function rerollAndAdjustWindSpeed() {
 	console.log(`rerollAndAdjustWindSpeed(): Wind speed after reroll and adjustment: ${GlobalWeatherConfig.windSpeed} mph`);
 }
 
-/* function calculateWindSpeed(weatherName, terrainName, altitude) {
-    // Fetch terrain effects from global configuration using the terrain name
-    const terrainEffects = GlobalWeatherConfig.terrainEffects[terrainName] || GlobalWeatherConfig.terrainEffects['Plains'];
-
-    // Check if user prefers realistic wind speed adjustment for mountains
-    const isRealisticWind = GlobalWeatherConfig.useRealisticWind;
-
-    // Initialize variables for wind speed calculation
-    let baseWindSpeed, terrainAdjustment, totalWindSpeed;
-
-    if (!weatherName || weatherName.toLowerCase() === "none") {
-        console.log("No specific weather type provided or weather is 'none', defaulting to minimal wind speed adjustment.");
-        baseWindSpeed = evalDice("d20-1"); // Roll d20-1 for general wind speed
-        
-        // Handle terrain adjustment for wind speed
-        terrainAdjustment = terrainEffects.windSpeedAdjustment || 0;
-        if (Array.isArray(terrainAdjustment)) {
-            // Randomly select an adjustment from the array if multiple options exist
-            terrainAdjustment = terrainAdjustment[Math.floor(Math.random() * terrainAdjustment.length)];
-        } else if (terrainName === "Mountains" && terrainAdjustment === "dynamic") {
-            // Adjust wind speed for mountainous terrain dynamically based on altitude
-            terrainAdjustment = Math.floor(altitude / 1000) * (isRealisticWind ? 0.5 : 5); // Toggle between 0.5 mph and 5 mph per 1000 feet
-        }
-        
-        totalWindSpeed = baseWindSpeed + terrainAdjustment;
-        console.log(`Wind speed adjusted for 'none' in ${terrainName}: ${totalWindSpeed} mph`);
-        if (totalWindSpeed < 0) totalWindSpeed = 0; // Ensure wind speed does not drop below zero
-        return totalWindSpeed;
-    }
-    
-    // Processing wind speed calculations for specific weather types
-    const weatherDetails = GlobalWeatherConfig.standardWeatherTable.find(item => item.name === weatherName);
-    if (!weatherDetails) {
-        console.error("Weather details not found for:", weatherName);
-        return 0; // Return a default or error case wind speed
-    }
-
-    console.log(`Calculating wind speed for ${weatherName} in ${terrainName} at ${altitude} ft altitude.`);
-    baseWindSpeed = weatherDetails.windSpeed ? evalDice(weatherDetails.windSpeed) : evalDice("d20-1");
-
-    // Adjust wind speed for terrain and altitude
-    terrainAdjustment = (terrainName === "Mountains" && terrainEffects.windSpeedAdjustment === "dynamic") ?
-        Math.floor(altitude / 1000) * (isRealisticWind ? 0.5 : 5) : // Toggle between 0.5 mph and 5 mph per 1000 feet
-        (Array.isArray(terrainEffects.windSpeedAdjustment) ? 
-        terrainEffects.windSpeedAdjustment[Math.floor(Math.random() * terrainEffects.windSpeedAdjustment.length)] : 
-        terrainEffects.windSpeedAdjustment || 0);
-    
-    totalWindSpeed = baseWindSpeed + terrainAdjustment;
-    if (totalWindSpeed < 0) totalWindSpeed = 0; // Ensure wind speed does not drop below zero
-
-    console.log(`Total wind speed: ${totalWindSpeed} mph`);
-    return totalWindSpeed;
-}
- */
 function calculateWindSpeed(weatherName, terrainName, altitude) {
     // Fetch terrain effects from global configuration using the terrain name
     const terrainEffects = GlobalWeatherConfig.terrainEffects[terrainName] || GlobalWeatherConfig.terrainEffects['Plains'];
@@ -1220,6 +1166,7 @@ function calculateWindSpeed(weatherName, terrainName, altitude) {
         }
         
         totalWindSpeed = baseWindSpeed + terrainAdjustment;
+        totalWindSpeed = Math.floor(totalWindSpeed);  // Round down the final total wind speed
         console.log(`Wind speed adjusted for 'none' in ${terrainName}: ${totalWindSpeed} mph`);
         if (totalWindSpeed < 0) totalWindSpeed = 0; // Ensure wind speed does not drop below zero
         return totalWindSpeed;
@@ -1587,69 +1534,6 @@ async function generateWeather() {
         weatherData.precipitationType = precipitationCheck.type; // Ensure this is handled correctly downstream
         console.log("Precipitation flag set to: ", weatherData.precipitationFlag);
         console.log("Precipitation type determined as: ", weatherData.precipitationType);
-/* 
-        // Step 3b: Determine Precipitation Type if flag is true
-        //if (weatherData.precipitationFlag) {console.log(`%cSTEP 3b: DETERMINE PRECIP TYPE`, "color: green; font-weight: bold");}
-        console.log(`%cSTEP 3b: Determine precip type or if no precip, skip to wind speed only`, "color: green; font-weight: bold");
-        if (weatherData.precipitationFlag) {
-            const precipTypeResult = determinePrecipitationType(settings.terrain, weatherData.highTemp);
-            // it's possible due to terrain or temperature that the precip flag has to be changed from true to false, so check for that possiblity
-            if (precipTypeResult.precipitationFlag) {
-                weatherData.precipitationType = precipTypeResult.type;
-                console.log("Precipitation type determined and flag:", weatherData.precipitationType, weatherData.precipitationFlag);
-            }
-                        
-            // Step 3c: Determine precip amount, duration, and wind speed if precip is still true
-            if (precipTypeResult.precipitationFlag) {
-                console.log(`%cSTEP 3c: DETERMINE PRECIP AMT, DURATION & WIND SPEED`, "color: green; font-weight: bold");
-                console.log("About to call applyWeatherEffects() with:", weatherData.precipitationType.type);   // passing the weather type name, eg "Thunderstorm"
-                const weatherEffects = applyWeatherEffects(weatherData.precipitationType.type, settings.terrain, settings.altitude);
-                weatherData.precipitationAmount = weatherEffects.precipitationAmount;
-                weatherData.precipitationDuration = weatherEffects.precipitationDuration;
-                weatherData.windSpeed = weatherEffects.windSpeed;
-                console.log("Weather effects determined:", weatherData.precipitationAmount, weatherData.precipitationDuration, weatherData.windSpeed);
-            }
-        } else {
-            // Step 3d: If no precipitation, calculate wind speed as per the rules and adjust for terrain
-            console.log(`%cSTEP 3d: No precip found, calculating wind speed`, "color: red; font-weight: bold");
-
-            // Ensure there's a valid precipitation type or default to 'none'
-            const weatherType = weatherData.precipitationType ? weatherData.precipitationType.type : "none";
-            console.log("About to calculate wind speed with:", weatherType);
-
-            // Calculate wind speed using the adjusted or default weather type
-            weatherData.windSpeed = calculateWindSpeed(weatherType, settings.terrain, settings.altitude);
-            console.log("No precipitation today. Adjusted wind speed set to:", weatherData.windSpeed);
-        }
-
- */        
-/*         // Step 3b: Determine Precipitation Type if flag is true
-        console.log(`%cSTEP 3b: Determine precip type or if no precip, skip to wind speed only`, "color: green; font-weight: bold");
-        if (weatherData.precipitationFlag) {
-            const precipTypeResult = determinePrecipitationType(settings.terrain, weatherData.highTemp);
-            if (precipTypeResult.precipitationFlag) {
-                weatherData.precipitationType = precipTypeResult.type;
-                console.log("Precipitation type determined and flag:", weatherData.precipitationType, weatherData.precipitationFlag);
-
-                // Step 3c: Determine precip amount, duration, and wind speed if precip is still true
-                console.log(`%cSTEP 3c: DETERMINE PRECIP AMT, DURATION & WIND SPEED`, "color: green; font-weight: bold");
-                console.log("About to call applyWeatherEffects() with:", weatherData.precipitationType.type);
-                const weatherEffects = applyWeatherEffects(weatherData.precipitationType.type, settings.terrain, settings.altitude);
-                weatherData.precipitationAmount = weatherEffects.precipitationAmount;
-                weatherData.precipitationDuration = weatherEffects.precipitationDuration;
-                console.log("Weather effects determined:", weatherData.precipitationAmount, weatherData.precipitationDuration);
-            } else {
-                console.log("Precipitation type is 'none', skipping related effects.");
-            }
-        }
-        // Calculate wind speed independently of precipitation
-
-        const weatherType = weatherData.precipitationType ? weatherData.precipitationType.type : "none";
-        console.log(`%cSTEP 3d: Calculating wind speed`, "color: red; font-weight: bold");
-        console.log("About to calculate wind speed with:", weatherType);
-        weatherData.windSpeed = calculateWindSpeed(weatherType, settings.terrain, settings.altitude);
-        
-        console.log("Wind speed set to:", weatherData.windSpeed); */
 
         // Step 3b: Determine Precipitation Type if flag is true
         console.log(`%cSTEP 3b: Determine precip type or if no precip, skip to wind speed only`, "color: green; font-weight: bold");
