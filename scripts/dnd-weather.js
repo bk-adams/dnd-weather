@@ -1312,7 +1312,7 @@ function applyWeatherEffects(weatherType, terrainName, altitude) {
     console.log("Weather details found:", weatherDetails);
 
     // Determine wind speed using the calculated function
-    //console.log(`Inside applyWeatherEffects(), calculateWindSpeed() parameters = weatherType/terrainName/altitude = ${weatherType} ${terrainName} ${altitude}`);
+    console.log(`Inside applyWeatherEffects(), calculateWindSpeed() parameters = weatherType/terrainName/altitude = ${weatherType} ${terrainName} ${altitude}`);
     let totalWindSpeed = calculateWindSpeed(weatherType, terrainName, altitude);
 
     // Determine duration and precipitation if available
@@ -1323,7 +1323,7 @@ function applyWeatherEffects(weatherType, terrainName, altitude) {
     console.log(`Precipitation for ${weatherTypeName}: ${precipitationAmount} over ${precipitationDuration}`);
 
     return {
-        windSpeed: totalWindSpeed,
+        windSpeed: Math.floor(totalWindSpeed),
         precipitationAmount: precipitationAmount,
         precipitationDuration: precipitationDuration
     };
