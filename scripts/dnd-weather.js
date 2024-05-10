@@ -1457,11 +1457,11 @@ async function displayWeatherConditions(weatherData, season, settings, onlyConso
         Humidity Effects: ${humidityEffects}<br>  <!-- Added humidity effects -->
         Record High Temperature: ${recordTempHigh !== 'N/A' ? recordTempHigh + '°F' : 'N/A'}<br>
         Record Low Temperature: ${recordTempLow !== 'N/A' ? recordTempLow + '°F' : 'N/A'}<br>
+        Special Weather Event: ${specialWeatherEvent}<br>
         Precipitation Type: ${precipitationType.type}<br>
         Precipitation Amount: ${precipitationAmount !== 'None' ? precipitationAmount : 'N/A'}<br>
         Precipitation Duration: ${precipitationDuration !== 'None' ? precipitationDuration : 'N/A'}<br>
         Precipitation Continues?: ${continues}<br>
-        Special Weather Event: ${specialWeatherEvent}<br>
         Rainbow: ${rainbow.hasRainbow ? rainbow.rainbowType : 'None'}<br>
         Wind Speed: ${windLabel} (${windSpeed} mph)<br>
         Wind Direction: ${windDirection}<br>
@@ -2473,7 +2473,7 @@ function compileWeatherNotes(weatherType, terrain, month, day) {
             `Normal Vision Range: ${weatherDetails.NormVisionRng}`,
             `IR Vision Range: ${weatherDetails.IRvisionRng}`,
             `Tracking: ${weatherDetails.tracking}`,
-            `Lost Chance: ${weatherDetails.lostChance}`
+            `Chance of Getting Lost: ${weatherDetails.lostChance}`
         ].filter(detail => detail).join(". "); // Filter out empty details
         notes.push(detailsNotes);
     }
@@ -2485,8 +2485,8 @@ function compileWeatherNotes(weatherType, terrain, month, day) {
             specialWeatherDetails.notes,
             `Precipitation: ${specialWeatherDetails.precipitation}`,
             `Duration: ${specialWeatherDetails.duration}`,
-            `Effect on Vision: ${specialWeatherDetails.effectOnVision}`,
-            `Effect on IR Vision: ${specialWeatherDetails.effectOnIRVision}`,
+            `Normal Vision Range: ${specialWeatherDetails.effectOnVision}`,
+            `IR Vision Range: ${specialWeatherDetails.effectOnIRVision}`,
             `Tracking: ${specialWeatherDetails.effectOnTracking}`,
             `Chance of Getting Lost: ${specialWeatherDetails.chanceOfGettingLost}`,
             `Speed: ${specialWeatherDetails.speed}`
@@ -2502,7 +2502,7 @@ function compileWeatherNotes(weatherType, terrain, month, day) {
 
     // Include lycanthrope activity based on moon phases
     const lycanthropeActivity = evaluateLycanthropeActivity(month, day);
-    if (lycanthropeActivity) {
+    if (lycanthropeActivity !== 'Normal.') {
         notes.push(`Lycanthrope Activity: ${lycanthropeActivity}`);
     }
 
