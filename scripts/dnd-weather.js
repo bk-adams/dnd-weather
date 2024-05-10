@@ -42,6 +42,7 @@ var GlobalWeatherConfig = {
     precipBase: 0,
     precipAdj: 0,
 	precipAmount: 0,
+    useRealisticWind: false,
     windSpeedInitial: 0,
 	windSpeed: 0,
 	windSpeedAdjustment: 0,
@@ -1181,7 +1182,7 @@ function rerollAndAdjustWindSpeed() {
     return totalWindSpeed;
 } */
 
-function calculateWindSpeed(weatherName, terrainName, altitude) {
+/* function calculateWindSpeed(weatherName, terrainName, altitude) {
     // Fetch terrain effects from global configuration using the terrain name
     const terrainEffects = GlobalWeatherConfig.terrainEffects[terrainName] || GlobalWeatherConfig.terrainEffects['Plains'];
 
@@ -1229,7 +1230,61 @@ function calculateWindSpeed(weatherName, terrainName, altitude) {
 
     console.log(`Total wind speed: ${totalWindSpeed} mph`);
     return totalWindSpeed;
+} */
+function calculateWindSpeed(weatherName, terrainName, altitude) {
+    // Fetch terrain effects from global configuration using the terrain name
+    const terrainEffects = GlobalWeatherConfig.terrainEffects[terrainName] || GlobalWeatherConfig.terrainEffects['Plains'];
+
+    // Check if user prefers realistic wind speed adjustment for mountains
+    const isRealisticWind = GlobalWeatherConfig.useRealisticWind;
+
+    // Initialize variables for wind speed calculation
+    let baseWindSpeed, terrainAdjustment, totalWindSpeed;
+
+    if (!weatherName || weatherName.toLowerCase() === "none") {
+        console.log("No specific weather type provided or weather is 'none', defaulting to minimal wind speed adjustment.");
+        baseWindSpeed = evalDice("d20-1"); // Roll d20-1 for general wind speed
+        
+        // Handle terrain adjustment for wind speed
+        terrainAdjustment = terrainEffects.windSpeedAdjustment || 0;
+        if (Array.isArray(terrainAdjustment)) {
+            // Randomly select an adjustment from the array if multiple options exist
+            terrainAdjustment = terrainAdjustment[Math.floor(Math.random() * terrainAdjustment.length)];
+        } else if (terrainName === "Mountains" && terrainAdjustment === "dynamic") {
+            // Adjust wind speed for mountainous terrain dynamically based on altitude
+            terrainAdjustment = Math.floor(altitude / 1000) * (isRealisticWind ? 0.5 : 5); // Toggle between 0.5 mph and 5 mph per 1000 feet
+        }
+        
+        totalWindSpeed = baseWindSpeed + terrainAdjustment;
+        console.log(`Wind speed adjusted for 'none' in ${terrainName}: ${totalWindSpeed} mph`);
+        if (totalWindSpeed < 0) totalWindSpeed = 0; // Ensure wind speed does not drop below zero
+        return totalWindSpeed;
+    }
+    
+    // Processing wind speed calculations for specific weather types
+    const weatherDetails = GlobalWeatherConfig.standardWeatherTable.find(item => item.name === weatherName);
+    if (!weatherDetails) {
+        console.error("Weather details not found for:", weatherName);
+        return 0; // Return a default or error case wind speed
+    }
+
+    console.log(`Calculating wind speed for ${weatherName} in ${terrainName} at ${altitude} ft altitude.`);
+    baseWindSpeed = weatherDetails.windSpeed ? evalDice(weatherDetails.windSpeed) : evalDice("d20-1");
+
+    // Adjust wind speed for terrain and altitude
+    terrainAdjustment = (terrainName === "Mountains" && terrainEffects.windSpeedAdjustment === "dynamic") ?
+        Math.floor(altitude / 1000) * (isRealisticWind ? 0.5 : 5) : // Toggle between 0.5 mph and 5 mph per 1000 feet
+        (Array.isArray(terrainEffects.windSpeedAdjustment) ? 
+        terrainEffects.windSpeedAdjustment[Math.floor(Math.random() * terrainEffects.windSpeedAdjustment.length)] : 
+        terrainEffects.windSpeedAdjustment || 0);
+    
+    totalWindSpeed = baseWindSpeed + terrainAdjustment;
+    if (totalWindSpeed < 0) totalWindSpeed = 0; // Ensure wind speed does not drop below zero
+
+    console.log(`Total wind speed: ${totalWindSpeed} mph`);
+    return totalWindSpeed;
 }
+
 
 
 function calculateAltitudeAdjustment(altitude, terrain) {
@@ -1944,6 +1999,10 @@ async function requestWeatherSettings() {
                     <input type="checkbox" id="useSimpleCalendar" name="useSimpleCalendar" ${GlobalWeatherConfig.useSimpleCalendar ? 'checked' : ''}>
                 </div>
                 <div>
+                    <label for="useRealisticWind">Use Realistic Wind Speeds (Mountains):</label>
+                    <input type="checkbox" id="useRealisticWind" name="useRealisticWind" ${GlobalWeatherConfig.useRealisticWind ? 'checked' : ''}>
+                </div>
+                <div>
                     <label for="year">Year:</label>
                     <select id="year" name="year">
                         ${Array.from(new Array(38), (_, i) => GlobalWeatherConfig.year - 5 + i).map(year => `<option value="${year}" ${year === GlobalWeatherConfig.year ? 'selected' : ''}>${year}</option>`).join('')}
@@ -2026,6 +2085,7 @@ async function requestWeatherSettings() {
                     callback: (html) => {
                         const settings = {
                             useSimpleCalendar: html.find('#useSimpleCalendar').is(':checked'),
+                            useRealisticWind: html.find('#useRealisticWind').is(':checked'),
                             year: parseInt(html.find('#year').val(), 10),
                             month: html.find('#month').val(),
                             day: parseInt(html.find('#day').val(), 10),
@@ -2044,6 +2104,7 @@ async function requestWeatherSettings() {
 
                         // Update GlobalWeatherConfig with the new settings
                         GlobalWeatherConfig.useSimpleCalendar = settings.useSimpleCalendar;
+                        GlobalWeatherConfig.useRealisticWind = settings.useRealisticWind;
                         GlobalWeatherConfig.year = settings.year;
                         GlobalWeatherConfig.month = settings.month;
                         GlobalWeatherConfig.day = settings.day;
@@ -2066,9 +2127,6 @@ async function requestWeatherSettings() {
         dialog.render(true);
     });
 }
-
-
-
 
 function updateGlobalWeatherConfig(month, terrain, altitude, latitude) {
     //GlobalWeatherConfig.year = year;
