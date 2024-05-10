@@ -52,9 +52,11 @@ var GlobalWeatherConfig = {
     humidityRealistic: 0,
     humidityEffects: "",
     tempWindChillAdj: 0,
-	specialWeather: false,  // Indicates whether a special weather event is possible
+	specialWeather: false,  // Indicates whether to use "special weather" or not
 	specialWeatherEvent: "none", // Stores the type of special weather event
 	specialWeatherEventDuration: 0,
+    specialWeatherEventDurationUnit: "",
+    specialWeatherPrecipAmount: 0,
 	initialWeatherEvent: "none",
 	initialWeatherEventDuration: 0,
 	continuingWeatherEvent: "none",
@@ -1285,7 +1287,7 @@ function getEffectsByWindSpeed(windSpeed) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // STEP 4
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function determineSpecialWeather() {
+/* function determineSpecialWeather() {
     const specialWeatherRoll = Math.floor(Math.random() * 100) + 1; // Determine which special weather phenomenon occurs
     const specialWeathers = GlobalWeatherConfig.terrainEffects[GlobalWeatherConfig.terrain].specialWeather.split(', ').map(sw => sw.split(': '));
     const foundWeather = specialWeathers.find(sw => parseInt(sw[0].split('-')[0]) <= specialWeatherRoll && specialWeatherRoll <= parseInt(sw[0].split('-')[1]));
@@ -1297,7 +1299,7 @@ function determineSpecialWeather() {
         console.log("No special weather event triggered.");
     }
 }
-
+ */
 function applyWeatherEffects(weatherType, terrainName, altitude) {
     const weatherTypeName = weatherType;
     console.log(`Applying weather effects for type: ${weatherTypeName}`);
@@ -1459,7 +1461,7 @@ async function displayWeatherConditions(weatherData, season, settings, onlyConso
         Record Low Temperature: ${recordTempLow !== 'N/A' ? recordTempLow + '°F' : 'N/A'}<br>
         Special Weather Event: ${specialWeatherEvent}<br>
         Precipitation Type: ${precipitationType.type}<br>
-        Precipitation Amount: ${precipitationAmount !== 'None' ? precipitationAmount : 'N/A'}<br>
+        Precipitation Amount: ${precipitationAmount !== 'None' ? precipitationAmount + ' inches' : 'N/A'}<br>
         Precipitation Duration: ${precipitationDuration !== 'None' ? precipitationDuration : 'N/A'}<br>
         Precipitation Continues?: ${continues}<br>
         Rainbow: ${rainbow.hasRainbow ? rainbow.rainbowType : 'None'}<br>
@@ -1860,6 +1862,10 @@ async function requestWeatherSettings() {
                     <input type="checkbox" id="useRealisticWind" name="useRealisticWind" ${GlobalWeatherConfig.useRealisticWind ? 'checked' : ''}>
                 </div>
                 <div>
+                    <label for="enableSpecialWeather">Enable Special Weather Events:</label>
+                    <input type="checkbox" id="enableSpecialWeather" name="enableSpecialWeather" ${GlobalWeatherConfig.specialWeather ? 'checked' : ''}>
+                </div>
+                <div>
                     <label for="year">Year:</label>
                     <select id="year" name="year">
                         ${Array.from(new Array(38), (_, i) => GlobalWeatherConfig.year - 5 + i).map(year => `<option value="${year}" ${year === GlobalWeatherConfig.year ? 'selected' : ''}>${year}</option>`).join('')}
@@ -1943,6 +1949,7 @@ async function requestWeatherSettings() {
                         const settings = {
                             useSimpleCalendar: html.find('#useSimpleCalendar').is(':checked'),
                             useRealisticWind: html.find('#useRealisticWind').is(':checked'),
+                            enableSpecialWeather: html.find('#enableSpecialWeather').is(':checked'),
                             year: parseInt(html.find('#year').val(), 10),
                             month: html.find('#month').val(),
                             day: parseInt(html.find('#day').val(), 10),
@@ -1962,6 +1969,7 @@ async function requestWeatherSettings() {
                         // Update GlobalWeatherConfig with the new settings
                         GlobalWeatherConfig.useSimpleCalendar = settings.useSimpleCalendar;
                         GlobalWeatherConfig.useRealisticWind = settings.useRealisticWind;
+                        GlobalWeatherConfig.specialWeather = settings.enableSpecialWeather;
                         GlobalWeatherConfig.year = settings.year;
                         GlobalWeatherConfig.month = settings.month;
                         GlobalWeatherConfig.day = settings.day;
@@ -2618,4 +2626,38 @@ function evaluateLycanthropeActivity(month, day) {
 
     // Normal activity for other phases
     return lycanthropeResponses.normal;
+}
+
+function determineSpecialWeather(terrain) {
+    const terrainData = GlobalWeatherConfig.terrainEffects[terrain];
+    if (!terrainData || !terrainData.specialWeather) {
+        console.log("No special weather configuration found for terrain:", terrain);
+        return { precipitationFlag: false, type: "none" };
+    }
+
+    // Check global flag to see if special weather events are allowed
+    if (!GlobalWeatherConfig.specialWeather) {
+        console.log("Special weather events are disabled globally.");
+        return { precipitationFlag: false, type: "none" };
+    }
+
+    // Rolling for specific special weather type based on the terrain's special weather string
+    const roll = Math.floor(Math.random() * 100) + 1;
+    const specialWeatherOptions = terrainData.specialWeather.split(', ');
+    for (let option of specialWeatherOptions) {
+        let [range, event] = option.split(': ');
+        let [min, max] = range.split('-').map(Number);
+        if (roll >= min && roll <= max) {
+            console.log(`Special weather type determined based on terrain: ${event.trim()}`);
+
+            // Update global settings to reflect that a special weather event has occurred
+            GlobalWeatherConfig.specialWeatherEvent = event.trim();
+            return { precipitationFlag: true, type: event.trim() };
+        }
+    }
+
+    // Default case if no specific event is matched
+    console.log("No special weather type matched the roll, defaulting to generic special weather.");
+    GlobalWeatherConfig.specialWeatherEvent = "generic special weather"; // Update the global event type
+    return { precipitationFlag: true, type: "generic special weather" };
 }
