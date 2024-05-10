@@ -331,7 +331,7 @@ standardWeatherTable: [
         precipDice: "2d8+2",
         duration: "4d6",
         durationUnit: "hours",
-        movement: "x1/4 (foot, horse, cart)",
+        movement: "x1/2 (foot, horse, cart)",
         NormVisionRng: "x3/4",
 		IRvisionRng: "x1/2",
         tracking: "-40%",
@@ -361,7 +361,7 @@ standardWeatherTable: [
         precipDice: "1d2",
         duration: "1d6",
         durationUnit: "hours",
-        movement: "x3/4 (foot, horse, cart)",
+        movement: "x3/4 foot, x1/2 horse, x1/2 cart",
         NormVisionRng: "Normal",
 		IRvisionRng: "3/4",
         tracking: "-10%",
@@ -375,7 +375,7 @@ standardWeatherTable: [
         precipDice: "1d2",
         duration: "1d4",
         durationUnit: "hours",
-        movement: "Foot: x3/4, Horse: normal, Cart: normal",
+        movement: "x3/4 (foot, horse, cart)",
         NormVisionRng: "2 ft. radius",
 		IRvisionRng: "Normal",
         tracking: "-10%",
@@ -392,7 +392,7 @@ standardWeatherTable: [
         precipDice: "None",
         duration: "1d12",
         durationUnit: "hours",
-        movement: "Foot: x1/4, Horse: x1/4",
+        movement: "Foot: x1/4, Horse: x1/4, Cart: x1/4",
         NormVisionRng: "2 ft. radius",
 		IRvisionRng: "x1/2",
         tracking: "-60%",
@@ -406,7 +406,7 @@ standardWeatherTable: [
         precipDice: "None",
         duration: "2d4",
         durationUnit: "hours",
-        movement: "Normal",
+        movement: "Foot: x1/2, Horse: x1/2, Cart: x1/2",
         NormVisionRng: "x1/4",
 		IRvisionRng: "x3/4",
         tracking: "-30%",
@@ -458,7 +458,7 @@ standardWeatherTable: [
         precipDice: "1d4+3",
         duration: "1d12",
         durationUnit: "hours",
-        movement: "x3/4 (foot, horse, cart)",
+        movement: "Foot: x3/4, Horse: normal, Cart: x3/4",
         NormVisionRng: "x3/4",
 		IRvisionRng: "x3/4",
         tracking: "-10%/turn* this differs from the PHB rules",
@@ -487,7 +487,7 @@ standardWeatherTable: [
         precipDice: "1d6",
         duration: "1d3",
         durationUnit: "days",
-        movement: "Foot: x1/4, Horse: x1/4, Cart:not allowed",
+        movement: "Foot: x1/4, Horse: x1/4, Cart: not allowed",
         NormVisionRng: "x1/2",
 		IRvisionRng: "x1/2",
         tracking: "Not allowed",
@@ -1141,100 +1141,6 @@ function rerollAndAdjustWindSpeed() {
     // Fetch terrain effects from global configuration using the terrain name
     const terrainEffects = GlobalWeatherConfig.terrainEffects[terrainName] || GlobalWeatherConfig.terrainEffects['Plains'];
 
-    if (!weatherName || weatherName.toLowerCase() === "none") {
-        console.log("No specific weather type provided or weather is 'none', defaulting to minimal wind speed adjustment.");
-        const baseWindSpeed = evalDice("d20-1"); // Roll d20-1 for general wind speed
-    
-        // Fetch terrain effects from global configuration using the terrain name
-        const terrainEffects = GlobalWeatherConfig.terrainEffects[terrainName] || GlobalWeatherConfig.terrainEffects['Plains'];
-        let terrainAdjustment = terrainEffects.windSpeedAdjustment || 0;
-    
-        if (terrainName === "Mountains" && terrainEffects.windSpeedAdjustment === "dynamic") {
-            // Adjust wind speed for mountainous terrain dynamically based on altitude
-            terrainAdjustment = Math.floor(altitude / 1000) * 5;  // Increase wind speed by 5 mph for every 1000 feet of elevation
-        }
-    
-        let totalWindSpeed = baseWindSpeed + terrainAdjustment;
-        console.log(`Wind speed adjusted for 'none' in ${terrainName}: ${totalWindSpeed} mph`);
-        if (totalWindSpeed < 0) { (totalWindSpeed = 0); }
-        return totalWindSpeed;
-    }
-    
-    // Find weather details from the standard weather table using the weather name
-    const weatherDetails = GlobalWeatherConfig.standardWeatherTable.find(item => item.name === weatherName);
-    if (!weatherDetails) {
-        console.error("Weather details not found for:", weatherName);
-        return 0; // Return a default or error case wind speed
-    }
-
-    console.log(`Calculating wind speed for ${weatherName} in ${terrainName} at ${altitude} ft altitude.`);
-
-    // Calculate base wind speed from the dice roll specified in weather details
-    let baseWindSpeed = weatherDetails.windSpeed ? evalDice(weatherDetails.windSpeed) : evalDice("d20-1");
-
-    // Adjust wind speed for terrain, particularly dynamic adjustments in mountainous regions
-    let altitudeAdjustment = (terrainName === "Mountains" && terrainEffects.windSpeedAdjustment === "dynamic") ? Math.floor(altitude / 1000) * 5 : 0;
-    let totalWindSpeed = baseWindSpeed + (terrainEffects.windSpeedAdjustment !== "dynamic" ? terrainEffects.windSpeedAdjustment || 0 : altitudeAdjustment);
-    
-    if (totalWindSpeed < 0) { (totalWindSpeed = 0); }
-
-    console.log(`Total wind speed: ${totalWindSpeed} mph`);
-    return totalWindSpeed;
-} */
-
-/* function calculateWindSpeed(weatherName, terrainName, altitude) {
-    // Fetch terrain effects from global configuration using the terrain name
-    const terrainEffects = GlobalWeatherConfig.terrainEffects[terrainName] || GlobalWeatherConfig.terrainEffects['Plains'];
-
-    // Initialize variables for wind speed calculation
-    let baseWindSpeed, terrainAdjustment, totalWindSpeed;
-
-    if (!weatherName || weatherName.toLowerCase() === "none") {
-        console.log("No specific weather type provided or weather is 'none', defaulting to minimal wind speed adjustment.");
-        baseWindSpeed = evalDice("d20-1"); // Roll d20-1 for general wind speed
-        
-        // Handle terrain adjustment for wind speed
-        terrainAdjustment = terrainEffects.windSpeedAdjustment || 0;
-        if (Array.isArray(terrainAdjustment)) {
-            // Randomly select an adjustment from the array if multiple options exist
-            terrainAdjustment = terrainAdjustment[Math.floor(Math.random() * terrainAdjustment.length)];
-        } else if (terrainName === "Mountains" && terrainAdjustment === "dynamic") {
-            // Adjust wind speed for mountainous terrain dynamically based on altitude
-            terrainAdjustment = Math.floor(altitude / 1000) * 5;  // Increase wind speed by 5 mph for every 1000 feet of elevation
-        }
-        
-        totalWindSpeed = baseWindSpeed + terrainAdjustment;
-        console.log(`Wind speed adjusted for 'none' in ${terrainName}: ${totalWindSpeed} mph`);
-        if (totalWindSpeed < 0) totalWindSpeed = 0; // Ensure wind speed does not drop below zero
-        return totalWindSpeed;
-    }
-    
-    // Processing wind speed calculations for specific weather types
-    const weatherDetails = GlobalWeatherConfig.standardWeatherTable.find(item => item.name === weatherName);
-    if (!weatherDetails) {
-        console.error("Weather details not found for:", weatherName);
-        return 0; // Return a default or error case wind speed
-    }
-
-    console.log(`Calculating wind speed for ${weatherName} in ${terrainName} at ${altitude} ft altitude.`);
-    baseWindSpeed = weatherDetails.windSpeed ? evalDice(weatherDetails.windSpeed) : evalDice("d20-1");
-
-    // Adjust wind speed for terrain and altitude
-    terrainAdjustment = (terrainName === "Mountains" && terrainEffects.windSpeedAdjustment === "dynamic") ?
-        Math.floor(altitude / 1000) * 5 : (Array.isArray(terrainEffects.windSpeedAdjustment) ? 
-        terrainEffects.windSpeedAdjustment[Math.floor(Math.random() * terrainEffects.windSpeedAdjustment.length)] : 
-        terrainEffects.windSpeedAdjustment || 0);
-    
-    totalWindSpeed = baseWindSpeed + terrainAdjustment;
-    if (totalWindSpeed < 0) totalWindSpeed = 0; // Ensure wind speed does not drop below zero
-
-    console.log(`Total wind speed: ${totalWindSpeed} mph`);
-    return totalWindSpeed;
-} */
-function calculateWindSpeed(weatherName, terrainName, altitude) {
-    // Fetch terrain effects from global configuration using the terrain name
-    const terrainEffects = GlobalWeatherConfig.terrainEffects[terrainName] || GlobalWeatherConfig.terrainEffects['Plains'];
-
     // Check if user prefers realistic wind speed adjustment for mountains
     const isRealisticWind = GlobalWeatherConfig.useRealisticWind;
 
@@ -1284,7 +1190,70 @@ function calculateWindSpeed(weatherName, terrainName, altitude) {
     console.log(`Total wind speed: ${totalWindSpeed} mph`);
     return totalWindSpeed;
 }
+ */
+function calculateWindSpeed(weatherName, terrainName, altitude) {
+    // Fetch terrain effects from global configuration using the terrain name
+    const terrainEffects = GlobalWeatherConfig.terrainEffects[terrainName] || GlobalWeatherConfig.terrainEffects['Plains'];
 
+    // Check if user prefers realistic wind speed adjustment for mountains
+    const isRealisticWind = GlobalWeatherConfig.useRealisticWind;
+
+    // Initialize variables for wind speed calculation
+    let baseWindSpeed, terrainAdjustment, totalWindSpeed;
+
+    if (!weatherName || weatherName.toLowerCase() === "none") {
+        console.log("No specific weather type provided or weather is 'none', defaulting to minimal wind speed adjustment.");
+        baseWindSpeed = evalDice("d20-1"); // Roll d20-1 for general wind speed
+        
+        // Handle terrain adjustment for wind speed
+        terrainAdjustment = terrainEffects.windSpeedAdjustment || 0;
+        if (Array.isArray(terrainAdjustment)) {
+            // Randomly select an adjustment from the array if multiple options exist
+            terrainAdjustment = terrainAdjustment[Math.floor(Math.random() * terrainAdjustment.length)];
+        } else if (terrainName === "Mountains" && terrainAdjustment === "dynamic") {
+            // Adjust wind speed for mountainous terrain dynamically based on altitude
+            if (isRealisticWind) {
+                terrainAdjustment = 10 + Math.floor(altitude / 1000) * 0.5;  // Realistic wind speed adjustment
+            } else {
+                terrainAdjustment = Math.floor(altitude / 1000) * 5;  // Classic wind speed adjustment
+            }
+        }
+        
+        totalWindSpeed = baseWindSpeed + terrainAdjustment;
+        console.log(`Wind speed adjusted for 'none' in ${terrainName}: ${totalWindSpeed} mph`);
+        if (totalWindSpeed < 0) totalWindSpeed = 0; // Ensure wind speed does not drop below zero
+        return totalWindSpeed;
+    }
+    
+    // Processing wind speed calculations for specific weather types
+    const weatherDetails = GlobalWeatherConfig.standardWeatherTable.find(item => item.name === weatherName);
+    if (!weatherDetails) {
+        console.error("Weather details not found for:", weatherName);
+        return 0; // Return a default or error case wind speed
+    }
+
+    console.log(`Calculating wind speed for ${weatherName} in ${terrainName} at ${altitude} ft altitude.`);
+    baseWindSpeed = weatherDetails.windSpeed ? evalDice(weatherDetails.windSpeed) : evalDice("d20-1");
+
+    // Adjust wind speed for terrain and altitude
+    if (terrainName === "Mountains" && terrainEffects.windSpeedAdjustment === "dynamic") {
+        if (isRealisticWind) {
+            terrainAdjustment = 10 + Math.floor(altitude / 1000) * 0.5;  // Realistic wind speed adjustment
+        } else {
+            terrainAdjustment = Math.floor(altitude / 1000) * 5;  // Classic wind speed adjustment
+        }
+    } else {
+        terrainAdjustment = (Array.isArray(terrainEffects.windSpeedAdjustment) ?
+            terrainEffects.windSpeedAdjustment[Math.floor(Math.random() * terrainEffects.windSpeedAdjustment.length)] :
+            terrainEffects.windSpeedAdjustment || 0);
+    }
+    
+    totalWindSpeed = baseWindSpeed + terrainAdjustment;
+    if (totalWindSpeed < 0) totalWindSpeed = 0; // Ensure wind speed does not drop below zero
+
+    console.log(`Total wind speed: ${totalWindSpeed} mph`);
+    return totalWindSpeed;
+}
 
 
 function calculateAltitudeAdjustment(altitude, terrain) {
