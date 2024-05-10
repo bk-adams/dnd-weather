@@ -2511,19 +2511,71 @@ function determineSeason(month) {
     return seasons[month] || "Unknown";
 }
 
-function compileWeatherNotes(weatherType, terrain) {
+/* function compileWeatherNotes(weatherType, terrain) {
     let notes = [];
 
-    // Check standard weather table for notes
-    const weatherNote = GlobalWeatherConfig.standardWeatherTable.find(item => item.name === weatherType)?.notes;
-    if (weatherNote) {
-        notes.push(weatherNote);
+    // Check standard weather table for notes including additional details
+    const weatherDetails = GlobalWeatherConfig.standardWeatherTable.find(item => item.name === weatherType);
+    if (weatherDetails) {
+        let detailsNotes = [
+            weatherDetails.notes,
+            `Movement: ${weatherDetails.movement}`,
+            `Normal Vision Range: ${weatherDetails.NormVisionRng}`,
+            `IR Vision Range: ${weatherDetails.IRvisionRng}`,
+            `Tracking: ${weatherDetails.tracking}`,
+            `Lost Chance: ${weatherDetails.lostChance}`
+        ].filter(detail => detail).join(". "); // Only add details that are present
+        notes.push(detailsNotes);
     }
 
     // Check special weather table for notes
     const specialWeatherNote = GlobalWeatherConfig.specialWeatherTable.find(item => item.phenomenon === weatherType)?.notes;
     if (specialWeatherNote) {
         notes.push(specialWeatherNote);
+    }
+
+    // Check terrain effects table for notes
+    const terrainNote = GlobalWeatherConfig.terrainEffects[terrain]?.notes;
+    if (terrainNote) {
+        notes.push(terrainNote);
+    }
+
+    // Combine all notes into a single string
+    return notes.join(". ") || "No specific notes for current conditions.";
+}
+ */
+
+function compileWeatherNotes(weatherType, terrain) {
+    let notes = [];
+
+    // Check standard weather table for extended details
+    const weatherDetails = GlobalWeatherConfig.standardWeatherTable.find(item => item.name === weatherType);
+    if (weatherDetails) {
+        let detailsNotes = [
+            weatherDetails.notes,
+            `Movement: ${weatherDetails.movement}`,
+            `Normal Vision Range: ${weatherDetails.NormVisionRng}`,
+            `IR Vision Range: ${weatherDetails.IRvisionRng}`,
+            `Tracking: ${weatherDetails.tracking}`,
+            `Lost Chance: ${weatherDetails.lostChance}`
+        ].filter(detail => detail).join(". "); // Filter out empty details
+        notes.push(detailsNotes);
+    }
+
+    // Check special weather table for extended details
+    const specialWeatherDetails = GlobalWeatherConfig.specialWeatherTable.find(item => item.phenomenon === weatherType);
+    if (specialWeatherDetails) {
+        let specialNotes = [
+            specialWeatherDetails.notes,
+            `Precipitation: ${specialWeatherDetails.precipitation}`,
+            `Duration: ${specialWeatherDetails.duration}`,
+            `Effect on Vision: ${specialWeatherDetails.effectOnVision}`,
+            `Effect on IR Vision: ${specialWeatherDetails.effectOnIRVision}`,
+            `Tracking: ${specialWeatherDetails.effectOnTracking}`,
+            `Chance of Getting Lost: ${specialWeatherDetails.chanceOfGettingLost}`,
+            `Speed: ${specialWeatherDetails.speed}`
+        ].filter(detail => detail).join(". ");
+        notes.push(specialNotes);
     }
 
     // Check terrain effects table for notes
@@ -2595,56 +2647,6 @@ const moonPhases = {
         // Add other months and special cases as needed
     }
 };
-
-/* function getMoonPhase(moon, month, day) {
-    const monthData = moonPhases[moon][month];
-    const days = Object.keys(monthData).map(Number).sort((a, b) => a - b);
-    const phaseDay = days.find(d => day <= d) || days[0];
-    return monthData[phaseDay];
-} */
-
-/* function getMoonPhase(moon, month, day) {
-    const monthData = moonPhases[moon][month];
-    const days = Object.keys(monthData).map(Number).sort((a, b) => a - b);
-
-    let currentPhase = null;
-    let previousPhaseDay = null;
-    let nextPhaseDay = null;
-
-    for (let i = 0; i < days.length; i++) {
-        if (day === days[i]) {
-            currentPhase = monthData[days[i]]; // Exact match on a phase day
-            previousPhaseDay = days[i - 1] || "Start of cycle";
-            nextPhaseDay = days[i + 1] || "End of cycle";
-            break;
-        } else if (day < days[i]) {
-            previousPhaseDay = days[i - 1] || "Start of cycle";
-            nextPhaseDay = days[i];
-            const previousPhase = monthData[previousPhaseDay] || "Previous month's last phase";
-            const nextPhase = monthData[nextPhaseDay];
-            currentPhase = `Transiting from ${previousPhase} to ${nextPhase}`;
-            break;
-        }
-    }
-
-    if (!nextPhaseDay) { // If day is beyond the last specified phase day
-        previousPhaseDay = days[days.length - 1];
-        nextPhaseDay = "End of cycle";
-        const lastPhase = monthData[previousPhaseDay];
-        currentPhase = `Transiting from ${lastPhase} to Next month's first phase`;
-    }
-
-    return {
-        currentPhase: currentPhase,
-        previousPhase: previousPhaseDay !== "Start of cycle" ? `${previousPhaseDay} (${monthData[previousPhaseDay]})` : previousPhaseDay,
-        nextPhase: nextPhaseDay !== "End of cycle" ? `${nextPhaseDay} (${monthData[nextPhaseDay]})` : nextPhaseDay,
-    };
-}
-
-// Example usage
-console.log(getMoonPhase("Luna", "Fireseek", 7));
-console.log(getMoonPhase("Luna", "Fireseek", 11));
- */
 
 function getMoonPhase(moon, month, day) {
     const monthData = moonPhases[moon][month];
