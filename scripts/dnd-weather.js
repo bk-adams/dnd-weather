@@ -2639,36 +2639,6 @@ function getPrecipitationDetails(weatherEffect) {
     };
 }
 
-/* function compileWeatherNotes(weatherData) {
-    const weatherTypeEntry = weatherData.precipitation;  // Assuming this holds the precipitation type details
-    const weatherTypeName = weatherTypeEntry ? weatherTypeEntry.type : "";
-
-    // Assuming these tables are accessible via GlobalWeatherConfig or similar
-    const standardWeatherTable = GlobalWeatherConfig.standardWeatherTable;
-    const specialWeatherTable = GlobalWeatherConfig.specialWeatherTable;
-    const terrain = weatherData.terrain;  // Make sure terrain is passed in or accessible
-
-    const standardWeatherNotes = standardWeatherTable
-        .filter(condition => condition.name && condition.name.includes(weatherTypeName))
-        .map(condition => condition.notes)
-        .join("<br>");
-
-    const specialWeatherNotes = specialWeatherTable
-        .filter(effect => effect.phenomenon && effect.phenomenon.includes(weatherTypeName))
-        .map(effect => effect.notes)
-        .join("<br>");
-
-    const terrainEffect = GlobalWeatherConfig.terrainEffects[terrain] || {};
-    const terrainNote = terrainEffect.notes || "";
-
-    let compiledNotes = "";
-    if (standardWeatherNotes) compiledNotes += `<div><em><strong>Standard Weather Notes:</strong></em></div><div>${standardWeatherNotes}</div>`;
-    if (specialWeatherNotes) compiledNotes += `<div><br><em><strong>Special Weather Notes:</strong></em></div><div>${specialWeatherNotes}</div>`;
-    if (terrainNote) compiledNotes += `<div><br><em><strong>Terrain Notes:</strong></em></div><div>${terrainNote}</div>`;
-
-    return compiledNotes;
-} */
-
 function determineSeason(month) {
     const seasons = {
         "Needfest": "Winter",
@@ -2693,54 +2663,6 @@ function determineSeason(month) {
     return seasons[month] || "Unknown";
 }
 
-/* function compileWeatherNotes(weatherType, terrain, month, day) {
-    let notes = [];
-
-    // Check standard weather table for extended details
-    const weatherDetails = GlobalWeatherConfig.standardWeatherTable.find(item => item.name === weatherType);
-    if (weatherDetails) {
-        let detailsNotes = [
-            weatherDetails.notes,
-            `Movement: ${weatherDetails.movement}`,
-            `Normal Vision Range: ${weatherDetails.NormVisionRng}`,
-            `IR Vision Range: ${weatherDetails.IRvisionRng}`,
-            `Tracking: ${weatherDetails.tracking}`,
-            `Chance of Getting Lost: ${weatherDetails.lostChance}`
-        ].filter(detail => detail).join(". "); // Filter out empty details
-        notes.push(detailsNotes);
-    }
-
-    // Check special weather table for extended details
-    const specialWeatherDetails = GlobalWeatherConfig.specialWeatherTable.find(item => item.phenomenon === weatherType);
-    if (specialWeatherDetails) {
-        let specialNotes = [
-            specialWeatherDetails.notes,
-            `Precipitation: ${specialWeatherDetails.precipitation}`,
-            `Duration: ${specialWeatherDetails.duration}`,
-            `Normal Vision Range: ${specialWeatherDetails.effectOnVision}`,
-            `IR Vision Range: ${specialWeatherDetails.effectOnIRVision}`,
-            `Tracking: ${specialWeatherDetails.effectOnTracking}`,
-            `Chance of Getting Lost: ${specialWeatherDetails.chanceOfGettingLost}`,
-            `Speed: ${specialWeatherDetails.windSpeed}`
-        ].filter(detail => detail).join(". ");
-        notes.push(specialNotes);
-    }
-
-    // Check terrain effects table for notes
-    const terrainNote = GlobalWeatherConfig.terrainEffects[terrain]?.notes;
-    if (terrainNote) {
-        notes.push(terrainNote);
-    }
-
-    // Include lycanthrope activity based on moon phases
-    const lycanthropeActivity = evaluateLycanthropeActivity(month, day);
-    if (lycanthropeActivity !== 'Normal.') {
-        notes.push(`Lycanthrope Activity: ${lycanthropeActivity}`);
-    }
-
-    // Combine all notes into a single string
-    return notes.join(". ") || "No specific notes for current conditions.";
-} */
 function compileWeatherNotes(weatherType, terrain, month, day) {
     console.log(`Compiling weather notes for type: ${weatherType}, terrain: ${terrain}, month: ${month}, day: ${day}`);
     let notes = [];
