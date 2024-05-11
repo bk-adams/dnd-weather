@@ -1292,33 +1292,6 @@ function adjustTemperatureForWindChill() {
     // Implement wind chill calculation here, modify temperatures based on wind speed and current temperature
 }
 
-/* function determinePrecipitationType(terrain, currentHighTemp) {
-    let attempt = 0;
-    while (attempt < 2) {
-        const roll = Math.floor(Math.random() * 100) + 1;
-        console.log(`Attempt ${attempt + 1}: Rolled for precipitation type: ${roll}`);
-
-        for (const type of GlobalWeatherConfig.precipitationTable) {
-            if (roll >= type.rollMin && roll <= type.rollMax) {
-                if (type.notAllowedIn.includes(terrain) ||
-                    (type.tempMin !== null && currentHighTemp < type.tempMin) ||
-                    (type.tempMax !== null && currentHighTemp > type.tempMax)) {
-                    console.log(`Excluding type ${type.type} due to restrictions (terrain: ${terrain}, temp: ${currentHighTemp}°F).`);
-                    break; // Exit the for loop to allow for a second roll
-                }
-                console.log(`Precipitation type determined: ${type.type}`);
-                return { precipitationFlag: true, type: type };
-            }
-        }
-
-        attempt++;
-        if (attempt === 2) {
-            console.log("No valid precipitation type found after second attempt, setting type to 'none'.");
-            return { precipitationFlag: false, type: "none" };  // Return "none" when no suitable type is found
-        }
-    }
-}
- */
 function determinePrecipitationType(terrain, currentHighTemp) {
     let attempt = 0;
     const specialRoll = Math.floor(Math.random() * 100) + 1;
