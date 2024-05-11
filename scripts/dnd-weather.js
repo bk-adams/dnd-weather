@@ -1420,16 +1420,22 @@ async function displayWeatherConditions(weatherData, season, settings, onlyConso
         skyCondition = 'Not available', sunrise = 'Not available', sunset = 'Not available',
         highTemp = 'N/A', lowTemp = 'N/A', windChill = 'N/A', humidity = 'N/A',
         humidityEffects = 'No significant effects', // Default value if not set
-        recordTempHigh = 'N/A', recordTempLow = 'N/A',
         precipitationType = { type: 'None' }, precipitationAmount = 'None', precipitationDuration = 'None',
         continues = 'No', rainbow = { hasRainbow: false, rainbowType: 'None' }, windSpeed = 0, windDirection = 'Not available',
-        specialWeatherEvent = 'None', notes = 'No additional notes'
+        specialWeatherEvent = 'None', notes = 'No additional notes',
+        recordDuration = GlobalWeatherConfig.tempRecordDuration
     } = weatherData;
 
     const windLabel = getWindSpeedLabel(windSpeed);  // Assume this function correctly labels the wind speed
     const windEffects = compileWindNotes(windSpeed); // This function should return 'None' if there are no effects
 
-    //let dateDisplay = "Date not set";
+    // Determining whether there are record temperatures
+    const isRecordTemp = GlobalWeatherConfig.recordTemperatureType !== "none";
+    const temperatureNote = isRecordTemp ? `${GlobalWeatherConfig.recordTemperatureType} for ${recordDuration} day(s): ` : '';
+    //const temperatureNote = isRecordTemp ? `${GlobalWeatherConfig.recordTemperatureType}: ` : '';
+    const displayedHighTemp = isRecordTemp ? `${temperatureNote}${highTemp}` : highTemp;
+    const displayedLowTemp = isRecordTemp ? `${temperatureNote}${lowTemp}` : lowTemp;
+
     const dateDisplay = `${month} ${day}, ${year}`;
     if (GlobalWeatherConfig.useSimpleCalendar && SimpleCalendar.api.currentDateTime) {
         const currentDate = SimpleCalendar.api.currentDateTime();
@@ -1447,19 +1453,16 @@ async function displayWeatherConditions(weatherData, season, settings, onlyConso
         Latitude: ${latitude}<br>
         Terrain: ${terrain}<br>
         Altitude: ${altitude} feet<br>
-        Sky Condition: ${skyCondition.skyCondition}<br>
+        Sky Condition: ${skyCondition}<br>
         Sunrise: ${sunrise}<br>
         Sunset: ${sunset}<br>
         Phase of Luna: ${lunaPhase}<br>
         Phase of Celene: ${celenePhase}<br>
-        High Temperature: ${highTemp}\u{B0}F<br>
-        Low Temperature: ${lowTemp}\u{B0}F<br>
+        High Temperature: ${displayedHighTemp}\u{B0}F<br>
+        Low Temperature: ${displayedLowTemp}\u{B0}F<br>
         Wind Chill: ${windChill !== 'N/A' ? windChill + '°F' : 'N/A'}<br>
         Humidity: ${humidity}<br>
-        Humidity Effects: ${humidityEffects}<br>  <!-- Added humidity effects -->
-        Record High Temperature: ${recordTempHigh !== 'N/A' ? recordTempHigh + '°F' : 'N/A'}<br>
-        Record Low Temperature: ${recordTempLow !== 'N/A' ? recordTempLow + '°F' : 'N/A'}<br>
-        Special Weather Event: ${specialWeatherEvent}<br>
+        Humidity Effects: ${humidityEffects}<br>
         Precipitation Type: ${precipitationType.type}<br>
         Precipitation Amount: ${precipitationAmount !== 'None' ? precipitationAmount + ' inches' : 'N/A'}<br>
         Precipitation Duration: ${precipitationDuration !== 'None' ? precipitationDuration : 'N/A'}<br>
@@ -1470,7 +1473,7 @@ async function displayWeatherConditions(weatherData, season, settings, onlyConso
         Wind Effects: ${windEffects}<br>
         Notes: ${notes !== 'No additional notes' ? notes : 'N/A'}
     `;
-    
+
     console.log(message.replace(/<br>/g, "\n").replace(/<strong>|<\/strong>/g, "").replace(/\s+\n/g, "\n"));
     if (!onlyConsole && typeof ChatMessage === "function") {
         ChatMessage.create({ content: message, speaker: ChatMessage.getSpeaker({ alias: "Weather System" }) });
@@ -1478,6 +1481,7 @@ async function displayWeatherConditions(weatherData, season, settings, onlyConso
         console.error("ChatMessage function not available. Ensure you are running this in the Foundry VTT environment.");
     }
 }
+
 
 async function generateWeather() {
     console.error("Starting weather generation for today.");
@@ -1521,11 +1525,176 @@ async function generateWeather() {
 
         console.log("%cBase temperature for month", "color: green; font-weight: bold");
 
+        // Step 0: Determine if Record Temps Occur
+        function determineTemperatureExtremes(monthlyBaseTemp, maxHigh, maxLow, terrain) {
+            const roll = Math.floor(Math.random() * 100) + 1;  // Roll percentile
+            let tempAdjustmentFactor = 0;  // Factor to adjust the base temperature
+            
+            if (terrain === "Forest, Sylvan") {
+                return {
+                    adjustedBaseTemp: monthlyBaseTemp,
+                    extremeType: "none",
+                    duration: 1
+                };
+            }
+        
+            // Reset global flags
+            GlobalWeatherConfig.recordTemperatureType = "none";
+            GlobalWeatherConfig.tempRecordLow = false;
+            GlobalWeatherConfig.tempRecordHigh = false;
+        
+            if (roll === 1) {
+                tempAdjustmentFactor = -3 * maxLow;
+                GlobalWeatherConfig.recordTemperatureType = "Extreme record low";
+                GlobalWeatherConfig.tempRecordLow = true;
+            } else if (roll === 2) {
+                tempAdjustmentFactor = -2 * maxLow;
+                GlobalWeatherConfig.recordTemperatureType = "Severe record low";
+                GlobalWeatherConfig.tempRecordLow = true;
+            } else if (roll >= 3 && roll <= 4) {
+                tempAdjustmentFactor = -maxLow;
+                GlobalWeatherConfig.recordTemperatureType = "Record low";
+                GlobalWeatherConfig.tempRecordLow = true;
+            } else if (roll >= 97 && roll <= 98) {
+                tempAdjustmentFactor = maxHigh;
+                GlobalWeatherConfig.recordTemperatureType = "Record high";
+                GlobalWeatherConfig.tempRecordHigh = true;
+            } else if (roll === 99) {
+                tempAdjustmentFactor = 2 * maxHigh;
+                GlobalWeatherConfig.recordTemperatureType = "Severe record high";
+                GlobalWeatherConfig.tempRecordHigh = true;
+            } else if (roll === 100) {
+                tempAdjustmentFactor = 3 * maxHigh;
+                GlobalWeatherConfig.recordTemperatureType = "Extreme record high";
+                GlobalWeatherConfig.tempRecordHigh = true;
+            }
+        
+            const adjustedBaseTemp = monthlyBaseTemp + tempAdjustmentFactor;
+            const duration = tempAdjustmentFactor !== 0 ? determineDurationOfExtremes() : 1;
+        
+            // Update the duration global flag
+            GlobalWeatherConfig.tempRecordDuration = duration;
+        
+            return {
+                adjustedBaseTemp,
+                extremeType: GlobalWeatherConfig.recordTemperatureType = "Severe record low",
+                duration
+            };
+        }
+        
+        function determineDurationOfExtremes() {
+            const durationRoll = Math.floor(Math.random() * 20) + 1;
+            if (durationRoll === 1) {
+                return 1;
+            } else if (durationRoll <= 3) {
+                return 2;
+            } else if (durationRoll <= 10) {
+                return 3;
+            } else if (durationRoll <= 14) {
+                return 4;
+            } else if (durationRoll <= 17) {
+                return 5;
+            } else if (durationRoll <= 19) {
+                return 6;
+            } else {
+                return 7;
+            }
+        }
+        
+        // Example Usage
+        const monthlyBaseTemp = 50;  // Example base temperature for a month
+        const maxHigh = 10;  // Maximum possible high adjustment
+        const maxLow = 10;  // Maximum possible low adjustment
+        
+        const temperatureExtremes = determineTemperatureExtremes(monthlyBaseTemp, maxHigh, maxLow, settings.terrain);
+        console.log("Adjusted Base Temperature:", temperatureExtremes.adjustedBaseTemp);
+        console.log("Type of Extreme:", temperatureExtremes.extremeType);
+        console.log("Duration of Extreme Temperatures (days):", temperatureExtremes.duration);
+        
+        //////////////////////////////////////////////////////////////////////////////////////////////////////
+        function calculateRecordTemperatures(month, latitude, altitude, terrain, season) {
+            const monthData = GlobalWeatherConfig.baselineData[month];
+            console.log(`Base temperature for month ${month}: ${monthData.baseDailyTemp}°F`);
+        
+            let baseTemp = monthData.baseDailyTemp;
+            console.log(`Starting temperature calculations for terrain: ${terrain} and season: ${season}`);
+            
+            let dailyHighAdjustment = evalDice(monthData.dailyHighAdj, true);
+            let dailyLowAdjustment = evalDice(monthData.dailyLowAdj, true);
+            console.log(`Daily high adjustment max: ${dailyHighAdjustment}`);
+            console.log(`Daily low adjustment max: ${dailyLowAdjustment}`);
+        
+            let adjustment = 0;
+
+            switch (GlobalWeatherConfig.recordTemperatureType) {
+                case 'Extreme record high':
+                    adjustment = 3 * dailyHighAdjustment;
+                    console.log(`Applying Extreme record high adjustment: ${adjustment}`);
+                    break;
+                case 'Severe record high':
+                    adjustment = 2 * dailyHighAdjustment;
+                    console.log(`Applying Severe record high adjustment: ${adjustment}`);
+                    break;
+                case 'Record high':
+                    adjustment = dailyHighAdjustment;
+                    console.log(`Applying Record high adjustment: ${adjustment}`);
+                    break;
+                case 'Extreme record low':
+                    adjustment = 3 * dailyLowAdjustment;  // Confirm this is correctly negative.
+                    console.log(`Applying Extreme record low adjustment: ${adjustment}`);
+                    break;
+                case 'Severe record low':
+                    adjustment = 2 * dailyLowAdjustment;  // Confirm this is correctly negative.
+                    console.log(`Applying Severe record low adjustment: ${adjustment}`);
+                    break;
+                case 'Record low':
+                    adjustment = dailyLowAdjustment;  // Confirm this is correctly negative.
+                    console.log(`Applying Record low adjustment: ${adjustment}`);
+                    break;
+            }
+            
+            console.log(`Temperature adjustment based on record type '${GlobalWeatherConfig.recordTemperatureType}': ${adjustment}`);
+            baseTemp += adjustment;
+            console.log(`Adjusted base temperature after record type modification: ${baseTemp}°F`);
+        
+            const latitudeAdjustment = (40 - latitude) * 2;
+            console.log(`Latitude adjustment for latitude ${latitude}: ${latitudeAdjustment}`);
+            baseTemp += latitudeAdjustment;
+        
+            const altitudeAdjustment = -Math.floor(altitude / 1000) * 3;
+            console.log(`Altitude adjustment for altitude ${altitude}: ${altitudeAdjustment}`);
+            baseTemp += altitudeAdjustment;
+        
+            console.log(`Base temperature after all adjustments: ${baseTemp}°F`);
+        
+            let dailyHigh = baseTemp + evalDice(monthData.dailyHighAdj);
+            let dailyLow = baseTemp + evalDice(monthData.dailyLowAdj);
+        
+            console.log(`Calculated daily high before terrain adjustments: ${dailyHigh}`);
+            console.log(`Calculated daily low before terrain adjustments: ${dailyLow}`);
+        
+            console.log(`Final record temperatures - High: ${dailyHigh}°F, Low: ${dailyLow}°F`);
+            
+            return { highTemp: dailyHigh, lowTemp: dailyLow };
+        }
+        
         // Step 1: Determine Temperature Extremes and Adjustments
         console.log(`%cSTEP 1: DETERMINE TEMPERATURES`, "color: green; font-weight: bold");
-        const temperatures = await calculateInitialDailyTemperatures(settings.month, settings.latitude, settings.altitude, settings.terrain, season);
-        weatherData.highTemp = temperatures.highTemp;
-        weatherData.lowTemp = temperatures.lowTemp;
+
+        // Check if there is a record temperature event before proceeding
+        if (GlobalWeatherConfig.recordTemperatureType !== 'none') {
+            console.log(`%cRecord temperature day detected: ${GlobalWeatherConfig.recordTemperatureType}`, "color: red; font-weight: bold");
+            const recordTemperatures = calculateRecordTemperatures(settings.month, settings.latitude, settings.altitude, settings.terrain, season);
+            //const recordTemperatures = calculateRecordTemperatures(settings.month, settings.month.maxHigh, settings.month.maxLow);
+            weatherData.highTemp = recordTemperatures.highTemp;
+            weatherData.lowTemp = recordTemperatures.lowTemp;
+        } else {
+            // Proceed with regular temperature calculation
+            const temperatures = await calculateInitialDailyTemperatures(settings.month, settings.latitude, settings.altitude, settings.terrain, season);
+            weatherData.highTemp = temperatures.highTemp;
+            weatherData.lowTemp = temperatures.lowTemp;
+        }
+
         console.log("Temperatures determined:", weatherData.highTemp, weatherData.lowTemp);
 
         // Step 2: Determine Sky Conditions
