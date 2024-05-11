@@ -1526,7 +1526,7 @@ async function generateWeather() {
         console.log("%cBase temperature for month", "color: green; font-weight: bold");
 
         // Step 0: Determine if Record Temps Occur
-        function determineTemperatureExtremes(monthlyBaseTemp, maxHigh, maxLow, terrain) {
+/*         function determineTemperatureExtremes(monthlyBaseTemp, maxHigh, maxLow, terrain) {
             const roll = Math.floor(Math.random() * 100) + 1;  // Roll percentile
             let tempAdjustmentFactor = 0;  // Factor to adjust the base temperature
             
@@ -1584,6 +1584,89 @@ async function generateWeather() {
         
         function determineDurationOfExtremes() {
             const durationRoll = Math.floor(Math.random() * 20) + 1;
+            if (durationRoll === 1) {
+                return 1;
+            } else if (durationRoll <= 3) {
+                return 2;
+            } else if (durationRoll <= 10) {
+                return 3;
+            } else if (durationRoll <= 14) {
+                return 4;
+            } else if (durationRoll <= 17) {
+                return 5;
+            } else if (durationRoll <= 19) {
+                return 6;
+            } else {
+                return 7;
+            }
+        } */
+        function determineTemperatureExtremes(monthlyBaseTemp, maxHigh, maxLow, terrain) {
+            const roll = Math.floor(Math.random() * 100) + 1;  // Roll percentile
+            console.log(`Random roll for temperature extremes: ${roll}`);
+        
+            if (terrain === "Forest, Sylvan") {
+                console.log("No record temperatures for 'Forest, Sylvan' terrain.");
+                return {
+                    adjustedBaseTemp: monthlyBaseTemp,
+                    extremeType: "none",
+                    duration: 1
+                };
+            }
+        
+            let tempAdjustmentFactor = 0;  // Factor to adjust the base temperature
+            // Reset global flags
+            GlobalWeatherConfig.recordTemperatureType = "none";
+            GlobalWeatherConfig.tempRecordLow = false;
+            GlobalWeatherConfig.tempRecordHigh = false;
+        
+            if (roll === 1) {
+                tempAdjustmentFactor = -3 * maxLow;
+                GlobalWeatherConfig.recordTemperatureType = "Extreme record low";
+                GlobalWeatherConfig.tempRecordLow = true;
+            } else if (roll === 2) {
+                tempAdjustmentFactor = -2 * maxLow;
+                GlobalWeatherConfig.recordTemperatureType = "Severe record low";
+                GlobalWeatherConfig.tempRecordLow = true;
+            } else if (roll >= 3 && roll <= 4) {
+                tempAdjustmentFactor = -maxLow;
+                GlobalWeatherConfig.recordTemperatureType = "Record low";
+                GlobalWeatherConfig.tempRecordLow = true;
+            } else if (roll >= 97 && roll <= 98) {
+                tempAdjustmentFactor = maxHigh;
+                GlobalWeatherConfig.recordTemperatureType = "Record high";
+                GlobalWeatherConfig.tempRecordHigh = true;
+            } else if (roll === 99) {
+                tempAdjustmentFactor = 2 * maxHigh;
+                GlobalWeatherConfig.recordTemperatureType = "Severe record high";
+                GlobalWeatherConfig.tempRecordHigh = true;
+            } else if (roll === 100) {
+                tempAdjustmentFactor = 3 * maxHigh;
+                GlobalWeatherConfig.recordTemperatureType = "Extreme record high";
+                GlobalWeatherConfig.tempRecordHigh = true;
+            }
+        
+            console.log(`Record temperature type: ${GlobalWeatherConfig.recordTemperatureType}`);
+            console.log(`Temperature adjustment factor: ${tempAdjustmentFactor}`);
+        
+            const adjustedBaseTemp = monthlyBaseTemp + tempAdjustmentFactor;
+            console.log(`Adjusted base temperature: ${adjustedBaseTemp}°F`);
+        
+            const duration = tempAdjustmentFactor !== 0 ? determineDurationOfExtremes() : 1;
+            console.log(`Duration of temperature extreme: ${duration} days`);
+        
+            // Update the duration global flag
+            GlobalWeatherConfig.tempRecordDuration = duration;
+        
+            return {
+                adjustedBaseTemp,
+                extremeType: GlobalWeatherConfig.recordTemperatureType,
+                duration
+            };
+        }
+        
+        function determineDurationOfExtremes() {
+            const durationRoll = Math.floor(Math.random() * 20) + 1;
+            console.log(`Roll for duration of extremes: ${durationRoll}`);
             if (durationRoll === 1) {
                 return 1;
             } else if (durationRoll <= 3) {
