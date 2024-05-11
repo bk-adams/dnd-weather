@@ -1453,7 +1453,7 @@ async function displayWeatherConditions(weatherData, season, settings, onlyConso
         Latitude: ${latitude}<br>
         Terrain: ${terrain}<br>
         Altitude: ${altitude} feet<br>
-        Sky Condition: ${skyCondition}<br>
+        Sky Condition: ${skyCondition.skyCondition}<br>
         Sunrise: ${sunrise}<br>
         Sunset: ${sunset}<br>
         Phase of Luna: ${lunaPhase}<br>
