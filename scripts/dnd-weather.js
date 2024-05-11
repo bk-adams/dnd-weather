@@ -52,7 +52,7 @@ var GlobalWeatherConfig = {
     humidityRealistic: 0,
     humidityEffects: "",
     tempWindChillAdj: 0,
-	specialWeather: false,  // Indicates whether to use "special weather" or not
+	specialWeather: true,  // Indicates whether to use "special weather" or not
 	specialWeatherEvent: "none", // Stores the type of special weather event
 	specialWeatherEventDuration: 0,
     specialWeatherEventDurationUnit: "",
@@ -111,43 +111,60 @@ flags: {
 
 specialWeatherTable: [
     {
-        phenomenon: "Sand storm or Dust storm",
-        precipitation: "",
-        duration: "1d8 hours",
+        phenomenon: "Sandstorm",
+        precipDice: "",
+        duration: "1d8",
+        durationUnit: "hours",
         areaEffect: "Normal",
-        movementRate: "No",
-        effectOnVision: "No",
-        effectOnIRVision: "No",
-        effectOnTracking: "No",
-        chanceOfGettingLost: "80%",
-        speed: "5d10 mph",
+        movement: "No",
+        NormVisionRng: "No",
+        IRvisionRng: "No",
+        tracking: "No",
+        lostChance: "80%",
+        windSpeed: "5d10",
 		notes: "50% chance of d4 damage every 3 turns, no saving throw, until shelter is found."
     },
     {
-        phenomenon: "Wind storm",
-        precipitation: "",
-        duration: "1d10 hours",
+        phenomenon: "Duststorm",
+        precipDice: "",
+        duration: "1d8",
+        durationUnit: "hours",
         areaEffect: "Normal",
-        movementRate: "1/2 (all)",
-        effectOnVision: "x1/2",
-        effectOnIRVision: "x3/4",
-        effectOnTracking: "No",
-        chanceOfGettingLost: "+30%",
-        speed: "8d10 mph",
+        movement: "No",
+        NormVisionRng: "No",
+        IRvisionRng: "No",
+        tracking: "No",
+        lostChance: "80%",
+        windSpeed: "5d10",
+		notes: "50% chance of d4 damage every 3 turns, no saving throw, until shelter is found."
+    },
+    {
+        phenomenon: "Windstorm",
+        precipDice: "",
+        duration: "1d10",
+        durationUnit: "hours",
+        areaEffect: "Normal",
+        movement: "1/2 (all)",
+        NormVisionRng: "x1/2",
+        IRvisionRng: "x3/4",
+        tracking: "No",
+        lostChance: "+30%",
+        windSpeed: "8d10",
 		notes: "50% chance of 2d6 of rock damage every 3 turns. Characters must roll dexterity or " +
 				"less on d20 to save for 1/2 damage; monsters must save vs. pertrifaction."
     },
     {
         phenomenon: "Earthquake",
-        precipitation: "",
-        duration: "1d10 hours",
+        precipDice: "",
+        duration: "1d10",
+        durationUnit: "hours",
         areaEffect: "Normal",
-        movementRate: "Foot: x1/4 H: x1/4 C: no (may be overturned)",
-        effectOnVision: "No",
-        effectOnIRVision: "No",
-        effectOnTracking: "-50%",
-        chanceOfGettingLost: "+10% (+30% on horse)",
-        speed: "d20 mph",
+        movement: "Foot: x1/4 H: x1/4 C: no (may be overturned)",
+        NormVisionRng: "No",
+        IRvisionRng: "No",
+        tracking: "-50%",
+        lostChance: "+10% (+30% on horse)",
+        windSpeed: "d20",
 		notes: "Center is 1-100 miles away from party, with shock waves extending 1-1000 miles. " +
 				"The first shock wave of the earthquake will be preceded by 1-4 mild tremors, " +
 				"which do no damage but cause untrained horses, cattle, and other animals to " +
@@ -157,30 +174,47 @@ specialWeatherTable: [
 				"Each shock wave causes damage as the 7th level cleric spell Earthquake."
     },
     {
-        phenomenon: "Avalanche (rock or snow)",
-        precipitation: "5d10 inches",
-        duration: "1-10 minutes",
+        phenomenon: "Rock Avalanche",
+        precipDice: "",
+        duration: "1d10",
+        durationUnit: "minutes",
         areaEffect: "Normal",
-        movementRate: "may be blocked",
-        effectOnVision: "No",
-        effectOnIRVision: "No",
-        effectOnTracking: "-60%",
-        chanceOfGettingLost: "30% on horse",
-        speed: "d20 mph",
+        movement: "may be blocked",
+        NormVisionRng: "No",
+        IRvisionRng: "No",
+        tracking: "-60%",
+        lostChance: "30% on horse",
+        windSpeed: "d20",
+		notes: "Damage is 2d2O pts., with save (vs. dexterity or petrification) for 1/2 damage. " +
+				"Victims taking more than 20 points of damage are buried and will suffocate in 6 rounds unless rescued."
+    },
+    {
+        phenomenon: "Snow Avalanche",
+        precipDice: "5d10 inches",
+        duration: "1d10",
+        durationUnit: "minutes",
+        areaEffect: "Normal",
+        movement: "may be blocked",
+        NormVisionRng: "No",
+        IRvisionRng: "No",
+        tracking: "-60%",
+        lostChance: "30% on horse",
+        windSpeed: "d20",
 		notes: "Damage is 2d2O pts., with save (vs. dexterity or petrification) for 1/2 damage. " +
 				"Victims taking more than 20 points of damage are buried and will suffocate in 6 rounds unless rescued."
     },
     {
         phenomenon: "Volcano",
-        precipitation: "d8 inches of ash per day",
-        duration: "1-10 days",
+        precipDice: "d8 inches of ash per day",
+        duration: "1d10",
+        durationUnit: "days",
         areaEffect: "Normal",
-        movementRate: "x1/2 (all)",
-        effectOnVision: "x3/4 (x1/2 if undersea)",
-        effectOnIRVision: "x1/2",
-        effectOnTracking: "-50%",
-        chanceOfGettingLost: "+20% (+40% if on horse)",
-        speed: "d20 mph",
+        movement: "x1/2 (all)",
+        NormVisionRng: "x3/4 (x1/2 if undersea)",
+        IRvisionRng: "x1/2",
+        tracking: "-50%",
+        lostChance: "+20% (+40% if on horse)",
+        windSpeed: "d20",
 		notes: "Ash burns: d4 damage every 3 turns, no save. Location: 0-7 (d8-l) miles from party. " +
 				"Lava flows at dlO mph, does damage as a salamander's tail (2d6). For every day a volcano " +
 				"continues to erupt, the base temperature will rise 1 degree in a 60-mile-diameter " +
@@ -190,28 +224,30 @@ specialWeatherTable: [
     },
     {
         phenomenon: "Tsunami",
-        precipitation: "Wave ht. has 10d20 feet",
-        duration: "1-2 hours",
+        precipDice: "Wave ht. has 10d20 feet",
+        duration: "1d2",
+        durationUnit: "hours",
         areaEffect: "Normal",
-        movementRate: "Normal",
-        effectOnVision: "No",
-        effectOnIRVision: "No",
-        effectOnTracking: "No",
-        chanceOfGettingLost: "Normal",
-        speed: "5d10+10 mph",
+        movement: "Normal",
+        NormVisionRng: "No",
+        IRvisionRng: "No",
+        tracking: "No",
+        lostChance: "Normal",
+        windSpeed: "5d10+10",
 		notes: "Save vs. dexterity/petrification or drown. If save is made, victim takes d20 damage."
     },
     {
         phenomenon: "Quicksand",
-        precipitation: "",
+        precipDice: "",
         duration: "Normal",
+        durationUnit: "",
         areaEffect: "covers radius of d20 inches",
-        movementRate: "Normal (until entered)",
-        effectOnVision: "No",
-        effectOnIRVision: "No",
-        effectOnTracking: "No",
-        chanceOfGettingLost: "+20 if skirted",
-        speed: "d20 mph",
+        movement: "Normal (until entered)",
+        NormVisionRng: "No",
+        IRvisionRng: "No",
+        tracking: "No",
+        lostChance: "+20 if skirted",
+        windSpeed: "d20",
 		notes: "An individual wearing no armor, leather armor, studded armor, elven chain, or magical armor " +
 				"will only sink up to the neck if he remains motionless, keeps his arms above the surface, " +
 				"and discards all heavy items. Other characters will be dragged under at the rate of 1 foot " +
@@ -221,17 +257,18 @@ specialWeatherTable: [
     },
     {
         phenomenon: "Flash flood",
-        precipitation: "3",
-        duration: "d6+2 hours",
+        precipDice: "3",
+        duration: "1d6+2",
+        durationUnit: "hours",
         areaEffect: "Normal",
-        movementRate: "Normal",
-        effectOnVision: "Normal",
-        effectOnIRVision: "No",
-        effectOnTracking: "-5% per turn",
-        chanceOfGettingLost: "+10%",
-        speed: "d20 mph",
+        movement: "Normal",
+        NormVisionRng: "Normal",
+        IRvisionRng: "No",
+        tracking: "-5% per turn",
+        lostChance: "+10%",
+        windSpeed: "d20",
 		notes: "A flash flood will begin with what appears to be a heavy rainstorm, with appropriate effects, " +
-				"during which 3 inches of rain will fall each hours. The rain will stop when 50% of the flood's " +
+				"during which 3 inches of rain will fall each hour. The rain will stop when 50% of the flood's " +
 				"duration is over, at which point all low areas will be covered with running water to a depth " +
 				"which is triple the amount of rainfall. This water will remain for 6-10 turns, and then " +
 				"disappear at a rate of 3 inches per hour. The current will vary from 5-50 mph, increasing when " +
@@ -239,56 +276,78 @@ specialWeatherTable: [
     },
     {
         phenomenon: "Rain forest downpour",
-        precipitation: "1 inch per hour",
-        duration: "3d4 hours",
+        precipDice: "1 inch per hour",
+        duration: "3d4",
+        durationUnit: "hours",
         areaEffect: "Normal",
-        movementRate: "Foot: x1/2, H: x1/2, C: no",
-        effectOnVision: "x3/4",
-        effectOnIRVision: "x3/4",
-        effectOnTracking: "-5% per turn",
-        chanceOfGettingLost: "+20%",
-        speed: "d6-1 mph",
+        movement: "Foot: x1/2, H: x1/2, C: no",
+        NormVisionRng: "x3/4",
+        IRvisionRng: "x3/4",
+        tracking: "-5% per turn",
+        lostChance: "+20%",
+        windSpeed: "d6-1",
 		notes: "The ground will absorb up to 6 inches of water; then mud will form, converting the area to a " +
 				"swamp for travel purposes."
     },
     {
         phenomenon: "Sun shower",
-        precipitation: "x1/2",
-        duration: "6-60 minutes",
+        precipDice: "x1/2",
+        duration: "6d10",
+        durationUnit: "minutes",
         areaEffect: "Normal",
-        movementRate: "Normal",
-        effectOnVision: "No",
-        effectOnIRVision: "No",
-        effectOnTracking: "No",
-        chanceOfGettingLost: "Normal",
-        speed: "d20 mph",
+        movement: "Normal",
+        NormVisionRng: "No",
+        IRvisionRng: "No",
+        tracking: "No",
+        lostChance: "Normal",
+        windSpeed: "d20",
 		notes: "95% chance of a rainbow; see note under Precipitation Occurrence Table."
     },
     {
         phenomenon: "Tornado or cyclone",
-        precipitation: "1 inch per hour",
-        duration: "5-50 hours",
+        precipDice: "1 inch per hour",
+        duration: "5d10",
+        durationUnit: "hours",
         areaEffect: "Normal",
-        movementRate: "normal",
-        effectOnVision: "x3/4",
-        effectOnIRVision: "x3/4",
-        effectOnTracking: "No",
-        chanceOfGettingLost: "+40%",
-        speed: "300 mph",
+        movement: "normal",
+        NormVisionRng: "x3/4",
+        IRvisionRng: "x3/4",
+        tracking: "No",
+        lostChance: "+40%",
+        windSpeed: "300",
 		notes: "10% chance party will be transported to the Ethereal Plane. Otherwise, treat " +
 				"as a triple-strength hurricane for damage."
     },
     {
-        phenomenon: "Oasis or mirage oasis",
-        precipitation: "",
+        phenomenon: "Oasis",
+        precipDice: "",
         duration: "Normal",
-        areaEffect: "3-6 inch radius",
-        movementRate: "Normal",
-        effectOnVision: "No",
-        effectOnIRVision: "No",
-        effectOnTracking: "No",
-        chanceOfGettingLost: "normal",
-        speed: "d20 mph",
+        durationUnit: "",
+        areaEffect: "3-6 (d4+2) inch radius",
+        movement: "Normal",
+        NormVisionRng: "No",
+        IRvisionRng: "No",
+        tracking: "No",
+        lostChance: "normal",
+        windSpeed: "d20",
+		notes: "If the oasis is real, roll d20. A result of 1 or 2 inches indicates that the " +
+				"oasis is currently populated (determine population type via the Wilderness " +
+				"Encounter Charts in the DMG), while a 20 indicates that the last visitor has " +
+				"poisoned all the wells. If the oasis is a mirage, anyone who drinks must " +
+				"save vs. spell or take d6 damage from swallowed sand."
+    },
+    {
+        phenomenon: "Mirage oasis",
+        precipDice: "",
+        duration: "Normal",
+        durationUnit: "",
+        areaEffect: "3-6 (d4+2) inch radius",
+        movement: "Normal",
+        NormVisionRng: "No",
+        IRvisionRng: "No",
+        tracking: "No",
+        lostChance: "normal",
+        windSpeed: "d20",
 		notes: "If the oasis is real, roll d20. A result of 1 or 2 inches indicates that the " +
 				"oasis is currently populated (determine population type via the Wilderness " +
 				"Encounter Charts in the DMG), while a 20 indicates that the last visitor has " +
@@ -595,85 +654,217 @@ highWindsTable: [
     }
 ],
 
-
-baselineData: {
-    "Needfest": { baseDailyTemp: 30, dailyHighAdj: "d10", dailyLowAdj: "-d20", chanceOfPrecip: 46, skyConditions: { clear: [1, 23], partlyCloudy: [24, 50], cloudy: [51, 100] }, sunrise: "7:10", sunset: "4:35" },
-    "Fireseek": { baseDailyTemp: 32, dailyHighAdj: "d10", dailyLowAdj: "-d20", chanceOfPrecip: 46, skyConditions: { clear: [1, 23], partlyCloudy: [24, 50], cloudy: [51, 100] }, sunrise: "7:21", sunset: "5:01" },
-    "Readying": { baseDailyTemp: 34, dailyHighAdj: "d6+4", dailyLowAdj: "-(d10+4)", chanceOfPrecip: 40, skyConditions: { clear: [1, 25], partlyCloudy: [26, 50], cloudy: [51, 100] }, sunrise: "6:55", sunset: "5:36" },
-    "Coldeven": { baseDailyTemp: 42, dailyHighAdj: "d8+4", dailyLowAdj: "-(d10+4)", chanceOfPrecip: 44, skyConditions: { clear: [1, 27], partlyCloudy: [28, 54], cloudy: [55, 100] }, sunrise: "6:12", sunset: "6:09" },
-    "Growfest": { baseDailyTemp: 44, dailyHighAdj: "d8+4", dailyLowAdj: "-(d10+4)", chanceOfPrecip: 46, skyConditions: { clear: [1, 23], partlyCloudy: [24, 54], cloudy: [55, 100] }, sunrise: "5:50", sunset: "6:05" },
-    "Planting": { baseDailyTemp: 52, dailyHighAdj: "d10+6", dailyLowAdj: "-(d8+4)", chanceOfPrecip: 42, skyConditions: { clear: [1, 20], partlyCloudy: [21, 55], cloudy: [56, 100] }, sunrise: "5:24", sunset: "6:39" },
-    "Flocktime": { baseDailyTemp: 63, dailyHighAdj: "d10+6", dailyLowAdj: "-(d10+6)", chanceOfPrecip: 42, skyConditions: { clear: [1, 20], partlyCloudy: [21, 53], cloudy: [54, 100] }, sunrise: "4:45", sunset: "7:10" },
-    "Wealsun": { baseDailyTemp: 71, dailyHighAdj: "d8+8", dailyLowAdj: "-(d6+6)", chanceOfPrecip: 36, skyConditions: { clear: [1, 20], partlyCloudy: [21, 60], cloudy: [61, 100] }, sunrise: "4:32", sunset: "7:32" },
-    "Richfest": { baseDailyTemp: 73, dailyHighAdj: "d8+8", dailyLowAdj: "-(d6+4)", chanceOfPrecip: 36, skyConditions: { clear: [1, 20], partlyCloudy: [21, 60], cloudy: [61, 100] }, sunrise: "4:20", sunset: "7:20" },
-    "Reaping": { baseDailyTemp: 77, dailyHighAdj: "d6+4", dailyLowAdj: "-(d6+6)", chanceOfPrecip: 33, skyConditions: { clear: [1, 22], partlyCloudy: [23, 62], cloudy: [63, 100] }, sunrise: "4:45", sunset: "7:29" },
-    "Goodmonth": { baseDailyTemp: 75, dailyHighAdj: "d4+6", dailyLowAdj: "-(d6+6)", chanceOfPrecip: 33, skyConditions: { clear: [1, 25], partlyCloudy: [26, 60], cloudy: [61, 100] }, sunrise: "5:13", sunset: "6:57" },
-    "Harvester": { baseDailyTemp: 68, dailyHighAdj: "d8+6", dailyLowAdj: "-(d8+6)", chanceOfPrecip: 33, skyConditions: { clear: [1, 33], partlyCloudy: [34, 54], cloudy: [55, 100] }, sunrise: "5:42", sunset: "6:10" },
-    "Brewfest": { baseDailyTemp: 64, dailyHighAdj: "d8+6", dailyLowAdj: "-(d8+6)", chanceOfPrecip: 33, skyConditions: { clear: [1, 33], partlyCloudy: [34, 54], cloudy: [55, 100] }, sunrise: "5:49", sunset: "6:02" },
-    "Patchwall": { baseDailyTemp: 57, dailyHighAdj: "d10+5", dailyLowAdj: "-(d10+5)", chanceOfPrecip: 36, skyConditions: { clear: [1, 35], partlyCloudy: [36, 60], cloudy: [61, 100] }, sunrise: "6:12", sunset: "5:21" },
-    "Ready'reat": { baseDailyTemp: 46, dailyHighAdj: "d10+6", dailyLowAdj: "-(d10+4)", chanceOfPrecip: 40, skyConditions: { clear: [1, 20], partlyCloudy: [21, 50], cloudy: [51, 100] }, sunrise: "6:46", sunset: "4:45" },
-    "Sunsebb": { baseDailyTemp: 33, dailyHighAdj: "d8+5", dailyLowAdj: "-d20", chanceOfPrecip: 43, skyConditions: { clear: [1, 25], partlyCloudy: [26, 50], cloudy: [51, 100] }, sunrise: "7:19", sunset: "4:36" }
-	},
-
-precipitationTable: [
-    { rollMin: 1, rollMax: 2, type: "Blizzard, heavy", tempMin: null, tempMax: 10, contChance: 5, rainbowChance: null, notAllowedIn: ["Desert"] },
-    { rollMin: 3, rollMax: 5, type: "Blizzard", tempMin: null, tempMax: 20, contChance: 10, rainbowChance: null, notAllowedIn: ["Desert"] },
-    { rollMin: 6, rollMax: 10, type: "Snowstorm, heavy", tempMin: null, tempMax: 25, contChance: 20, rainbowChance: null, notAllowedIn: [] },
-    { rollMin: 11, rollMax: 20, type: "Snowstorm, light", tempMin: null, tempMax: 35, contChance: 25, rainbowChance: 1, notAllowedIn: [] },
-    { rollMin: 21, rollMax: 25, type: "Sleetstorm", tempMin: null, tempMax: 35, contChance: 20, rainbowChance: null, notAllowedIn: [] },
-    { rollMin: 26, rollMax: 27, type: "Hailstorm", tempMin: null, tempMax: 65, contChance: 10, rainbowChance: null, notAllowedIn: ["Desert", "Dust"] },
-    { rollMin: 28, rollMax: 30, type: "Heavy Fog", tempMin: 32, tempMax: 60, contChance: 25, rainbowChance: 1, notAllowedIn: ["Desert", "Dust"] },
-    { rollMin: 31, rollMax: 38, type: "Light Fog", tempMin: 32, tempMax: 70, contChance: 30, rainbowChance: 3, notAllowedIn: ["Desert"] },
-    { rollMin: 39, rollMax: 40, type: "Mist", tempMin: 32, tempMax: null, contChance: 15, rainbowChance: 10, notAllowedIn: [] },
-    { rollMin: 41, rollMax: 45, type: "Drizzle", tempMin: 32, tempMax: null, contChance: 20, rainbowChance: 5, notAllowedIn: [] },
-    { rollMin: 46, rollMax: 60, type: "Rainstorm, light", tempMin: 32, tempMax: null, contChance: 45, rainbowChance: 15, notAllowedIn: [] },
-    { rollMin: 61, rollMax: 70, type: "Rainstorm, heavy", tempMin: 32, tempMax: null, contChance: 30, rainbowChance: 20, notAllowedIn: [] },
-    { rollMin: 71, rollMax: 84, type: "Thunderstorm", tempMin: 32, tempMax: null, contChance: 15, rainbowChance: 20, notAllowedIn: [] },
-    { rollMin: 85, rollMax: 89, type: "Tropical Storm", tempMin: 75, tempMax: null, contChance: 20, rainbowChance: 10, notAllowedIn: ["Desert", "Plains"] },
-    { rollMin: 90, rollMax: 94, type: "Monsoon", tempMin: 80, tempMax: null, contChance: 30, rainbowChance: 5, notAllowedIn: ["Desert", "Dust", "Plains"] },
-    { rollMin: 95, rollMax: 97, type: "Gale", tempMin: 40, tempMax: null, contChance: 15, rainbowChance: 10, notAllowedIn: ["Desert"] },
-    { rollMin: 98, rollMax: 99, type: "Hurricane or typhoon", tempMin: 80, tempMax: null, contChance: 20, rainbowChance: 5, notAllowedIn: ["Desert", "Dust"] },
-    { rollMin: 100, rollMax: 100, type: "Special", tempMin: null, tempMax: null, contChance: 1, rainbowChance: null, notAllowedIn: [] }
-	],
-	
-terrainEffects: {
-    "Rough terrain or Hills": { precipAdj: 0, temperatureAdjustment: { day: 0, night: 0 }, windSpeedAdjustment: [5, -5], specialWeather: "01-80: Windstorm, 81-00: Earthquake", notes: "" },
-    "Forest": { precipAdj: 0, temperatureAdjustment: { day: -5, night: -5 }, windSpeedAdjustment: -5, specialWeather: "01-80: Quicksand, 81-00: Earthquake", notes: "" },
-    "Forest, Sylvan": {
-        precipAdj: -30,  // Lower than usual to reduce precipitation chances
-        temperatureAdjustment: { day: 0, night: 0 },  // Neutral to avoid extremes
-        windSpeedAdjustment: -5,  // Standard wind conditions
-        specialWeather: "",  // No special weather effects unless specifically desired
-        notes: "Influenced by Faerie, ensuring temperate conditions and minimal precipitation."
+    terrainEffects: {
+        "Rough terrain or Hills": {
+            precipAdj: 0,
+            temperatureAdjustment: { day: 0, night: 0 },
+            windSpeedAdjustment: [5, -5],
+            specialWeather: [
+                { range: [1, 80], event: "Windstorm" },
+                { range: [81, 100], event: "Earthquake" }
+            ],
+            notes: ""
+        },
+        "Forest": {
+            precipAdj: 0,
+            temperatureAdjustment: { day: -5, night: -5 },
+            windSpeedAdjustment: -5,
+            specialWeather: [
+                { range: [1, 80], event: "Quicksand" },
+                { range: [81, 100], event: "Earthquake" }
+            ],
+            notes: ""
+        },
+        "Forest, Sylvan": {
+            precipAdj: -30,
+            temperatureAdjustment: { day: 0, night: 0 },
+            windSpeedAdjustment: -5,
+            specialWeather: [],
+            notes: "Influenced by Faerie, ensuring temperate conditions and minimal precipitation."
+        },
+        "Jungle": {
+            precipAdj: 10,
+            temperatureAdjustment: { day: 5, night: 5 },
+            windSpeedAdjustment: -10,
+            specialWeather: [
+                { range: [1, 5], event: "Volcano" },
+                { range: [6, 60], event: "Rain forest downpour" },
+                { range: [61, 80], event: "Quicksand" },
+                { range: [81, 100], event: "Earthquake" }
+            ],
+            notes: ""
+        },
+        "Swamp or marsh": {
+            precipAdj: 5,
+            temperatureAdjustment: { day: 5, night: 5 },
+            windSpeedAdjustment: -5,
+            specialWeather: [
+                { range: [1, 25], event: "Quicksand" },
+                { range: [26, 80], event: "Sun shower" },
+                { range: [81, 100], event: "Earthquake" }
+            ],
+            notes: ""
+        },
+        "Swamp or marsh, cold": {
+            precipAdj: 5,
+            temperatureAdjustment: { day: -5, night: -5 },
+            windSpeedAdjustment: -5,
+            specialWeather: [
+                { range: [1, 25], event: "Quicksand" },
+                { range: [26, 80], event: "Sun shower" },
+                { range: [81, 100], event: "Earthquake" }
+            ],
+            notes: ""
+        },
+        "Dust": {
+            precipAdj: -25,
+            temperatureAdjustment: { day: 10, night: -10 },
+            windSpeedAdjustment: 0,
+            specialWeather: [
+                { range: [1, 40], event: "Flash flood" },
+                { range: [41, 70], event: "Duststorm" },
+                { range: [71, 85], event: "Tornado" },
+                { range: [86, 100], event: "Earthquake" }
+            ],
+            notes: "No fog, gale, or hurricane permitted."
+        },
+        "Plains": {
+            precipAdj: 0,
+            temperatureAdjustment: { day: 0, night: 0 },
+            windSpeedAdjustment: 5,
+            specialWeather: [
+                { range: [1, 50], event: "Tornado" },
+                { range: [51, 100], event: "Earthquake" }
+            ],
+            notes: "No monsoon or tropical storm permitted."
+        },
+        "Desert": {
+            precipAdj: -30,
+            temperatureAdjustment: { day: 10, night: -10 },
+            windSpeedAdjustment: 5,
+            specialWeather: [
+                { range: [1, 25], event: "Flash flood" },
+                { range: [26, 50], event: "Sandstorm" },
+                { range: [51, 65], event: "Oasis" },
+                { range: [66, 85], event: "Mirage oasis" },
+                { range: [86, 100], event: "Earthquake" }
+            ],
+            notes: "No fog, mist, blizzard, monsoon, tropical storm, gale, or hurricane permitted."
+        },
+        "Mountains": {
+            precipAdj: 0,
+            temperatureAdjustment: { day: 0, night: 0 },
+            windSpeedAdjustment: "dynamic",
+            specialWeather: [
+                { range: [1, 20], event: "Windstorm" },
+                { range: [21, 50], event: "Rock Avalanche" },
+                { range: [51, 75], event: "Snow Avalanche" },
+                { range: [76, 80], event: "Volcano" },
+                { range: [81, 100], event: "Earthquake" }
+            ],
+            notes: ""
+        },
+        "Seacoast, warm current": {
+            precipAdj: 5,
+            temperatureAdjustment: { day: 5, night: 5 },
+            windSpeedAdjustment: 5,
+            specialWeather: [
+                { range: [1, 80], event: "Earthquake" },
+                { range: [81, 94], event: "Tsunami" },
+                { range: [95, 100], event: "Undersea volcano" }
+            ],
+            notes: "Duration of fog and mist doubled."
+        },
+        "Seacoast, cold current": {
+            precipAdj: 5,
+            temperatureAdjustment: { day: -5, night: -5 },
+            windSpeedAdjustment: 5,
+            specialWeather: [
+                { range: [1, 80], event: "Earthquake" },
+                { range: [81, 94], event: "Tsunami" },
+                { range: [95, 100], event: "Undersea volcano" }
+            ],
+            notes: "Duration of fog and mist doubled."
+        },
+        "At sea, warm current": {
+            precipAdj: 15,
+            temperatureAdjustment: { day: 5, night: 5 },
+            windSpeedAdjustment: 10,
+            specialWeather: [
+                { range: [1, 20], event: "Tsunami" },
+                { range: [21, 40], event: "Undersea volcano" },
+                { range: [41, 100], event: "Undersea earthquake" }
+            ],
+            notes: "Duration of fog and mist doubled."
+        },
+        "At sea, cold current": {
+            precipAdj: 15,
+            temperatureAdjustment: { day: -10, night: -10 },
+            windSpeedAdjustment: 10,
+            specialWeather: [
+                { range: [1, 20], event: "Tsunami" },
+                { range: [21, 40], event: "Undersea volcano" },
+                { range: [41, 100], event: "Undersea earthquake" }
+            ],
+            notes: "Duration of fog and mist doubled."
+        }
     },
-    "Jungle": { precipAdj: 10, temperatureAdjustment: { day: 5, night: 5 }, windSpeedAdjustment: -10, specialWeather: "01-05: Volcano, 06-60: Rain forest downpour, 61-80: Quicksand, 81-00: Earthquake", notes: "" },
-    "Swamp or marsh": { precipAdj: 5, temperatureAdjustment: { day: 5, night: 5 }, windSpeedAdjustment: -5, specialWeather: "01-25: Quicksand, 26-80: Sun shower, 81-00: Earthquake", notes: "" },
-    "Swamp or marsh, cold": { precipAdj: 5, temperatureAdjustment: { day: -5, night: -5 }, windSpeedAdjustment: -5, specialWeather: "01-25: Quicksand, 26-80: Sun shower, 81-00: Earthquake", notes: "" },
-    "Dust": { precipAdj: -25, temperatureAdjustment: { day: 10, night: -10 }, windSpeedAdjustment: 0, specialWeather: "01-40: Flash flood, 41-70: Dust storm, 71-85: Tornado, 86-00: Earthquake", notes: "No fog, gale, or hurricane permitted." },
-    "Plains": { precipAdj: 0, temperatureAdjustment: { day: 0, night: 0 }, windSpeedAdjustment: 5, specialWeather: "01-50: Tornado, 51-00: Earthquake", notes: " No monsoon or tropical storm permitted" },
-    "Desert": { precipAdj: -30, temperatureAdjustment: { day: 10, night: -10 }, windSpeedAdjustment: 5, specialWeather: "01-25: Flash flood, 26-50: Sandstorm, 51-65: Oasis, 66-85: Mirage oasis, 86-00: Earthquake", notes: "No fog, mist, " +
-			"blizzard, monsoon, tropical storm, gale, or hurricane permitted." },
-    "Mountains": { precipAdj: 0, temperatureAdjustment: { day: 0, night: 0 }, windSpeedAdjustment: "dynamic", specialWeather: "01-20: Wind storm, 21-50: Rock avalanche, 51-75: Snow avalanche, 76-80: Volcano, 81-00: Earthquake", notes: "" },
-    "Seacoast, warm current": { precipAdj: 5, temperatureAdjustment: { day: 5, night: 5 }, windSpeedAdjustment: 5, specialWeather: "01-80: Earthquake, 81-94: Tsunami, 95-00: Undersea volcano", notes: "Duration of fog and mist doubled." },
-    "Seacoast, cold current": { precipAdj: 5, temperatureAdjustment: { day: -5, night: -5 }, windSpeedAdjustment: 5, specialWeather: "01-80: Earthquake, 81-94: Tsunami, 95-00: Undersea volcano", notes: "Duration of fog and mist doubled." },
-    "At sea, warm current": { precipAdj: 15, temperatureAdjustment: { day: 5, night: 5 }, windSpeedAdjustment: 10, specialWeather: "01-20: Tsunami, 21-40: Undersea volcano, 41-00: Undersea earthquake", notes: "Duration of fog and mist doubled." },
-    "At sea, cold current": { precipAdj: 15, temperatureAdjustment: { day: -10, night: -10 }, windSpeedAdjustment: 10, specialWeather: "01-20: Tsunami, 21-40: Undersea volcano, 41-00: Undersea earthquake", notes: "Duration of fog and mist doubled." }
-    },
-	
-windChillTable: {
-    5: {35: 33, 30: 27, 25: 21, 20: 16, 15: 12, 10: 7, 5: 1, 0: "-6", "-5": "-11", "-10": "-15", "-15": "-20", "-20": "-22"},
-    10: {35: 21, 30: 16, 25: 9, 20: 2, 15: "-2", 10: "-9", 5: "-15", 0: "-22", "-5": "-27", "-10": "-31", "-15": "-37", "-20": "-43"},
-    15: {35: 16, 30: 11, 25: 1, 20: "-6", 15: "-11", 10: "-18", 5: "-25", 0: "-33", "-5": "-40", "-10": "-45", "-15": "-51", "-20": "-58"},
-    20: {35: 12, 30: 3, 25: "-4", 20: "-9", 15: "-17", 10: "-24", 5: "-32", 0: "-40", "-5": "-46", "-10": "-52", "-15": "-58", "-20": "-64"},
-    25: {35: 7, 30: 0, 25: "-7", 20: "-15", 15: "-22", 10: "-29", 5: "-37", 0: "-45", "-5": "-52", "-10": "-58", "-15": "-65", "-20": "-72"},
-    30: {35: 5, 30: "-2", 25: "-11", 20: "-18", 15: "-26", 10: "-33", 5: "-41", 0: "-49", "-5": "-56", "-10": "-63", "-15": "-70", "-20": "-78"},
-    35: {35: 3, 30: "-4", 25: "-13", 20: "-20", 15: "-27", 10: "-35", 5: "-43", 0: "-52", "-5": "-60", "-10": "-67", "-15": "-75", "-20": "-82"},
-    40: {35: 1, 30: "-4", 25: "-15", 20: "-22", 15: "-29", 10: "-36", 5: "-45", 0: "-54", "-5": "-62", "-10": "-69", "-15": "-76", "-20": "-83"},
-    45: {35: 1, 30: "-6", 25: "-17", 20: "-24", 15: "-31", 10: "-38", 5: "-46", 0: "-55", "-5": "-63", "-10": "-70", "-15": "-77", "-20": "-84"},
-    50: {35: 0, 30: "-7", 25: "-17", 20: "-24", 15: "-31", 10: "-38", 5: "-47", 0: "-56", "-5": "-64", "-10": "-71", "-15": "-78", "-20": "-85"},
-    55: {35: "-1", 30: "-8", 25: "-19", 20: "-25", 15: "-33", 10: "-39", 5: "-48", 0: "-57", "-5": "-65", "-10": "-72", "-15": "-79", "-20": "-86"},
-    60: {35: "-3", 30: "-10", 25: "-21", 20: "-27", 15: "-34", 10: "-40", 5: "-49", 0: "-58", "-5": "-66", "-10": "-73", "-15": "-80", "-20": "-87"}
-	}
+
+    baselineData: {
+        "Needfest": { baseDailyTemp: 30, dailyHighAdj: "d10", dailyLowAdj: "-d20", chanceOfPrecip: 46, skyConditions: { clear: [1, 23], partlyCloudy: [24, 50], cloudy: [51, 100] }, sunrise: "7:10", sunset: "4:35" },
+        "Fireseek": { baseDailyTemp: 32, dailyHighAdj: "d10", dailyLowAdj: "-d20", chanceOfPrecip: 46, skyConditions: { clear: [1, 23], partlyCloudy: [24, 50], cloudy: [51, 100] }, sunrise: "7:21", sunset: "5:01" },
+        "Readying": { baseDailyTemp: 34, dailyHighAdj: "d6+4", dailyLowAdj: "-(d10+4)", chanceOfPrecip: 40, skyConditions: { clear: [1, 25], partlyCloudy: [26, 50], cloudy: [51, 100] }, sunrise: "6:55", sunset: "5:36" },
+        //"Coldeven": { baseDailyTemp: 42, dailyHighAdj: "d8+4", dailyLowAdj: "-(d10+4)", chanceOfPrecip: 44, skyConditions: { clear: [1, 27], partlyCloudy: [28, 54], cloudy: [55, 100] }, sunrise: "6:12", sunset: "6:09" },
+        "Coldeven": { baseDailyTemp: 42, dailyHighAdj: "d8+4", dailyLowAdj: "-(d10+4)", chanceOfPrecip: 100, skyConditions: { clear: [1, 27], partlyCloudy: [28, 54], cloudy: [55, 100] }, sunrise: "6:12", sunset: "6:09" },
+        "Growfest": { baseDailyTemp: 44, dailyHighAdj: "d8+4", dailyLowAdj: "-(d10+4)", chanceOfPrecip: 46, skyConditions: { clear: [1, 23], partlyCloudy: [24, 54], cloudy: [55, 100] }, sunrise: "5:50", sunset: "6:05" },
+        "Planting": { baseDailyTemp: 52, dailyHighAdj: "d10+6", dailyLowAdj: "-(d8+4)", chanceOfPrecip: 42, skyConditions: { clear: [1, 20], partlyCloudy: [21, 55], cloudy: [56, 100] }, sunrise: "5:24", sunset: "6:39" },
+        "Flocktime": { baseDailyTemp: 63, dailyHighAdj: "d10+6", dailyLowAdj: "-(d10+6)", chanceOfPrecip: 42, skyConditions: { clear: [1, 20], partlyCloudy: [21, 53], cloudy: [54, 100] }, sunrise: "4:45", sunset: "7:10" },
+        "Wealsun": { baseDailyTemp: 71, dailyHighAdj: "d8+8", dailyLowAdj: "-(d6+6)", chanceOfPrecip: 36, skyConditions: { clear: [1, 20], partlyCloudy: [21, 60], cloudy: [61, 100] }, sunrise: "4:32", sunset: "7:32" },
+        "Richfest": { baseDailyTemp: 73, dailyHighAdj: "d8+8", dailyLowAdj: "-(d6+4)", chanceOfPrecip: 36, skyConditions: { clear: [1, 20], partlyCloudy: [21, 60], cloudy: [61, 100] }, sunrise: "4:20", sunset: "7:20" },
+        "Reaping": { baseDailyTemp: 77, dailyHighAdj: "d6+4", dailyLowAdj: "-(d6+6)", chanceOfPrecip: 33, skyConditions: { clear: [1, 22], partlyCloudy: [23, 62], cloudy: [63, 100] }, sunrise: "4:45", sunset: "7:29" },
+        "Goodmonth": { baseDailyTemp: 75, dailyHighAdj: "d4+6", dailyLowAdj: "-(d6+6)", chanceOfPrecip: 33, skyConditions: { clear: [1, 25], partlyCloudy: [26, 60], cloudy: [61, 100] }, sunrise: "5:13", sunset: "6:57" },
+        "Harvester": { baseDailyTemp: 68, dailyHighAdj: "d8+6", dailyLowAdj: "-(d8+6)", chanceOfPrecip: 33, skyConditions: { clear: [1, 33], partlyCloudy: [34, 54], cloudy: [55, 100] }, sunrise: "5:42", sunset: "6:10" },
+        "Brewfest": { baseDailyTemp: 64, dailyHighAdj: "d8+6", dailyLowAdj: "-(d8+6)", chanceOfPrecip: 33, skyConditions: { clear: [1, 33], partlyCloudy: [34, 54], cloudy: [55, 100] }, sunrise: "5:49", sunset: "6:02" },
+        "Patchwall": { baseDailyTemp: 57, dailyHighAdj: "d10+5", dailyLowAdj: "-(d10+5)", chanceOfPrecip: 36, skyConditions: { clear: [1, 35], partlyCloudy: [36, 60], cloudy: [61, 100] }, sunrise: "6:12", sunset: "5:21" },
+        "Ready'reat": { baseDailyTemp: 46, dailyHighAdj: "d10+6", dailyLowAdj: "-(d10+4)", chanceOfPrecip: 40, skyConditions: { clear: [1, 20], partlyCloudy: [21, 50], cloudy: [51, 100] }, sunrise: "6:46", sunset: "4:45" },
+        "Sunsebb": { baseDailyTemp: 33, dailyHighAdj: "d8+5", dailyLowAdj: "-d20", chanceOfPrecip: 43, skyConditions: { clear: [1, 25], partlyCloudy: [26, 50], cloudy: [51, 100] }, sunrise: "7:19", sunset: "4:36" }
+        },
+    
+    precipitationTable: [
+        { rollMin: 1, rollMax: 2, type: "Blizzard, heavy", tempMin: null, tempMax: 10, contChance: 5, rainbowChance: null, notAllowedIn: ["Desert"] },
+        { rollMin: 3, rollMax: 5, type: "Blizzard", tempMin: null, tempMax: 20, contChance: 10, rainbowChance: null, notAllowedIn: ["Desert"] },
+        { rollMin: 6, rollMax: 10, type: "Snowstorm, heavy", tempMin: null, tempMax: 25, contChance: 20, rainbowChance: null, notAllowedIn: [] },
+        { rollMin: 11, rollMax: 20, type: "Snowstorm, light", tempMin: null, tempMax: 35, contChance: 25, rainbowChance: 1, notAllowedIn: [] },
+        { rollMin: 21, rollMax: 25, type: "Sleetstorm", tempMin: null, tempMax: 35, contChance: 20, rainbowChance: null, notAllowedIn: [] },
+        { rollMin: 26, rollMax: 27, type: "Hailstorm", tempMin: null, tempMax: 65, contChance: 10, rainbowChance: null, notAllowedIn: ["Desert", "Dust"] },
+        { rollMin: 28, rollMax: 30, type: "Heavy Fog", tempMin: 32, tempMax: 60, contChance: 25, rainbowChance: 1, notAllowedIn: ["Desert", "Dust"] },
+        { rollMin: 31, rollMax: 38, type: "Light Fog", tempMin: 32, tempMax: 70, contChance: 30, rainbowChance: 3, notAllowedIn: ["Desert"] },
+        { rollMin: 39, rollMax: 40, type: "Mist", tempMin: 32, tempMax: null, contChance: 15, rainbowChance: 10, notAllowedIn: [] },
+        { rollMin: 41, rollMax: 45, type: "Drizzle", tempMin: 32, tempMax: null, contChance: 20, rainbowChance: 5, notAllowedIn: [] },
+        { rollMin: 46, rollMax: 60, type: "Rainstorm, light", tempMin: 32, tempMax: null, contChance: 45, rainbowChance: 15, notAllowedIn: [] },
+        { rollMin: 61, rollMax: 70, type: "Rainstorm, heavy", tempMin: 32, tempMax: null, contChance: 30, rainbowChance: 20, notAllowedIn: [] },
+        { rollMin: 71, rollMax: 84, type: "Thunderstorm", tempMin: 32, tempMax: null, contChance: 15, rainbowChance: 20, notAllowedIn: [] },
+        { rollMin: 85, rollMax: 89, type: "Tropical Storm", tempMin: 75, tempMax: null, contChance: 20, rainbowChance: 10, notAllowedIn: ["Desert", "Plains"] },
+        { rollMin: 90, rollMax: 94, type: "Monsoon", tempMin: 80, tempMax: null, contChance: 30, rainbowChance: 5, notAllowedIn: ["Desert", "Dust", "Plains"] },
+        { rollMin: 95, rollMax: 97, type: "Gale", tempMin: 40, tempMax: null, contChance: 15, rainbowChance: 10, notAllowedIn: ["Desert"] },
+        { rollMin: 98, rollMax: 99, type: "Hurricane or typhoon", tempMin: 80, tempMax: null, contChance: 20, rainbowChance: 5, notAllowedIn: ["Desert", "Dust"] },
+        { rollMin: 100, rollMax: 100, type: "Special", tempMin: null, tempMax: null, contChance: 1, rainbowChance: null, notAllowedIn: [] }
+        ],
+        
+    windChillTable: {
+        5: {35: 33, 30: 27, 25: 21, 20: 16, 15: 12, 10: 7, 5: 1, 0: "-6", "-5": "-11", "-10": "-15", "-15": "-20", "-20": "-22"},
+        10: {35: 21, 30: 16, 25: 9, 20: 2, 15: "-2", 10: "-9", 5: "-15", 0: "-22", "-5": "-27", "-10": "-31", "-15": "-37", "-20": "-43"},
+        15: {35: 16, 30: 11, 25: 1, 20: "-6", 15: "-11", 10: "-18", 5: "-25", 0: "-33", "-5": "-40", "-10": "-45", "-15": "-51", "-20": "-58"},
+        20: {35: 12, 30: 3, 25: "-4", 20: "-9", 15: "-17", 10: "-24", 5: "-32", 0: "-40", "-5": "-46", "-10": "-52", "-15": "-58", "-20": "-64"},
+        25: {35: 7, 30: 0, 25: "-7", 20: "-15", 15: "-22", 10: "-29", 5: "-37", 0: "-45", "-5": "-52", "-10": "-58", "-15": "-65", "-20": "-72"},
+        30: {35: 5, 30: "-2", 25: "-11", 20: "-18", 15: "-26", 10: "-33", 5: "-41", 0: "-49", "-5": "-56", "-10": "-63", "-15": "-70", "-20": "-78"},
+        35: {35: 3, 30: "-4", 25: "-13", 20: "-20", 15: "-27", 10: "-35", 5: "-43", 0: "-52", "-5": "-60", "-10": "-67", "-15": "-75", "-20": "-82"},
+        40: {35: 1, 30: "-4", 25: "-15", 20: "-22", 15: "-29", 10: "-36", 5: "-45", 0: "-54", "-5": "-62", "-10": "-69", "-15": "-76", "-20": "-83"},
+        45: {35: 1, 30: "-6", 25: "-17", 20: "-24", 15: "-31", 10: "-38", 5: "-46", 0: "-55", "-5": "-63", "-10": "-70", "-15": "-77", "-20": "-84"},
+        50: {35: 0, 30: "-7", 25: "-17", 20: "-24", 15: "-31", 10: "-38", 5: "-47", 0: "-56", "-5": "-64", "-10": "-71", "-15": "-78", "-20": "-85"},
+        55: {35: "-1", 30: "-8", 25: "-19", 20: "-25", 15: "-33", 10: "-39", 5: "-48", 0: "-57", "-5": "-65", "-10": "-72", "-15": "-79", "-20": "-86"},
+        60: {35: "-3", 30: "-10", 25: "-21", 20: "-27", 15: "-34", 10: "-40", 5: "-49", 0: "-58", "-5": "-66", "-10": "-73", "-15": "-80", "-20": "-87"}
+        }
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1102,26 +1293,6 @@ function adjustTemperatureForWindChill() {
 }
 
 /* function determinePrecipitationType(terrain, currentHighTemp) {
-    const roll = Math.floor(Math.random() * 100) + 1;
-    console.log(`Rolled for precipitation type: ${roll}`);
-
-    for (const type of GlobalWeatherConfig.precipitationTable) {
-        if (roll >= type.rollMin && roll <= type.rollMax) {
-            if (type.notAllowedIn.includes(terrain) ||
-                (type.tempMin !== null && currentHighTemp < type.tempMin) ||
-                (type.tempMax !== null && currentHighTemp > type.tempMax)) {
-                console.log(`Excluding type ${type.type} due to restrictions (terrain: ${terrain}, temp: ${currentHighTemp}°F).`);
-                continue;
-            }
-            console.log(`Precipitation type determined: ${type.type}`);
-            return { precipitationFlag: true, type: type };
-        }
-    }
-
-    console.log("No valid precipitation type found, setting type to 'none'.");
-    return { precipitationFlag: false, type: "none" };  // Return "none" when no suitable type is found
-} */
-function determinePrecipitationType(terrain, currentHighTemp) {
     let attempt = 0;
     while (attempt < 2) {
         const roll = Math.floor(Math.random() * 100) + 1;
@@ -1134,6 +1305,41 @@ function determinePrecipitationType(terrain, currentHighTemp) {
                     (type.tempMax !== null && currentHighTemp > type.tempMax)) {
                     console.log(`Excluding type ${type.type} due to restrictions (terrain: ${terrain}, temp: ${currentHighTemp}°F).`);
                     break; // Exit the for loop to allow for a second roll
+                }
+                console.log(`Precipitation type determined: ${type.type}`);
+                return { precipitationFlag: true, type: type };
+            }
+        }
+
+        attempt++;
+        if (attempt === 2) {
+            console.log("No valid precipitation type found after second attempt, setting type to 'none'.");
+            return { precipitationFlag: false, type: "none" };  // Return "none" when no suitable type is found
+        }
+    }
+}
+ */
+function determinePrecipitationType(terrain, currentHighTemp) {
+    let attempt = 0;
+    const specialRoll = Math.floor(Math.random() * 100) + 1;
+    console.log(`Rolled for special weather check: ${specialRoll}`);
+    //if (specialRoll === 100) {
+    if (specialRoll > 0) {
+        console.log("Special weather triggered.");
+        return { precipitationFlag: true, type: "special" };
+    }
+
+    while (attempt < 2) {
+        const roll = Math.floor(Math.random() * 100) + 1;
+        console.log(`Attempt ${attempt + 1}: Rolled for precipitation type: ${roll}`);
+
+        for (const type of GlobalWeatherConfig.precipitationTable) {
+            if (roll >= type.rollMin && roll <= type.rollMax) {
+                if (type.notAllowedIn.includes(terrain) ||
+                    (type.tempMin !== null && currentHighTemp < type.tempMin) ||
+                    (type.tempMax !== null && currentHighTemp > type.tempMax)) {
+                    console.log(`Excluding type ${type.type} due to restrictions (terrain: ${terrain}, temp: ${currentHighTemp}°F).`);
+                    break; // Exit the for loop to allow for a second attempt
                 }
                 console.log(`Precipitation type determined: ${type.type}`);
                 return { precipitationFlag: true, type: type };
@@ -1299,7 +1505,7 @@ async function displayWeatherConditions(weatherData, season, settings, onlyConso
         skyCondition = 'Not available', sunrise = 'Not available', sunset = 'Not available',
         highTemp = 'N/A', lowTemp = 'N/A', windChill = 'N/A', humidity = 'N/A',
         humidityEffects = 'No significant effects', // Default value if not set
-        precipitationType = { type: 'None' }, precipitationAmount = 'None', precipitationDuration = 'None',
+        precipitationType = { type: 'None' }, precipitationAmount = 'None', precipitationDuration = 'None', precipitationDurationUnit = 'None',
         continues = 'No', rainbow = { hasRainbow: false, rainbowType: 'None' }, windSpeed = 0, windDirection = 'Not available',
         specialWeatherEvent = 'None', notes = 'No additional notes',
         recordDuration = GlobalWeatherConfig.tempRecordDuration
@@ -1324,7 +1530,9 @@ async function displayWeatherConditions(weatherData, season, settings, onlyConso
     // Correcting how the phases are defined to properly create a string
     let lunaPhase = `${getMoonPhase("Luna", month, day)}`;
     let celenePhase = `${getMoonPhase("Celene", month, day)}`;
-
+    let precipitationDisplay = specialWeatherEvent !== 'None' ? `Special Weather Phenomena: ${specialWeatherEvent}` : `Precipitation Type: ${precipitationType.type}`;
+    //Precipitation Type: ${precipitationType.type}<br></br>
+    
     let message = `
         <strong>Greyhawk Weather Report for ${dateDisplay}</strong><br>
         Season: ${season}<br>
@@ -1342,7 +1550,7 @@ async function displayWeatherConditions(weatherData, season, settings, onlyConso
         Wind Chill: ${windChill !== 'N/A' ? windChill + '°F' : 'N/A'}<br>
         Humidity: ${humidity}<br>
         Humidity Effects: ${humidityEffects}<br>
-        Precipitation Type: ${precipitationType.type}<br>
+        ${precipitationDisplay}<br>
         Precipitation Amount: ${precipitationAmount !== 'None' ? precipitationAmount + ' inches' : 'N/A'}<br>
         Precipitation Duration: ${precipitationDuration !== 'None' ? precipitationDuration : 'N/A'}<br>
         Precipitation Continues?: ${continues}<br>
@@ -1386,6 +1594,7 @@ async function generateWeather() {
             precipitationType: "None",
             precipitationAmount: 0,
             precipitationDuration: 0,
+            precipitationDurationUnit: "none",
             precipitationFlag: false,
             windSpeed: 0,
             windDirection: "Not available",
@@ -1405,80 +1614,6 @@ async function generateWeather() {
         console.log("%cBase temperature for month", "color: green; font-weight: bold");
 
         // Step 0: Determine if Record Temps Occur
-/*         function determineTemperatureExtremes(monthlyBaseTemp, maxHigh, maxLow, terrain) {
-            const roll = Math.floor(Math.random() * 100) + 1;  // Roll percentile
-            let tempAdjustmentFactor = 0;  // Factor to adjust the base temperature
-            
-            if (terrain === "Forest, Sylvan") {
-                return {
-                    adjustedBaseTemp: monthlyBaseTemp,
-                    extremeType: "none",
-                    duration: 1
-                };
-            }
-        
-            // Reset global flags
-            GlobalWeatherConfig.recordTemperatureType = "none";
-            GlobalWeatherConfig.tempRecordLow = false;
-            GlobalWeatherConfig.tempRecordHigh = false;
-        
-            if (roll === 1) {
-                tempAdjustmentFactor = -3 * maxLow;
-                GlobalWeatherConfig.recordTemperatureType = "Extreme record low";
-                GlobalWeatherConfig.tempRecordLow = true;
-            } else if (roll === 2) {
-                tempAdjustmentFactor = -2 * maxLow;
-                GlobalWeatherConfig.recordTemperatureType = "Severe record low";
-                GlobalWeatherConfig.tempRecordLow = true;
-            } else if (roll >= 3 && roll <= 4) {
-                tempAdjustmentFactor = -maxLow;
-                GlobalWeatherConfig.recordTemperatureType = "Record low";
-                GlobalWeatherConfig.tempRecordLow = true;
-            } else if (roll >= 97 && roll <= 98) {
-                tempAdjustmentFactor = maxHigh;
-                GlobalWeatherConfig.recordTemperatureType = "Record high";
-                GlobalWeatherConfig.tempRecordHigh = true;
-            } else if (roll === 99) {
-                tempAdjustmentFactor = 2 * maxHigh;
-                GlobalWeatherConfig.recordTemperatureType = "Severe record high";
-                GlobalWeatherConfig.tempRecordHigh = true;
-            } else if (roll === 100) {
-                tempAdjustmentFactor = 3 * maxHigh;
-                GlobalWeatherConfig.recordTemperatureType = "Extreme record high";
-                GlobalWeatherConfig.tempRecordHigh = true;
-            }
-        
-            const adjustedBaseTemp = monthlyBaseTemp + tempAdjustmentFactor;
-            const duration = tempAdjustmentFactor !== 0 ? determineDurationOfExtremes() : 1;
-        
-            // Update the duration global flag
-            GlobalWeatherConfig.tempRecordDuration = duration;
-        
-            return {
-                adjustedBaseTemp,
-                extremeType: GlobalWeatherConfig.recordTemperatureType = "Severe record low",
-                duration
-            };
-        }
-        
-        function determineDurationOfExtremes() {
-            const durationRoll = Math.floor(Math.random() * 20) + 1;
-            if (durationRoll === 1) {
-                return 1;
-            } else if (durationRoll <= 3) {
-                return 2;
-            } else if (durationRoll <= 10) {
-                return 3;
-            } else if (durationRoll <= 14) {
-                return 4;
-            } else if (durationRoll <= 17) {
-                return 5;
-            } else if (durationRoll <= 19) {
-                return 6;
-            } else {
-                return 7;
-            }
-        } */
         function determineTemperatureExtremes(monthlyBaseTemp, maxHigh, maxLow, terrain) {
             const roll = Math.floor(Math.random() * 100) + 1;  // Roll percentile
             console.log(`Random roll for temperature extremes: ${roll}`);
@@ -1671,23 +1806,50 @@ async function generateWeather() {
         weatherData.precipitationType = precipitationCheck.type; // Ensure this is handled correctly downstream
         console.log("Precipitation flag set to: ", weatherData.precipitationFlag);
         console.log("Precipitation type determined as: ", weatherData.precipitationType);
-
+       
         // Step 3b: Determine Precipitation Type if flag is true
         console.log(`%cSTEP 3b: Determine precip type or if no precip, skip to wind speed only`, "color: green; font-weight: bold");
         if (weatherData.precipitationFlag) {
             const precipTypeResult = determinePrecipitationType(settings.terrain, weatherData.highTemp);
             if (precipTypeResult.precipitationFlag) {
-                weatherData.precipitationType = precipTypeResult.type;
-                console.log("Precipitation type determined and flag:", weatherData.precipitationType, weatherData.precipitationFlag);
-
-                // Step 3c: Determine precip amount, duration, and wind speed if precip is still true
-                console.log(`%cSTEP 3c: DETERMINE PRECIP AMT, DURATION & WIND SPEED`, "color: green; font-weight: bold");
-                console.log("About to call applyWeatherEffects() with:", weatherData.precipitationType.type);
-                const weatherEffects = applyWeatherEffects(weatherData.precipitationType.type, settings.terrain, settings.altitude);
-                weatherData.precipitationAmount = weatherEffects.precipitationAmount;
-                weatherData.precipitationDuration = weatherEffects.precipitationDuration;
-                weatherData.windSpeed = weatherEffects.windSpeed; // Wind speed calculated here
-                console.log("Weather effects determined:", weatherData.precipitationAmount, weatherData.precipitationDuration, weatherData.windSpeed);
+                if (precipTypeResult.type === "special") {
+                    // Handle special weather
+                    const specialWeatherData = determineSpecialWeather(settings.terrain);
+                    console.log("specialWeatherData =", specialWeatherData);
+                    if (specialWeatherData.type !== "none") {
+                        // If a special weather is determined, retrieve additional data
+                        const specialWeatherDetails = findSpecialWeatherData(specialWeatherData.type);
+                        console.log("const specialWeatherDetails = ",specialWeatherDetails);
+                        if (specialWeatherDetails) {
+                            // Apply the special weather data retrieved from the table
+                            //weatherData.precipitationType = specialWeatherDetails.phenomenon;
+                            weatherData.precipitationType = { type: specialWeatherDetails.phenomenon };
+                            weatherData.precipitationAmount = specialWeatherDetails.precipitation;
+                            //weatherData.precipitationDuration = specialWeatherDetails.duration;
+                            weatherData.precipitationDuration = `${evalDice(specialWeatherDetails.duration)} ${specialWeatherDetails.durationUnit}`;
+                            //weatherData.precipitationDurationUnit = specialWeatherDetails.durationUnit;
+                            weatherData.windSpeed = evalDice(specialWeatherDetails.windSpeed); // Assuming evalDice handles the speed dice string
+                            console.log("Special weather effects applied:", weatherData.precipitationType.type, weatherData.precipitationAmount, weatherData.precipitationDuration, weatherData.windSpeed);
+                            //console.log("Special weather effects applied:", weatherData.precipitationType, weatherData.precipitationAmount, weatherData.precipitationDuration, weatherData.windSpeed);
+                        } else {
+                            console.log("Special weather details not found for", specialWeatherData.type);
+                        }
+                    }
+                } else {
+                    // Regular weather processing
+                    //weatherData.precipitationType = precipTypeResult.type.type;
+                    //console.log("Precipitation type determined and flag:", weatherData.precipitationType.type, weatherData.precipitationFlag);
+                    weatherData.precipitationType = { type: precipTypeResult.type.type };
+                    console.log("Precipitation type determined and flag:", weatherData.precipitationType.type, weatherData.precipitationFlag);
+                    
+                    // Step 3c: Determine precip amount, duration, and wind speed if precip is still true
+                    console.log(`%cSTEP 3c: DETERMINE PRECIP AMT, DURATION & WIND SPEED`, "color: green; font-weight: bold");
+                    const weatherEffects = applyWeatherEffects(weatherData.precipitationType, settings.terrain, settings.altitude);
+                    weatherData.precipitationAmount = weatherEffects.precipitationAmount;
+                    weatherData.precipitationDuration = weatherEffects.precipitationDuration;
+                    weatherData.windSpeed = weatherEffects.windSpeed; // Wind speed calculated here
+                    console.log("Weather effects determined:", weatherData.precipitationAmount, weatherData.precipitationDuration, weatherData.windSpeed);
+                }
             } else {
                 console.log("Precipitation type is 'none', skipping related effects.");
                 // Skip to calculating wind speed if no valid precipitation type was determined
@@ -1750,6 +1912,7 @@ async function generateWeather() {
  */
         // Step 9: Compile notes
         console.log(`%cSTEP 9a: Compile weather notes`, "color: green; font-weight: bold");
+        console.log("weatherData.notes is calling compileWeatherNotes with: ", weatherData.precipitationType.type, settings.terrain, GlobalWeatherConfig.month, GlobalWeatherConfig.day);
         weatherData.notes = compileWeatherNotes(weatherData.precipitationType.type, settings.terrain, GlobalWeatherConfig.month, GlobalWeatherConfig.day);
 
         console.log(`%cSTEP 9b: Compile wind notes`, "color: green; font-weight: bold");
@@ -2557,50 +2720,7 @@ function determineSeason(month) {
     return seasons[month] || "Unknown";
 }
 
-/* function compileWeatherNotes(weatherType, terrain) {
-    let notes = [];
-
-    // Check standard weather table for extended details
-    const weatherDetails = GlobalWeatherConfig.standardWeatherTable.find(item => item.name === weatherType);
-    if (weatherDetails) {
-        let detailsNotes = [
-            weatherDetails.notes,
-            `Movement: ${weatherDetails.movement}`,
-            `Normal Vision Range: ${weatherDetails.NormVisionRng}`,
-            `IR Vision Range: ${weatherDetails.IRvisionRng}`,
-            `Tracking: ${weatherDetails.tracking}`,
-            `Lost Chance: ${weatherDetails.lostChance}`
-        ].filter(detail => detail).join(". "); // Filter out empty details
-        notes.push(detailsNotes);
-    }
-
-    // Check special weather table for extended details
-    const specialWeatherDetails = GlobalWeatherConfig.specialWeatherTable.find(item => item.phenomenon === weatherType);
-    if (specialWeatherDetails) {
-        let specialNotes = [
-            specialWeatherDetails.notes,
-            `Precipitation: ${specialWeatherDetails.precipitation}`,
-            `Duration: ${specialWeatherDetails.duration}`,
-            `Effect on Vision: ${specialWeatherDetails.effectOnVision}`,
-            `Effect on IR Vision: ${specialWeatherDetails.effectOnIRVision}`,
-            `Tracking: ${specialWeatherDetails.effectOnTracking}`,
-            `Chance of Getting Lost: ${specialWeatherDetails.chanceOfGettingLost}`,
-            `Speed: ${specialWeatherDetails.speed}`
-        ].filter(detail => detail).join(". ");
-        notes.push(specialNotes);
-    }
-
-    // Check terrain effects table for notes
-    const terrainNote = GlobalWeatherConfig.terrainEffects[terrain]?.notes;
-    if (terrainNote) {
-        notes.push(terrainNote);
-    }
-
-    // Combine all notes into a single string
-    return notes.join(". ") || "No specific notes for current conditions.";
-}
- */
-function compileWeatherNotes(weatherType, terrain, month, day) {
+/* function compileWeatherNotes(weatherType, terrain, month, day) {
     let notes = [];
 
     // Check standard weather table for extended details
@@ -2628,7 +2748,7 @@ function compileWeatherNotes(weatherType, terrain, month, day) {
             `IR Vision Range: ${specialWeatherDetails.effectOnIRVision}`,
             `Tracking: ${specialWeatherDetails.effectOnTracking}`,
             `Chance of Getting Lost: ${specialWeatherDetails.chanceOfGettingLost}`,
-            `Speed: ${specialWeatherDetails.speed}`
+            `Speed: ${specialWeatherDetails.windSpeed}`
         ].filter(detail => detail).join(". ");
         notes.push(specialNotes);
     }
@@ -2647,6 +2767,69 @@ function compileWeatherNotes(weatherType, terrain, month, day) {
 
     // Combine all notes into a single string
     return notes.join(". ") || "No specific notes for current conditions.";
+} */
+function compileWeatherNotes(weatherType, terrain, month, day) {
+    console.log(`Compiling weather notes for type: ${weatherType}, terrain: ${terrain}, month: ${month}, day: ${day}`);
+    let notes = [];
+
+    // Check standard weather table for extended details
+    const weatherDetails = GlobalWeatherConfig.standardWeatherTable.find(item => item.name === weatherType);
+    if (weatherDetails) {
+        console.log(`Standard weather details found for ${weatherType}:`, weatherDetails);
+        let detailsNotes = [
+            weatherDetails.notes,
+            `Movement: ${weatherDetails.movement}`,
+            `Normal Vision Range: ${weatherDetails.normVisionRng}`,
+            `IR Vision Range: ${weatherDetails.irVisionRng}`,
+            `Tracking: ${weatherDetails.tracking}`,
+            `Chance of Getting Lost: ${weatherDetails.lostChance}`
+        ].filter(detail => detail).join(". ");
+        notes.push(detailsNotes);
+    } else {
+        console.log(`No standard weather details found for ${weatherType}.`);
+    }
+
+    // Check special weather table for extended details
+    const specialWeatherDetails = GlobalWeatherConfig.specialWeatherTable.find(item => item.phenomenon === weatherType);
+    if (specialWeatherDetails) {
+        console.log(`Special weather details found for ${weatherType}:`, specialWeatherDetails);
+        let specialNotes = [
+            specialWeatherDetails.notes,
+            `Precipitation: ${specialWeatherDetails.precipDice}`,
+            `Duration: ${specialWeatherDetails.duration} ${specialWeatherDetails.durationUnit}`,
+            `Normal Vision Range: ${specialWeatherDetails.NormVisionRng}`,
+            `IR Vision Range: ${specialWeatherDetails.IRvisionRng}`,
+            `Tracking: ${specialWeatherDetails.tracking}`,
+            `Chance of Getting Lost: ${specialWeatherDetails.lostChance}`,
+            `Wind Speed: ${evalDice(specialWeatherDetails.windSpeed)} mph`
+        ].filter(detail => detail).join(". ");
+        notes.push(specialNotes);
+    } else {
+        console.log(`No special weather details found for ${weatherType}.`);
+    }
+
+    // Check terrain effects table for notes
+    const terrainNote = GlobalWeatherConfig.terrainEffects[terrain]?.notes;
+    if (terrainNote) {
+        console.log(`Terrain notes for ${terrain}: ${terrainNote}`);
+        notes.push(terrainNote);
+    } else {
+        console.log(`No specific terrain notes for ${terrain}.`);
+    }
+
+    // Include lycanthrope activity based on moon phases
+    const lycanthropeActivity = evaluateLycanthropeActivity(month, day);
+    if (lycanthropeActivity !== 'Normal.') {
+        console.log(`Lycanthrope activity noted: ${lycanthropeActivity}`);
+        notes.push(`Lycanthrope Activity: ${lycanthropeActivity}`);
+    } else {
+        console.log(`No special lycanthrope activity for ${month} ${day}.`);
+    }
+
+    // Combine all notes into a single string
+    const compiledNotes = notes.join(". ") || "No specific notes for current conditions.";
+    console.log(`Compiled notes: ${compiledNotes}`);
+    return compiledNotes;
 }
 
 function compileWindNotes(windSpeed) {
@@ -2760,30 +2943,29 @@ function evaluateLycanthropeActivity(month, day) {
 }
 
 function determineSpecialWeather(terrain) {
+    console.log(`Determining special weather for terrain: ${terrain}`);
+
+    // Attempt to fetch the terrain-specific data from the global configuration
     const terrainData = GlobalWeatherConfig.terrainEffects[terrain];
-    if (!terrainData || !terrainData.specialWeather) {
-        console.log("No special weather configuration found for terrain:", terrain);
+    if (!terrainData || !terrainData.specialWeather || terrainData.specialWeather.length === 0) {
+        console.log("No special weather configuration found or empty special weather list for terrain:", terrain);
         return { precipitationFlag: false, type: "none" };
     }
 
-    // Check global flag to see if special weather events are allowed
-    if (!GlobalWeatherConfig.specialWeather) {
-        console.log("Special weather events are disabled globally.");
-        return { precipitationFlag: false, type: "none" };
-    }
+    // Log the special weather possibilities for debugging
+    console.log(`Special weather options for ${terrain}:`, terrainData.specialWeather.map(sw => `${sw.range[0]}-${sw.range[1]}: ${sw.event}`).join(", "));
 
-    // Rolling for specific special weather type based on the terrain's special weather string
+    // Roll for special weather determination
     const roll = Math.floor(Math.random() * 100) + 1;
-    const specialWeatherOptions = terrainData.specialWeather.split(', ');
-    for (let option of specialWeatherOptions) {
-        let [range, event] = option.split(': ');
-        let [min, max] = range.split('-').map(Number);
-        if (roll >= min && roll <= max) {
-            console.log(`Special weather type determined based on terrain: ${event.trim()}`);
+    console.log(`Rolled for special weather check: ${roll}`);
 
-            // Update global settings to reflect that a special weather event has occurred
-            GlobalWeatherConfig.specialWeatherEvent = event.trim();
-            return { precipitationFlag: true, type: event.trim() };
+    // Iterate over special weather options to find a match
+    for (const option of terrainData.specialWeather) {
+        console.log(`Checking if roll ${roll} is between ${option.range[0]} and ${option.range[1]} for ${option.event}`);
+        if (roll >= option.range[0] && roll <= option.range[1]) {
+            console.log(`Special weather type determined based on terrain and roll: ${option.event}`);
+            GlobalWeatherConfig.specialWeatherEvent = option.event;  // Update the global setting
+            return { precipitationFlag: true, type: option.event };
         }
     }
 
@@ -2791,5 +2973,26 @@ function determineSpecialWeather(terrain) {
     console.log("No special weather type matched the roll, defaulting to generic special weather.");
     GlobalWeatherConfig.specialWeatherEvent = "generic special weather"; // Update the global event type
     return { precipitationFlag: true, type: "generic special weather" };
+}
+
+function findSpecialWeatherData(phenoName) {
+    // Log the starting of the function and what it is looking for
+    console.log(`Searching for special weather data for phenomenon: ${phenoName}`);
+
+    // Access the global specialWeatherTable from the configuration
+    const specialWeatherTable = GlobalWeatherConfig.specialWeatherTable;
+    console.log(`Total special weather entries available: ${specialWeatherTable.length}`);
+
+    // Find the matching weather phenomenon based on the name
+    const weatherData = specialWeatherTable.find(weather => weather.phenomenon === phenoName);
+
+    // Log the result of the search
+    if (weatherData) {
+        console.log(`Special weather data found for ${phenoName}:`, weatherData);
+        return weatherData;
+    } else {
+        console.log(`No special weather data found for ${phenoName}.`);
+        return null; // Return null if no matching phenomenon is found
+    }
 }
 
