@@ -1985,7 +1985,7 @@ async function generateWeather() {
         // Step 9: Compile notes
         console.log(`%cSTEP 9a: Compile weather notes`, "color: green; font-weight: bold");
         console.log("weatherData.notes is calling compileWeatherNotes with: ", weatherData.precipitationType.type, settings.terrain, GlobalWeatherConfig.month, GlobalWeatherConfig.day);
-        weatherData.notes = compileWeatherNotes(weatherData.precipitationType.type, settings.terrain, GlobalWeatherConfig.month, GlobalWeatherConfig.day);
+        weatherData.notes = compileWeatherNotes(weatherData.precipitationType.type, settings.terrain, GlobalWeatherConfig.month, GlobalWeatherConfig.day, weatherData.windChill, season, GlobalWeatherConfig.skyCondition);
 
         console.log(`%cSTEP 9b: Compile wind notes`, "color: green; font-weight: bold");
         weatherData.windEffects = compileWindNotes(weatherData.windSpeed);
@@ -2774,7 +2774,7 @@ function determineSeason(month) {
     return seasons[month] || "Unknown";
 }
 
-function compileWeatherNotes(weatherType, terrain, month, day) {
+function compileWeatherNotes(weatherType, terrain, month, day, temperature, season, skyCondition) {
     console.log(`Compiling weather notes for type: ${weatherType}, terrain: ${terrain}, month: ${month}, day: ${day}`);
     let notes = [];
 
@@ -2821,6 +2821,21 @@ function compileWeatherNotes(weatherType, terrain, month, day) {
         console.log(`No special weather details found for ${weatherType}.`);
     }
 
+    console.log(`Windchill temperature: ${temperature}°F, Sky condition:  ${skyCondition}, Weather type: ${weatherType}`);
+     // Frostbite note
+    if (temperature <= -40) {
+        console.log(`Frostbite warning triggered at temperature: ${temperature}°F`);
+        notes.push("At temperatures of -40 degrees F and below, frostbite will destroy an exposed body part in 10-30 minutes.");
+    }
+
+    // Snowblindness note - Only in winter season, clear skies, and no significant weather phenomenon
+    if (season === 'Winter' && skyCondition.toLowerCase() === 'clear' && (weatherType === "none" || weatherType === null || weatherType === "undefined")) {
+        console.log(`Snowblindness warning triggered during ${season}, with clear skies and no significant weather event.`);
+        notes.push("On a sunny winter day, there is a cumulative 2% chance per hour that a character will become snowblind for d4 turns. " +
+        "The effects of this are equivalent to a Light spell cast on the character's visage.");
+    }
+
+    
     // Check terrain effects table for notes
     const terrainNote = GlobalWeatherConfig.terrainEffects[terrain]?.notes;
     if (terrainNote) {
