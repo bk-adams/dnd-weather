@@ -411,7 +411,7 @@ standardWeatherTable: [
         windSpeed: "6d8+40",
         minTemp: null,
         maxTemp: 10,
-        notes: "Snowdrifts of up to 10 ft per hour may accumulate against buildings, walls, etc."
+        notes: "Snowdrifts of up to 10 ft per hour may accumulate against buildings, walls, etc"
     },
     {
         name: "Blizzard",
@@ -426,7 +426,7 @@ standardWeatherTable: [
         windSpeed: "3d8+36",
         minTemp: null,
         maxTemp: 20,
-        notes: "Snowdrifts of up to 5 ft per hour may accumulate against buildings, walls, etc."
+        notes: "Snowdrifts of up to 5 ft per hour may accumulate against buildings, walls, etc"
     },
     {
         name: "Snowstorm, heavy",
@@ -441,7 +441,7 @@ standardWeatherTable: [
         windSpeed: "3d10",
         minTemp: null,
         maxTemp: 25,
-        notes: "Drifts of 1 foot per hour if wind speed > 20 mph."
+        notes: "Drifts of 1 foot per hour if wind speed > 20 mph"
     },
     {
         name: "Snowstorm, light",
@@ -456,7 +456,7 @@ standardWeatherTable: [
         windSpeed: "4d6",
         minTemp: null,
         maxTemp: 35,
-        notes: "Drifts of 1 foot per hour if wind speed > 20 mph."
+        notes: "Drifts of 1 foot per hour if wind speed > 20 mph"
     },
     {
         name: "Sleetstorm",
@@ -487,7 +487,7 @@ standardWeatherTable: [
         maxTemp: 65,
         notes: "Average hailstone diameter is 1/2 d4 inches. If stones are more than 1 inch in diameter, " +
                "assess 1 point of damage per 1/2 inch of diameter every turn for those AC6 or worse. Rings, " +
-			   "bracers, etc., give no protection from this damage, but magic armor does."
+			   "bracers, etc., give no protection from this damage, but magic armor does"
     },
     {
         name: "Heavy Fog",
@@ -553,7 +553,7 @@ standardWeatherTable: [
         lostChance: "+10% cumulative",
         windSpeed: "1d20",
         notes: "A drop in temperature to 30\u{B0}F or below after a storm may result in icy conditions, " +
-				"affecting travel and dexterity."
+				"affecting travel and dexterity"
     },
     {
         name: "Rainstorm, heavy",
@@ -567,7 +567,7 @@ standardWeatherTable: [
         lostChance: "+10% cumulative",
         windSpeed: "2d12+10",
         notes: "A drop in temperature to 30\u{B0}F or below after a storm may result in icy conditions, " +
-				"affecting travel and dexterity."
+				"affecting travel and dexterity"
     },
     {
         name: "Thunderstorm",
@@ -582,7 +582,7 @@ standardWeatherTable: [
         windSpeed: "4d10",
         notes: "Lightning strikes occur once every 10 minutes with a 1% chance of hitting the party, increased " +
 		"to 10% if sheltering under trees. Damage is 6d6, with a saving throw allowed for half damage. A drop in " +
-		"temperature to 30\u{B0}F or below after a storm may result in icy conditions, affecting travel and dexterity."
+		"temperature to 30\u{B0}F or below after a storm may result in icy conditions, affecting travel and dexterity"
     },
     {
         name: "Tropical Storm",
@@ -596,7 +596,7 @@ standardWeatherTable: [
         lostChance: "+30%",
         windSpeed: "3d12",
         notes: "Every 3 turns, there's a 10% chance of gust damage if wind speed exceeds 40 mph. Damage is 1d6 " +
-				"for every 10 mph over 40 mph."
+				"for every 10 mph over 40 mph"
     },
     {
         name: "Monsoon",
@@ -610,7 +610,7 @@ standardWeatherTable: [
         lostChance: "+30%",
         windSpeed: "6d10",
         notes: "Every 3 turns, there's a 10% chance of gust damage if wind speed exceeds 40 mph. Damage is 1d6 " +
-				"for every 10 mph over 40 mph."
+				"for every 10 mph over 40 mph"
     },
     {
         name: "Gale",
@@ -624,7 +624,7 @@ standardWeatherTable: [
         lostChance: "+20%",
         windSpeed: "6d8+40",
         notes: "Every 3 turns, there's a 10% chance of gust damage if wind speed exceeds 40 mph. Damage is 1d6 " +
-				"for every 10 mph over 40 mph."
+				"for every 10 mph over 40 mph"
     },
     {
         name: "Hurricane or typhoon",
@@ -638,7 +638,7 @@ standardWeatherTable: [
         lostChance: "+30%",
         windSpeed: "7d10+70",
         notes: "Unprotected creatures suffer 1d6 wind damage every 3 turns, and buildings take 1d4 " +
-				"structural damage each turn."
+				"structural damage each turn"
     }
 ],
 
