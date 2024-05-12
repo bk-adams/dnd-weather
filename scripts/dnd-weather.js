@@ -1566,7 +1566,7 @@ function formatFractions(text) {
     // Replace fractions with their corresponding unicode characters
     return text.replace(/1\/2/g, '½').replace(/1\/4/g, '¼').replace(/3\/4/g, '¾');
 }
-
+        
 async function displayWeatherConditions(weatherData, season, settings, onlyConsole = false) {
     const { latitude, altitude, terrain, month, year, day } = settings;
     // Using default objects for precipitationType and rainbow to safely access nested properties
@@ -1582,6 +1582,8 @@ async function displayWeatherConditions(weatherData, season, settings, onlyConso
 
     const windLabel = getWindSpeedLabel(windSpeed);  // Assume this function correctly labels the wind speed
     const windEffects = compileWindNotes(windSpeed); // This function should return 'None' if there are no effects
+    const continuingWeather = GlobalWeatherConfig.continuingWeatherEvent !== "none";
+    const continuingWeatherType = GlobalWeatherConfig.continuingWeatherEvent;
 
     // Determining whether there are record temperatures
     const isRecordTemp = GlobalWeatherConfig.recordTemperatureType !== "none";
@@ -1622,7 +1624,8 @@ async function displayWeatherConditions(weatherData, season, settings, onlyConso
         ${precipitationDisplay}<br>
         Precipitation Amount: ${precipitationAmount !== 'None' ? precipitationAmount + ' inches' : 'N/A'}<br>
         Precipitation Duration: ${precipitationDuration !== 'None' ? precipitationDuration : 'N/A'}<br>
-        Precipitation Continues?: ${continues}<br>
+        Continuing Weather: ${continuingWeather ? 'Yes' : 'No'}<br>
+        Continuing Weather Type: ${continuingWeatherType}<br>
         Rainbow: ${rainbow.hasRainbow ? rainbow.rainbowType : 'None'}<br>
         Wind Speed: ${windLabel} (${windSpeed} mph)<br>
         Wind Direction: ${windDirection}<br>
@@ -1921,6 +1924,21 @@ async function generateWeather() {
                     weatherData.precipitationDuration = weatherEffects.precipitationDuration;
                     weatherData.windSpeed = weatherEffects.windSpeed; // Wind speed calculated here
                     console.log("Weather effects determined:", weatherData.precipitationAmount, weatherData.precipitationDuration, weatherData.windSpeed);
+                    
+                    // Check for continuing weather before proceeding with new weather generation
+                    if (GlobalWeatherConfig.continuingWeatherEvent === weatherData.precipitationType.type || GlobalWeatherConfig.continuingWeatherEvent === "none") {
+                        const continuationResult = determineWeatherContinuation(weatherData.precipitationType.type);
+                        GlobalWeatherConfig.precipContinues = continuationResult.continues;
+                        GlobalWeatherConfig.continuingWeatherEvent = continuationResult.newWeatherType;
+                        GlobalWeatherConfig.continuingWeatherEventDuration = continuationResult.continuationChance;
+
+                        if (continuationResult.continues) {
+                            console.log(`Weather continues as ${continuationResult.newWeatherType}. Generate this weather?`);
+                        } else {
+                            console.log("Weather does not continue. Proceeding with normal weather generation.");
+                        }
+                    }
+
                 }
             } else {
                 console.log("Precipitation type is 'none', skipping related effects.");
@@ -3043,3 +3061,55 @@ function determineCauseOfWeatherPhenomenon() {
     }
 }
 
+function determineWeatherContinuation(currentWeatherType) {
+    const weatherDetails = GlobalWeatherConfig.precipitationTable.find(p => p.type === currentWeatherType);
+    if (!weatherDetails) {
+        console.log("Weather type not found in precipitation table:", currentWeatherType);
+        return {
+            continues: false,
+            newWeatherType: currentWeatherType,
+            continuationChance: 0
+        };
+    }
+
+    // Roll to see if the weather continues
+    const continuationRoll = Math.floor(Math.random() * 100) + 1;
+    console.log(`Rolled for weather continuation: ${continuationRoll} vs continuation chance: ${weatherDetails.contChance}%`);
+
+    if (continuationRoll <= weatherDetails.contChance) {
+        // Determine if the type of precipitation changes
+        const changeTypeRoll = Math.floor(Math.random() * 10) + 1;
+        console.log(`Roll for type of precipitation change: ${changeTypeRoll}`);
+
+        let newWeatherType = currentWeatherType;
+        if (changeTypeRoll === 1) {
+            newWeatherType = moveUpOneLine(currentWeatherType);
+            console.log(`Weather type moves up one line in the precipitation table to: ${newWeatherType}`);
+        } else if (changeTypeRoll === 10) {
+            newWeatherType = moveDownOneLine(currentWeatherType);
+            console.log(`Weather type moves down one line in the precipitation table to: ${newWeatherType}`);
+        }
+
+        return {
+            continues: true,
+            newWeatherType: newWeatherType,
+            continuationChance: weatherDetails.contChance
+        };
+    } else {
+        return {
+            continues: false,
+            newWeatherType: currentWeatherType,
+            continuationChance: weatherDetails.contChance
+        };
+    }
+}
+
+function moveUpOneLine(currentWeatherType) {
+    const currentIndex = GlobalWeatherConfig.precipitationTable.findIndex(p => p.type === currentWeatherType);
+    return currentIndex > 0 ? GlobalWeatherConfig.precipitationTable[currentIndex - 1].type : currentWeatherType;
+}
+
+function moveDownOneLine(currentWeatherType) {
+    const currentIndex = GlobalWeatherConfig.precipitationTable.findIndex(p => p.type === currentWeatherType);
+    return currentIndex < GlobalWeatherConfig.precipitationTable.length - 1 ? GlobalWeatherConfig.precipitationTable[currentIndex + 1].type : currentWeatherType;
+}
