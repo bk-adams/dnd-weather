@@ -1866,10 +1866,20 @@ async function generateWeather() {
 
         console.log("Temperatures determined:", weatherData.highTemp, weatherData.lowTemp);
 
-        // Step 2: Determine Sky Conditions
+        /* // Step 2: Determine Sky Conditions
         console.log(`%cSTEP 2: DETERMINE SKY CONDITIONS`, "color: green; font-weight: bold");
         weatherData.skyCondition = await determineSkyConditions(settings.month);
         console.log("Sky conditions determined:", weatherData.skyCondition);
+ */
+        // Step 2: Determine Sky Conditions
+        console.log(`%cSTEP 2: DETERMINE SKY CONDITIONS`, "color: green; font-weight: bold");
+        if (GlobalWeatherConfig.continuingWeatherEvent !== "none") {
+            weatherData.skyCondition = "Cloudy";
+            console.log(`%cSky conditions set to 'Cloudy' due to continuing weather event.`, "color:blue; font-weight: italic");
+        } else {
+            weatherData.skyCondition = await determineSkyConditions(settings.month);
+            console.log("Sky conditions determined:", weatherData.skyCondition);
+        }
 
         // Step 3a: Check for Precipitation
         console.log(`%cSTEP 3a: DETERMINE IF PRECIP OCCURS`, "color: green; font-weight: bold");
