@@ -120,7 +120,7 @@ specialWeatherTable: [
         NormVisionRng: "No",
         IRvisionRng: "No",
         tracking: "No",
-        lostChance: "80%",
+        lostChance: "+80%",
         windSpeed: "5d10",
 		notes: "50% chance of d4 damage every 3 turns, no saving throw, until shelter is found."
     },
@@ -134,7 +134,7 @@ specialWeatherTable: [
         NormVisionRng: "No",
         IRvisionRng: "No",
         tracking: "No",
-        lostChance: "80%",
+        lostChance: "+80%",
         windSpeed: "5d10",
 		notes: "50% chance of d4 damage every 3 turns, no saving throw, until shelter is found."
     },
@@ -149,7 +149,7 @@ specialWeatherTable: [
         IRvisionRng: "x3/4",
         tracking: "No",
         lostChance: "+30%",
-        windSpeed: "8d10",
+        windSpeed: "8d10+20",
 		notes: "50% chance of 2d6 of rock damage every 3 turns. Characters must roll dexterity or " +
 				"less on d20 to save for 1/2 damage; monsters must save vs. pertrifaction."
     },
@@ -159,9 +159,9 @@ specialWeatherTable: [
         duration: "1d10",
         durationUnit: "hours",
         areaEffect: "Normal",
-        movement: "Foot: x1/4 H: x1/4 C: no (may be overturned)",
-        NormVisionRng: "No",
-        IRvisionRng: "No",
+        movement: "Foot: x1/4 Horse: x1/4 Cart: no (may be overturned)",
+        NormVisionRng: "Normal",
+        IRvisionRng: "Normal",
         tracking: "-50%",
         lostChance: "+10% (+30% on horse)",
         windSpeed: "d20",
@@ -174,16 +174,37 @@ specialWeatherTable: [
 				"Each shock wave causes damage as the 7th level cleric spell Earthquake."
     },
     {
-        phenomenon: "Rock Avalanche",
+        phenomenon: "Earthquake, Undersea",
         precipDice: "",
+        duration: "1d10",
+        durationUnit: "hours",
+        areaEffect: "Normal",
+        movement: "Foot: x1/4 Horse: x1/4 Cart: no (may be overturned)",
+        NormVisionRng: "Normal",
+        IRvisionRng: "Normal",
+        tracking: "-50%",
+        lostChance: "+10% (+30% on horse)",
+        windSpeed: "d20",
+		notes: "A tsunami will occur in d10 hours. Center is 1-100 miles away from party, " +
+                "with shock waves extending 1-1000 miles. " +
+				"The first shock wave of the earthquake will be preceded by 1-4 mild tremors, " +
+				"which do no damage but cause untrained horses, cattle, and other animals to " +
+				"bolt in fear and run for open ground. After a delay of 1-6	rounds, the first " +
+				"shock wave reaches the party, and there are 1-6 shock waves in an earthquake. " +
+				"Roll d20 to determine the number of rounds between	each of the shock waves. " +
+				"Each shock wave causes damage as the 7th level cleric spell Earthquake."
+    },
+    {
+        phenomenon: "Rock Avalanche",
+        precipDice: "5d10",
         duration: "1d10",
         durationUnit: "minutes",
         areaEffect: "Normal",
-        movement: "may be blocked",
-        NormVisionRng: "No",
-        IRvisionRng: "No",
+        movement: "May be blocked",
+        NormVisionRng: "Normal",
+        IRvisionRng: "Normal",
         tracking: "-60%",
-        lostChance: "30% on horse",
+        lostChance: "+10% if trail is covered",
         windSpeed: "d20",
 		notes: "Damage is 2d2O pts., with save (vs. dexterity or petrification) for 1/2 damage. " +
 				"Victims taking more than 20 points of damage are buried and will suffocate in 6 rounds unless rescued."
@@ -194,18 +215,18 @@ specialWeatherTable: [
         duration: "1d10",
         durationUnit: "minutes",
         areaEffect: "Normal",
-        movement: "may be blocked",
-        NormVisionRng: "No",
-        IRvisionRng: "No",
+        movement: "May be blocked",
+        NormVisionRng: "Normal",
+        IRvisionRng: "Normal",
         tracking: "-60%",
-        lostChance: "30% on horse",
+        lostChance: "+10% if trail is covered",
         windSpeed: "d20",
 		notes: "Damage is 2d2O pts., with save (vs. dexterity or petrification) for 1/2 damage. " +
 				"Victims taking more than 20 points of damage are buried and will suffocate in 6 rounds unless rescued."
     },
     {
         phenomenon: "Volcano",
-        precipDice: "d8 inches of ash per day",
+        precipDice: "d8",
         duration: "1d10",
         durationUnit: "days",
         areaEffect: "Normal",
@@ -215,7 +236,27 @@ specialWeatherTable: [
         tracking: "-50%",
         lostChance: "+20% (+40% if on horse)",
         windSpeed: "d20",
-		notes: "Ash burns: d4 damage every 3 turns, no save. Location: 0-7 (d8-l) miles from party. " +
+		notes: "1d8 inches of ash per day. Ash burns: d4 damage every 3 Turns, no save. Location: 0-7 (d8-l) miles from party. " +
+				"Lava flows at dlO mph, does damage as a salamander's tail (2d6). For every day a volcano " +
+				"continues to erupt, the base temperature will rise 1 degree in a 60-mile-diameter " +
+				"area. This overheating will lapse after 7-12 months, as particles of ash in the air " +
+				"bring the temperature backdown, but the chance of clear skies in the area will be " +
+				"cut by 50% for anadditonal 1-6	months thereafter."
+    },
+    {
+        phenomenon: "Volcano, Undersea",
+        precipDice: "d8",
+        duration: "1d10",
+        durationUnit: "days",
+        areaEffect: "Normal",
+        movement: "x1/2 (all)",
+        NormVisionRng: "x1/2",
+        IRvisionRng: "x1/2",
+        tracking: "-50%",
+        lostChance: "+20% (+40% if on horse)",
+        windSpeed: "d20",
+		notes: "An island will be formed after 2d6 days. 1d8 inches of ash per day. Ash burns: d4 damage " +
+                "every 3 Turns, no save. Location: 0-7 (d8-l) miles from party. " +
 				"Lava flows at dlO mph, does damage as a salamander's tail (2d6). For every day a volcano " +
 				"continues to erupt, the base temperature will rise 1 degree in a 60-mile-diameter " +
 				"area. This overheating will lapse after 7-12 months, as particles of ash in the air " +
@@ -224,17 +265,17 @@ specialWeatherTable: [
     },
     {
         phenomenon: "Tsunami",
-        precipDice: "Wave ht. has 10d20 feet",
+        precipDice: "",
         duration: "1d2",
         durationUnit: "hours",
         areaEffect: "Normal",
         movement: "Normal",
-        NormVisionRng: "No",
-        IRvisionRng: "No",
+        NormVisionRng: "Normal",
+        IRvisionRng: "Normal",
         tracking: "No",
         lostChance: "Normal",
         windSpeed: "5d10+10",
-		notes: "Save vs. dexterity/petrification or drown. If save is made, victim takes d20 damage."
+		notes: "Wave height is 10d20 feet. Save vs. Dexterity/Petrification or drown. If save is made, victim takes d20 damage."
     },
     {
         phenomenon: "Quicksand",
@@ -243,12 +284,12 @@ specialWeatherTable: [
         durationUnit: "",
         areaEffect: "covers radius of d20 inches",
         movement: "Normal (until entered)",
-        NormVisionRng: "No",
-        IRvisionRng: "No",
+        NormVisionRng: "Normal",
+        IRvisionRng: "Normal",
         tracking: "No",
-        lostChance: "+20 if skirted",
+        lostChance: "+20% if skirted",
         windSpeed: "d20",
-		notes: "An individual wearing no armor, leather armor, studded armor, elven chain, or magical armor " +
+		notes: "Covers a radius of d20 inches. An individual wearing no armor, leather armor, studded armor, elven chain, or magical armor " +
 				"will only sink up to the neck if he remains motionless, keeps his arms above the surface, " +
 				"and discards all heavy items. Other characters will be dragged under at the rate of 1 foot " +
 				"per round if motionless or 2 feet per round if attempting to escape. Drowning occurs 3 rounds " +
@@ -256,15 +297,15 @@ specialWeatherTable: [
 				"damage of d6 per round of submersion once character is resuscitated."
     },
     {
-        phenomenon: "Flash flood",
+        phenomenon: "Flash Flood",
         precipDice: "3",
         duration: "1d6+2",
         durationUnit: "hours",
         areaEffect: "Normal",
         movement: "Normal",
         NormVisionRng: "Normal",
-        IRvisionRng: "No",
-        tracking: "-5% per turn",
+        IRvisionRng: "Normal",
+        tracking: "-5% per Turn",
         lostChance: "+10%",
         windSpeed: "d20",
 		notes: "A flash flood will begin with what appears to be a heavy rainstorm, with appropriate effects, " +
@@ -275,37 +316,37 @@ specialWeatherTable: [
 				"water flows in narrow gullies."
     },
     {
-        phenomenon: "Rain forest downpour",
-        precipDice: "1 inch per hour",
+        phenomenon: "Rain Forest Downpour",
+        precipDice: "d1",
         duration: "3d4",
         durationUnit: "hours",
         areaEffect: "Normal",
-        movement: "Foot: x1/2, H: x1/2, C: no",
+        movement: "Foot: x1/2, Horse: x1/2, Cart: no",
         NormVisionRng: "x3/4",
         IRvisionRng: "x3/4",
-        tracking: "-5% per turn",
+        tracking: "-5% per Turn",
         lostChance: "+20%",
         windSpeed: "d6-1",
-		notes: "The ground will absorb up to 6 inches of water; then mud will form, converting the area to a " +
+		notes: "Precipitation is 1 inch per hour. The ground will absorb up to 6 inches of water; then mud will form, converting the area to a " +
 				"swamp for travel purposes."
     },
     {
-        phenomenon: "Sun shower",
+        phenomenon: "Sun Shower",
         precipDice: "x1/2",
         duration: "6d10",
         durationUnit: "minutes",
         areaEffect: "Normal",
         movement: "Normal",
-        NormVisionRng: "No",
-        IRvisionRng: "No",
+        NormVisionRng: "Normal",
+        IRvisionRng: "Normal",
         tracking: "No",
         lostChance: "Normal",
         windSpeed: "d20",
 		notes: "95% chance of a rainbow; see note under Precipitation Occurrence Table."
     },
     {
-        phenomenon: "Tornado or cyclone",
-        precipDice: "1 inch per hour",
+        phenomenon: "Tornado or Cyclone",
+        precipDice: "1",
         duration: "5d10",
         durationUnit: "hours",
         areaEffect: "Normal",
@@ -315,7 +356,7 @@ specialWeatherTable: [
         tracking: "No",
         lostChance: "+40%",
         windSpeed: "300",
-		notes: "10% chance party will be transported to the Ethereal Plane. Otherwise, treat " +
+		notes: "Precipitation is 1 inch per hour. 10% chance party will be transported to the Ethereal Plane. Otherwise, treat " +
 				"as a triple-strength hurricane for damage."
     },
     {
@@ -325,10 +366,10 @@ specialWeatherTable: [
         durationUnit: "",
         areaEffect: "3-6 (d4+2) inch radius",
         movement: "Normal",
-        NormVisionRng: "No",
-        IRvisionRng: "No",
+        NormVisionRng: "Normal",
+        IRvisionRng: "Normal",
         tracking: "No",
-        lostChance: "normal",
+        lostChance: "Normal",
         windSpeed: "d20",
 		notes: "If the oasis is real, roll d20. A result of 1 or 2 inches indicates that the " +
 				"oasis is currently populated (determine population type via the Wilderness " +
@@ -343,10 +384,10 @@ specialWeatherTable: [
         durationUnit: "",
         areaEffect: "3-6 (d4+2) inch radius",
         movement: "Normal",
-        NormVisionRng: "No",
-        IRvisionRng: "No",
+        NormVisionRng: "Normal",
+        IRvisionRng: "Normal",
         tracking: "No",
-        lostChance: "normal",
+        lostChance: "Normal",
         windSpeed: "d20",
 		notes: "If the oasis is real, roll d20. A result of 1 or 2 inches indicates that the " +
 				"oasis is currently populated (determine population type via the Wilderness " +
@@ -644,7 +685,7 @@ highWindsTable: [
     },
     {
         minSpeed: 75,
-        maxSpeed: 200,
+        maxSpeed: 500,
         effects: {
             onLand: "Only strong stone buildings will be undamaged; travel is impossible; up to large trees are damaged or uprooted; roofs will be torn off; torches and large fires will be blown out.",
             atSea: "Ships are capsized and sunk; wave height d20+20 ft. or more",
@@ -688,7 +729,7 @@ highWindsTable: [
             windSpeedAdjustment: -10,
             specialWeather: [
                 { range: [1, 5], event: "Volcano" },
-                { range: [6, 60], event: "Rain forest downpour" },
+                { range: [6, 60], event: "Rain Forest Downpour" },
                 { range: [61, 80], event: "Quicksand" },
                 { range: [81, 100], event: "Earthquake" }
             ],
@@ -700,7 +741,7 @@ highWindsTable: [
             windSpeedAdjustment: -5,
             specialWeather: [
                 { range: [1, 25], event: "Quicksand" },
-                { range: [26, 80], event: "Sun shower" },
+                { range: [26, 80], event: "Sun Shower" },
                 { range: [81, 100], event: "Earthquake" }
             ],
             notes: ""
@@ -711,7 +752,7 @@ highWindsTable: [
             windSpeedAdjustment: -5,
             specialWeather: [
                 { range: [1, 25], event: "Quicksand" },
-                { range: [26, 80], event: "Sun shower" },
+                { range: [26, 80], event: "Sun Shower" },
                 { range: [81, 100], event: "Earthquake" }
             ],
             notes: ""
@@ -721,9 +762,9 @@ highWindsTable: [
             temperatureAdjustment: { day: 10, night: -10 },
             windSpeedAdjustment: 0,
             specialWeather: [
-                { range: [1, 40], event: "Flash flood" },
+                { range: [1, 40], event: "Flash Flood" },
                 { range: [41, 70], event: "Duststorm" },
-                { range: [71, 85], event: "Tornado" },
+                { range: [71, 85], event: "Tornado or Cyclone" },
                 { range: [86, 100], event: "Earthquake" }
             ],
             notes: "No fog, gale, or hurricane permitted."
@@ -733,7 +774,7 @@ highWindsTable: [
             temperatureAdjustment: { day: 0, night: 0 },
             windSpeedAdjustment: 5,
             specialWeather: [
-                { range: [1, 50], event: "Tornado" },
+                { range: [1, 50], event: "Tornado or Cyclone" },
                 { range: [51, 100], event: "Earthquake" }
             ],
             notes: "No monsoon or tropical storm permitted."
@@ -743,13 +784,17 @@ highWindsTable: [
             temperatureAdjustment: { day: 10, night: -10 },
             windSpeedAdjustment: 5,
             specialWeather: [
-                { range: [1, 25], event: "Flash flood" },
+                { range: [1, 25], event: "Flash Flood" },
                 { range: [26, 50], event: "Sandstorm" },
                 { range: [51, 65], event: "Oasis" },
                 { range: [66, 85], event: "Mirage oasis" },
                 { range: [86, 100], event: "Earthquake" }
             ],
-            notes: "No fog, mist, blizzard, monsoon, tropical storm, gale, or hurricane permitted."
+            notes: "In the desert, there is a cumulative 2% chance per hour that a creature or character will become blinded "+
+            "by the glare. The effect is equivalent to a Light spell cast on the creatures visage, and may be relieved with "+
+            "a Cure Disease spell or a nights sleep. After a week of travel in the desert, the cumulative chance drops to "+
+            "1% per hour, and after one month of continual exposure to these conditions, the possibility is entirely removed."+
+            "No fog, mist, blizzard, monsoon, tropical storm, gale, or hurricane permitted."
         },
         "Mountains": {
             precipAdj: 0,
@@ -771,7 +816,7 @@ highWindsTable: [
             specialWeather: [
                 { range: [1, 80], event: "Earthquake" },
                 { range: [81, 94], event: "Tsunami" },
-                { range: [95, 100], event: "Undersea volcano" }
+                { range: [95, 100], event: "Volcano, Undersea" }
             ],
             notes: "Duration of fog and mist doubled."
         },
@@ -782,7 +827,7 @@ highWindsTable: [
             specialWeather: [
                 { range: [1, 80], event: "Earthquake" },
                 { range: [81, 94], event: "Tsunami" },
-                { range: [95, 100], event: "Undersea volcano" }
+                { range: [95, 100], event: "Volcano, Undersea" }
             ],
             notes: "Duration of fog and mist doubled."
         },
@@ -792,8 +837,8 @@ highWindsTable: [
             windSpeedAdjustment: 10,
             specialWeather: [
                 { range: [1, 20], event: "Tsunami" },
-                { range: [21, 40], event: "Undersea volcano" },
-                { range: [41, 100], event: "Undersea earthquake" }
+                { range: [21, 40], event: "Volcano, Undersea" },
+                { range: [41, 100], event: "Earthquake, Undersea" }
             ],
             notes: "Duration of fog and mist doubled."
         },
@@ -803,8 +848,8 @@ highWindsTable: [
             windSpeedAdjustment: 10,
             specialWeather: [
                 { range: [1, 20], event: "Tsunami" },
-                { range: [21, 40], event: "Undersea volcano" },
-                { range: [41, 100], event: "Undersea earthquake" }
+                { range: [21, 40], event: "Volcano, Undersea" },
+                { range: [41, 100], event: "Earthquake, Undersea" }
             ],
             notes: "Duration of fog and mist doubled."
         }
@@ -1213,7 +1258,7 @@ function rerollAndAdjustWindSpeed() {
 	console.log(`rerollAndAdjustWindSpeed(): Wind speed after reroll and adjustment: ${GlobalWeatherConfig.windSpeed} mph`);
 }
 
-function calculateWindSpeed(weatherName, terrainName, altitude) {
+/* function calculateWindSpeed(weatherName, terrainName, altitude) {
     // Fetch terrain effects from global configuration using the terrain name
     const terrainEffects = GlobalWeatherConfig.terrainEffects[terrainName] || GlobalWeatherConfig.terrainEffects['Plains'];
 
@@ -1276,7 +1321,59 @@ function calculateWindSpeed(weatherName, terrainName, altitude) {
 
     console.log(`Total wind speed: ${totalWindSpeed} mph`);
     return totalWindSpeed;
+} */
+function calculateWindSpeed(weatherName, terrainName, altitude) {
+    console.log(`Starting wind speed calculation for weather: ${weatherName}, terrain: ${terrainName}, altitude: ${altitude}`);
+    const terrainEffects = GlobalWeatherConfig.terrainEffects[terrainName] || GlobalWeatherConfig.terrainEffects['Plains'];
+    const isRealisticWind = GlobalWeatherConfig.useRealisticWind;
+
+    let baseWindSpeed, terrainAdjustment, totalWindSpeed;
+
+    if (!weatherName || weatherName.toLowerCase() === "none") {
+        baseWindSpeed = evalDice("d20-1"); // Roll d20-1 for general wind speed
+        console.log(`Base wind speed for undefined or 'none' weather condition: ${baseWindSpeed}`);
+        terrainAdjustment = handleTerrainAdjustment(terrainEffects, terrainName, altitude, isRealisticWind);
+        totalWindSpeed = Math.max(baseWindSpeed + terrainAdjustment, 0); // Ensure non-negative wind speed
+        console.log(`Final wind speed for 'none' weather in ${terrainName}: ${totalWindSpeed} mph`);
+        return totalWindSpeed;
+    }
+
+    // Check if the weather type is from the special weather table
+    const specialWeatherDetails = GlobalWeatherConfig.specialWeatherTable.find(item => item.phenomenon.toLowerCase() === weatherName.toLowerCase());
+    if (specialWeatherDetails) {
+        console.log(`Special weather details found for ${weatherName}:`, specialWeatherDetails);
+        baseWindSpeed = evalDice(specialWeatherDetails.windSpeed); // Get wind speed for special weather
+    } else {
+        console.log(`Looking up standard weather table for ${weatherName}`);
+        const weatherDetails = GlobalWeatherConfig.standardWeatherTable.find(item => item.name.toLowerCase() === weatherName.toLowerCase());
+        if (!weatherDetails) {
+            console.error("No weather details found for:", weatherName);
+            return 0;
+        }
+        baseWindSpeed = evalDice(weatherDetails.windSpeed || "d20-1");
+    }
+
+    console.log(`Base wind speed from table for ${weatherName}: ${baseWindSpeed}`);
+    terrainAdjustment = handleTerrainAdjustment(terrainEffects, terrainName, altitude, isRealisticWind);
+    totalWindSpeed = Math.max(baseWindSpeed + terrainAdjustment, 0); // Ensure non-negative wind speed
+    console.log(`Calculated wind speed for ${weatherName} in ${terrainName}: ${totalWindSpeed} mph`);
+    return totalWindSpeed;
 }
+
+function handleTerrainAdjustment(terrainEffects, terrainName, altitude, isRealisticWind) {
+    let adjustment = 0;
+    if (terrainName === "Mountains" && terrainEffects.windSpeedAdjustment === "dynamic") {
+        adjustment = isRealisticWind ? 10 + Math.floor(altitude / 1000) * 0.5 : Math.floor(altitude / 1000) * 5;
+        console.log(`Dynamic wind speed adjustment for ${terrainName} at ${altitude} ft with realistic setting ${isRealisticWind}: ${adjustment}`);
+        return adjustment;
+    }
+    adjustment = Array.isArray(terrainEffects.windSpeedAdjustment) ?
+        terrainEffects.windSpeedAdjustment[Math.floor(Math.random() * terrainEffects.windSpeedAdjustment.length)] :
+        terrainEffects.windSpeedAdjustment || 0;
+    console.log(`Static or array-based wind speed adjustment for ${terrainName}: ${adjustment}`);
+    return adjustment;
+}
+
 
 
 function calculateAltitudeAdjustment(altitude, terrain) {
@@ -1792,7 +1889,7 @@ async function generateWeather() {
                     if (specialWeatherData.type !== "none") {
                         // If a special weather is determined, retrieve additional data
                         const specialWeatherDetails = findSpecialWeatherData(specialWeatherData.type);
-                        console.log("const specialWeatherDetails = ",specialWeatherDetails);
+                        //console.log("const specialWeatherDetails = ",specialWeatherDetails);
                         if (specialWeatherDetails) {
                             // Apply the special weather data retrieved from the table
                             //weatherData.precipitationType = specialWeatherDetails.phenomenon;
@@ -1801,7 +1898,10 @@ async function generateWeather() {
                             //weatherData.precipitationDuration = specialWeatherDetails.duration;
                             weatherData.precipitationDuration = `${evalDice(specialWeatherDetails.duration)} ${specialWeatherDetails.durationUnit}`;
                             //weatherData.precipitationDurationUnit = specialWeatherDetails.durationUnit;
-                            weatherData.windSpeed = evalDice(specialWeatherDetails.windSpeed); // Assuming evalDice handles the speed dice string
+                            weatherData.windSpeed = calculateWindSpeed(specialWeatherData.type, settings.terrain, settings.altitude);
+                            //console.log("Wind speed calculated before special weather to:", weatherData.windSpeed);
+                            //weatherData.windSpeed += evalDice(specialWeatherDetails.windSpeed); // Assuming evalDice handles the speed dice string
+                            console.log("Wind speed value after adjusting for special weather:", weatherData.windSpeed);
                             console.log("Special weather effects applied:", weatherData.precipitationType.type, weatherData.precipitationAmount, weatherData.precipitationDuration, weatherData.windSpeed);
                             //console.log("Special weather effects applied:", weatherData.precipitationType, weatherData.precipitationAmount, weatherData.precipitationDuration, weatherData.windSpeed);
                         } else {
@@ -2014,6 +2114,18 @@ function checkForRainbows(weatherType) {
     if (!weatherType) {
         console.log("No precipitation type provided.");
         return { hasRainbow: false, rainbowType: null };
+    }
+
+    // Special handling for Sun Shower, which has a specific rainbow chance defined outside the standard table
+    if (weatherType.toLowerCase() === "Sun Shower") {
+        console.log("Checking for rainbow after Sun Shower, with a 95% chance.");
+        const roll = Math.floor(Math.random() * 100) + 1;
+        if (roll <= 95) {  // 95% chance for a rainbow
+            const rainbowType = determineRainbowType(Math.floor(Math.random() * 100) + 1);
+            return { hasRainbow: true, rainbowType: rainbowType };
+        } else {
+            return { hasRainbow: false, rainbowType: "No rainbow" };
+        }
     }
 
     const precipitationDetails = GlobalWeatherConfig.precipitationTable.find(p => p.type === weatherType);
@@ -2673,10 +2785,10 @@ function compileWeatherNotes(weatherType, terrain, month, day) {
         console.log(`Standard weather details found for ${weatherType}:`, weatherDetails);
         let detailsNotes = [
             weatherDetails.notes,
-            `Movement: ${weatherDetails.movement}`,
-            `Normal Vision Range: ${weatherDetails.normVisionRng}`,
-            `IR Vision Range: ${weatherDetails.irVisionRng}`,
-            `Tracking: ${weatherDetails.tracking}`,
+            `Movement Rate: ${weatherDetails.movement}`,
+            `Range of Normal Vision: ${weatherDetails.normVisionRng}`,
+            `Range of IR Vision: ${weatherDetails.irVisionRng}`,
+            `Effect on Tracking: ${weatherDetails.tracking}`,
             `Chance of Getting Lost: ${weatherDetails.lostChance}`
         ].filter(detail => detail).join(". ");
         notes.push(detailsNotes);
@@ -2692,13 +2804,20 @@ function compileWeatherNotes(weatherType, terrain, month, day) {
             specialWeatherDetails.notes,
             `Precipitation: ${specialWeatherDetails.precipDice}`,
             `Duration: ${specialWeatherDetails.duration} ${specialWeatherDetails.durationUnit}`,
-            `Normal Vision Range: ${specialWeatherDetails.NormVisionRng}`,
-            `IR Vision Range: ${specialWeatherDetails.IRvisionRng}`,
-            `Tracking: ${specialWeatherDetails.tracking}`,
+            `Area Effect: ${specialWeatherDetails.areaEffect}`,
+            `Movement Rate: ${specialWeatherDetails.movement}`,
+            `Range of Normal Vision: ${specialWeatherDetails.NormVisionRng}`,
+            `Range of IR Vision: ${specialWeatherDetails.IRvisionRng}`,
+            `Effect on Tracking: ${specialWeatherDetails.tracking}`,
             `Chance of Getting Lost: ${specialWeatherDetails.lostChance}`,
-            `Wind Speed: ${evalDice(specialWeatherDetails.windSpeed)} mph`
-        ].filter(detail => detail).join(". ");
+        ].filter(detail => detail).join("; ");
         notes.push(specialNotes);
+
+        // Determine the cause of the weather if it's a special weather event
+        if (Math.random() <= 0.9) { // 10% chance to check for extraordinary causes
+            const cause = determineCauseOfWeatherPhenomenon();
+            notes.push(`<br>Possible extraordinary cause of the weather: ${cause}`);
+        }
     } else {
         console.log(`No special weather details found for ${weatherType}.`);
     }
@@ -2888,6 +3007,25 @@ function findSpecialWeatherData(phenoName) {
     } else {
         console.log(`No special weather data found for ${phenoName}.`);
         return null; // Return null if no matching phenomenon is found
+    }
+}
+
+function determineCauseOfWeatherPhenomenon() {
+    const rollForCause = Math.floor(Math.random() * 100) + 1;
+    console.log(`Rolling for the cause of the weather phenomenon: ${rollForCause}`);
+
+    if (rollForCause <= 30) {
+        return "Elemental(s) or giant(s).";
+    } else if (rollForCause <= 60) {
+        return "Elemental(s) under NPC control.";
+    } else if (rollForCause <= 90) {
+        return "NPC or monster.";
+    } else if (rollForCause <= 98) {
+        return "Demons, devils, or creatures from the appropriate Elemental Plane.";
+    } else if (rollForCause === 99) {
+        return "A deity or his/her servants.";
+    } else {
+        return "A battle between two or more deities.";
     }
 }
 
