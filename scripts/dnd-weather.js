@@ -859,8 +859,7 @@ highWindsTable: [
         "Needfest": { baseDailyTemp: 30, dailyHighAdj: "d10", dailyLowAdj: "-d20", chanceOfPrecip: 46, skyConditions: { clear: [1, 23], partlyCloudy: [24, 50], cloudy: [51, 100] }, sunrise: "7:10", sunset: "4:35" },
         "Fireseek": { baseDailyTemp: 32, dailyHighAdj: "d10", dailyLowAdj: "-d20", chanceOfPrecip: 46, skyConditions: { clear: [1, 23], partlyCloudy: [24, 50], cloudy: [51, 100] }, sunrise: "7:21", sunset: "5:01" },
         "Readying": { baseDailyTemp: 34, dailyHighAdj: "d6+4", dailyLowAdj: "-(d10+4)", chanceOfPrecip: 40, skyConditions: { clear: [1, 25], partlyCloudy: [26, 50], cloudy: [51, 100] }, sunrise: "6:55", sunset: "5:36" },
-        //"Coldeven": { baseDailyTemp: 42, dailyHighAdj: "d8+4", dailyLowAdj: "-(d10+4)", chanceOfPrecip: 44, skyConditions: { clear: [1, 27], partlyCloudy: [28, 54], cloudy: [55, 100] }, sunrise: "6:12", sunset: "6:09" },
-        "Coldeven": { baseDailyTemp: 42, dailyHighAdj: "d8+4", dailyLowAdj: "-(d10+4)", chanceOfPrecip: 100, skyConditions: { clear: [1, 27], partlyCloudy: [28, 54], cloudy: [55, 100] }, sunrise: "6:12", sunset: "6:09" },
+        "Coldeven": { baseDailyTemp: 42, dailyHighAdj: "d8+4", dailyLowAdj: "-(d10+4)", chanceOfPrecip: 44, skyConditions: { clear: [1, 27], partlyCloudy: [28, 54], cloudy: [55, 100] }, sunrise: "6:12", sunset: "6:09" },
         "Growfest": { baseDailyTemp: 44, dailyHighAdj: "d8+4", dailyLowAdj: "-(d10+4)", chanceOfPrecip: 46, skyConditions: { clear: [1, 23], partlyCloudy: [24, 54], cloudy: [55, 100] }, sunrise: "5:50", sunset: "6:05" },
         "Planting": { baseDailyTemp: 52, dailyHighAdj: "d10+6", dailyLowAdj: "-(d8+4)", chanceOfPrecip: 42, skyConditions: { clear: [1, 20], partlyCloudy: [21, 55], cloudy: [56, 100] }, sunrise: "5:24", sunset: "6:39" },
         "Flocktime": { baseDailyTemp: 63, dailyHighAdj: "d10+6", dailyLowAdj: "-(d10+6)", chanceOfPrecip: 42, skyConditions: { clear: [1, 20], partlyCloudy: [21, 53], cloudy: [54, 100] }, sunrise: "4:45", sunset: "7:10" },
@@ -1393,8 +1392,8 @@ function determinePrecipitationType(terrain, currentHighTemp) {
     let attempt = 0;
     const specialRoll = Math.floor(Math.random() * 100) + 1;
     console.log(`Rolled for special weather check: ${specialRoll}`);
-    //if (specialRoll === 100) {
-    if (specialRoll > 0) {
+    //if (specialRoll > 0) {
+    if (specialRoll === 100) {
         console.log("Special weather triggered.");
         return { precipitationFlag: true, type: "special" };
     }
@@ -1917,7 +1916,7 @@ async function generateWeather() {
                     
                     // Step 3c: Determine precip amount, duration, and wind speed if precip is still true
                     console.log(`%cSTEP 3c: DETERMINE PRECIP AMT, DURATION & WIND SPEED`, "color: green; font-weight: bold");
-                    const weatherEffects = applyWeatherEffects(weatherData.precipitationType, settings.terrain, settings.altitude);
+                    const weatherEffects = applyWeatherEffects(weatherData.precipitationType.type, settings.terrain, settings.altitude);
                     weatherData.precipitationAmount = weatherEffects.precipitationAmount;
                     weatherData.precipitationDuration = weatherEffects.precipitationDuration;
                     weatherData.windSpeed = weatherEffects.windSpeed; // Wind speed calculated here
