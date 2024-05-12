@@ -2785,8 +2785,8 @@ function compileWeatherNotes(weatherType, terrain, month, day) {
         let detailsNotes = [
             weatherDetails.notes,
             `Movement Rate: ${weatherDetails.movement}`,
-            `Range of Normal Vision: ${weatherDetails.normVisionRng}`,
-            `Range of IR Vision: ${weatherDetails.irVisionRng}`,
+            `Range of Normal Vision: ${weatherDetails.NormVisionRng}`,
+            `Range of IR Vision: ${weatherDetails.IRvisionRng}`,
             `Effect on Tracking: ${weatherDetails.tracking}`,
             `Chance of Getting Lost: ${weatherDetails.lostChance}`
         ].filter(detail => detail).join(". ");
