@@ -1903,6 +1903,9 @@ async function generateWeather() {
                     weatherData.precipitationType = { type: precipTypeResult.type.type };
                     console.log("Precipitation type determined and flag:", weatherData.precipitationType.type, weatherData.precipitationFlag);
 
+                    // FOG TEST
+                    //weatherData.precipitationType.type = "Light Fog";
+
                     // Step 3c: Determine precip amount, duration, and wind speed if precip is still true
                     console.log(`%cSTEP 3c: DETERMINE PRECIP AMT, DURATION & WIND SPEED`, "color: green; font-weight: bold");
                     const weatherEffects = applyWeatherEffects(weatherData.precipitationType.type, settings.terrain, settings.altitude);
