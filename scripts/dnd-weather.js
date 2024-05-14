@@ -3057,22 +3057,21 @@ function compileWindNotes(windSpeed) {
 const moonPhases = {
     Luna: {
         "Needfest": {4: "New"},
-        "Fireseek": {4: "1st quarter", 11: "Full", 18: "3rd quarter", 25: "New"},
-        "Readying": {4: "1st quarter", 11: "Full", 18: "3rd quarter", 25: "New"},
-        "Coldeven": {4: "1st quarter", 11: "Full", 18: "3rd quarter", 25: "New"},
-        "Growfest": {4: "1st quarter"},
-        "Planting": {4: "Full", 11: "3rd quarter", 18: "New", 25: "1st quarter"},
-        "Flocktime": {4: "Full", 11: "3rd quarter", 18: "New", 25: "1st quarter"},
-        "Wealsun": {4: "Full", 11: "3rd quarter", 18: "New", 25: "1st quarter"},
-        "Richfest": {4: "Full"},
-        "Reaping": {4: "3rd quarter", 11: "New", 18: "1st quarter", 25: "Full"},
-        "Goodmonth": {4: "3rd quarter", 11: "New", 18: "1st quarter", 25: "Full"},
-        "Harvester": {4: "3rd quarter", 11: "New", 18: "1st quarter", 25: "Full"},
-        "Brewfest": {4: "3rd quarter"},
-        "Patchwall": {4: "New", 11: "1st quarter", 18: "Full", 25: "3rd quarter"},
-        "Ready'reat": {4: "New", 11: "1st quarter", 18: "Full", 25: "3rd quarter"},
-        "Sunsebb": {4: "New", 11: "1st quarter", 18: "Full", 25: "3rd quarter"},
-        // Add other months and special cases as needed
+        "Fireseek": {1: "Waxing Crescent", 4: "1st quarter", 7: "Waxing Gibbous", 11: "Full", 14: "Waning Gibbous", 18: "3rd quarter", 21: "Waning Crescent", 25: "New"},
+        "Readying": {1: "Waxing Crescent", 4: "1st quarter", 7: "Waxing Gibbous", 11: "Full", 14: "Waning Gibbous", 18: "3rd quarter", 21: "Waning Crescent", 25: "New"},
+        "Coldeven": {1: "Waxing Crescent", 4: "1st quarter", 7: "Waxing Gibbous", 11: "Full", 14: "Waning Gibbous", 18: "3rd quarter", 21: "Waning Crescent", 25: "New"},
+        "Growfest": {1: "Waxing Crescent", 4: "1st quarter", 7: "Waxing Gibbous"},
+        "Planting": {1: "Waning Crescent", 4: "Full", 7: "Waning Gibbous", 11: "3rd quarter", 14: "Waning Crescent", 18: "New", 21: "Waxing Crescent", 25: "1st quarter", 28: "Waxing Gibbous"},
+        "Flocktime": {1: "Waning Crescent", 4: "Full", 7: "Waning Gibbous", 11: "3rd quarter", 14: "Waning Crescent", 18: "New", 21: "Waxing Crescent", 25: "1st quarter", 28: "Waxing Gibbous"},
+        "Wealsun": {1: "Waning Crescent", 4: "Full", 7: "Waning Gibbous", 11: "3rd quarter", 14: "Waning Crescent", 18: "New", 21: "Waxing Crescent", 25: "1st quarter", 28: "Waxing Gibbous"},
+        "Richfest": {1: "Waxing Gibbous", 4: "Full"},
+        "Reaping": {1: "Waning Gibbous", 4: "3rd quarter", 7: "Waning Crescent", 11: "New", 14: "Waxing Crescent", 18: "1st quarter", 21: "Waxing Gibbous", 25: "Full", 28: "Waning Gibbous"},
+        "Goodmonth": {1: "Waning Gibbous", 4: "3rd quarter", 7: "Waning Crescent", 11: "New", 14: "Waxing Crescent", 18: "1st quarter", 21: "Waxing Gibbous", 25: "Full", 28: "Waning Gibbous"},
+        "Harvester": {1: "Waning Gibbous", 4: "3rd quarter", 7: "Waning Crescent", 11: "New", 14: "Waxing Crescent", 18: "1st quarter", 21: "Waxing Gibbous", 25: "Full", 28: "Waning Gibbous"},
+        "Brewfest": {1: "Waning Crescent", 4: "3rd quarter", 7: "Waning Gibbous"},
+        "Patchwall": {1: "Waning Crescent", 4: "New", 7: "Waxing Crescent", 11: "1st quarter", 14: "Waxing Gibbous", 18: "Full", 21: "Waning Gibbous", 25: "3rd quarter", 28: "Waning Crescent"},
+        "Ready'reat": {1: "Waning Crescent", 4: "New", 7: "Waxing Crescent", 11: "1st quarter", 14: "Waxing Gibbous", 18: "Full", 21: "Waning Gibbous", 25: "3rd quarter", 28: "Waning Crescent"},
+        "Sunsebb": {1: "Waning Crescent", 4: "New", 7: "Waxing Crescent", 11: "1st quarter", 14: "Waxing Gibbous", 18: "Full", 21: "Waning Gibbous", 25: "3rd quarter", 28: "Waning Crescent"}
     },
     Celene: {
         "Needfest": {4: "Full"},
@@ -3091,24 +3090,25 @@ const moonPhases = {
         "Patchwall": {19: "3rd quarter"},
         "Ready'reat": {11: "New"},
         "Sunsebb": {4: "1st quarter"},
-        // Add other months and special cases as needed
     }
 };
 
 function getMoonPhase(moon, month, day) {
     const monthData = moonPhases[moon][month];
     const days = Object.keys(monthData).map(Number).sort((a, b) => a - b);
-    const phaseDay = days.find(d => day <= d);
     
-    if (phaseDay === undefined) {
-        // If no phase day is found, it means the given day is beyond the last defined phase day
-        const lastPhaseDay = days[days.length - 1];
-        return monthData[lastPhaseDay] + "+"; // Indicate transition past the last known phase
-    } else if (day === phaseDay) {
-        return monthData[phaseDay]; // Exact match on a phase day
-    } else {
-        return monthData[phaseDay] + "+"; // Indicate transition towards this phase
+    for (let i = 0; i < days.length; i++) {
+        if (day < days[i]) {
+            const previousDay = i === 0 ? days[days.length - 1] : days[i - 1];
+            const previousPhase = monthData[previousDay];
+            return `${previousPhase}+`;
+        } else if (day === days[i]) {
+            return monthData[days[i]];
+        }
     }
+
+    // If no exact or earlier day found, return the last phase with a plus indicating the transition
+    return `${monthData[days[days.length - 1]]}+`;
 }
 
 function evaluateLycanthropeActivity(month, day) {
