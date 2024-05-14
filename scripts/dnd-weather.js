@@ -1530,8 +1530,10 @@ function precipChanceOfContinuing(weatherEffect) {
         }
         // Optionally, roll again for the new duration here or handle it in applyWeatherEffects
     } else {
-        // Weather event ends, set global flag to false
+        // Weather event ends, set global flag to false, 'none' and 0
         GlobalWeatherConfig.flags.precipContinues = false;
+        GlobalWeatherConfig.continuingWeatherEvent = "none";
+	    GlobalWeatherConfig.continuingWeatherEventDuration = 0;
         console.log(`Weather event ends after its initial duration of ${weatherEffect.duration}.`);
         // Optionally clear the current weather settings or set to a default weather
     }
@@ -1881,17 +1883,58 @@ async function generateWeather() {
             console.log("Sky conditions determined:", weatherData.skyCondition);
         }
 
-        // Step 3a: Check for Precipitation
+        // Initial check for continuing weather
+        console.log(`%cCHECK FOR CONTINUING WEATHER`, "color: blue; font-weight: bold");
+        if (GlobalWeatherConfig.precipContinues) {
+            console.log(`Continuing weather detected: ${GlobalWeatherConfig.continuingWeatherEvent}`);
+            weatherData.precipitationFlag = true;
+            weatherData.precipitationType = { type: GlobalWeatherConfig.continuingWeatherEvent };
+
+            // Recalculate the effects for the continuing weather
+            const weatherEffects = applyWeatherEffects(weatherData.precipitationType.type, settings.terrain, settings.altitude);
+            weatherData.precipitationAmount = weatherEffects.precipitationAmount;
+            weatherData.precipitationDuration = weatherEffects.precipitationDuration;
+            weatherData.windSpeed = calculateWindSpeed(weatherData.precipitationType.type, settings.terrain, settings.altitude);
+            console.log(`Continuing weather effects: Amount: ${weatherData.precipitationAmount}, Duration: ${weatherData.precipitationDuration}, Wind Speed: ${weatherData.windSpeed}`);
+
+            // Make decision on continuation for the next period early
+            const continuationResult = determineWeatherContinuation(weatherData.precipitationType.type);
+            GlobalWeatherConfig.precipContinues = continuationResult.continues;
+            GlobalWeatherConfig.continuingWeatherEvent = continuationResult.newWeatherType;
+            console.log(`Weather continuation decision: ${continuationResult.continues ? 'Continues' : 'Does not continue'}`);
+            
+        }
+
+        /* // Step 3a: Check for Precipitation
         console.log(`%cSTEP 3a: DETERMINE IF PRECIP OCCURS`, "color: green; font-weight: bold");
         const precipitationCheck = await checkForPrecipitation(settings.month, settings.terrain);
         weatherData.precipitationFlag = precipitationCheck.hasPrecipitation;
         weatherData.precipitationType = precipitationCheck.type; // Ensure this is handled correctly downstream
         console.log("Precipitation flag set to: ", weatherData.precipitationFlag);
-        console.log("Precipitation type determined as: ", weatherData.precipitationType);
+        console.log("Precipitation type determined as: ", weatherData.precipitationType); */
+
+        // Step 3a: Check for Precipitation
+        console.log(`%cSTEP 3a: DETERMINE IF PRECIP OCCURS`, "color: green; font-weight: bold");
+
+        if (GlobalWeatherConfig.precipContinues) {
+            // If the weather is continuing, set the precipitation flag to true and use the continuing weather event type
+            weatherData.precipitationFlag = true;
+            weatherData.precipitationType = { type: GlobalWeatherConfig.continuingWeatherEvent };
+            console.log(`Continuing weather detected. Type: ${weatherData.precipitationType.type}`);
+        } else {
+            // Otherwise, perform the normal check for precipitation
+            const precipitationCheck = await checkForPrecipitation(settings.month, settings.terrain);
+            weatherData.precipitationFlag = precipitationCheck.hasPrecipitation;
+            weatherData.precipitationType = precipitationCheck.type; // Ensure this is handled correctly downstream
+            console.log("Precipitation flag set to: ", weatherData.precipitationFlag);
+            console.log("Precipitation type determined as: ", weatherData.precipitationType);
+        }
+
        
-        // Step 3b: Determine Precipitation Type if flag is true
+        // Step 3b: Determine Precipitation Type if flag is true and there is no ongoing weather continuation
         console.log(`%cSTEP 3b: Determine precip type or if no precip, skip to wind speed only`, "color: green; font-weight: bold");
-        if (weatherData.precipitationFlag) {
+        //if (weatherData.precipitationFlag) {
+        if (weatherData.precipitationFlag && !GlobalWeatherConfig.precipContinues) {            
             const precipTypeResult = determinePrecipitationType(settings.terrain, weatherData.highTemp);
             if (precipTypeResult.precipitationFlag) {
                 if (precipTypeResult.type === "special") {
@@ -1934,21 +1977,6 @@ async function generateWeather() {
                     weatherData.precipitationDuration = weatherEffects.precipitationDuration;
                     weatherData.windSpeed = weatherEffects.windSpeed; // Wind speed calculated here
                     console.log("Weather effects determined:", weatherData.precipitationAmount, weatherData.precipitationDuration, weatherData.windSpeed);
-                    
-                    // Check for continuing weather before proceeding with new weather generation
-                    if (GlobalWeatherConfig.continuingWeatherEvent === weatherData.precipitationType.type || GlobalWeatherConfig.continuingWeatherEvent === "none") {
-                        const continuationResult = determineWeatherContinuation(weatherData.precipitationType.type);
-                        GlobalWeatherConfig.precipContinues = continuationResult.continues;
-                        GlobalWeatherConfig.continuingWeatherEvent = continuationResult.newWeatherType;
-                        GlobalWeatherConfig.continuingWeatherEventDuration = continuationResult.continuationChance;
-
-                        if (continuationResult.continues) {
-                            console.log(`Weather continues as ${continuationResult.newWeatherType}. Generate this weather?`);
-                        } else {
-                            console.log("Weather does not continue. Proceeding with normal weather generation.");
-                        }
-                    }
-
                 }
             } else {
                 console.log("Precipitation type is 'none', skipping related effects.");
@@ -1965,7 +1993,14 @@ async function generateWeather() {
             weatherData.windSpeed = calculateWindSpeed(weatherType, settings.terrain, settings.altitude);
             console.log("Wind speed set to:", weatherData.windSpeed);
         }
+/* 
+        // Make decision on continuation for the next period early
+        const continuationResult = determineWeatherContinuation(weatherData.precipitationType.type);
+        GlobalWeatherConfig.precipContinues = continuationResult.continues;
+        GlobalWeatherConfig.continuingWeatherEvent = continuationResult.newWeatherType;
+        console.log(`Weather continuation decision: ${continuationResult.continues ? 'Continues' : 'Does not continue'}`);
 
+ */
         // Step 4: Update Heat and Humidity Effects
         console.log(`%cSTEP 4: CHECK FOR HUMIDITY`, "color: blue; font-weight: bold");
         if (weatherData.highTemp) {
@@ -2010,6 +2045,21 @@ async function generateWeather() {
             return; // Handle this error appropriately
         }
  */
+        // Step 8.5: Check for continuing weather before proceeding with new weather generation
+        console.log(`%cSTEP 8.5: CHECK FOR CONTINUING WEATHER`, "color: green; font-weight: bold");
+        if (GlobalWeatherConfig.continuingWeatherEvent === weatherData.precipitationType.type || GlobalWeatherConfig.continuingWeatherEvent === "none") {
+            const continuationResult = determineWeatherContinuation(weatherData.precipitationType.type);
+            //GlobalWeatherConfig.precipContinues = continuationResult.continues;
+            //GlobalWeatherConfig.continuingWeatherEvent = continuationResult.newWeatherType;
+            //GlobalWeatherConfig.continuingWeatherEventDuration = continuationResult.continuationChance;
+
+            if (continuationResult.continues) {
+                console.log(`Weather continues as ${continuationResult.newWeatherType}. Generate this weather?`);
+            } else {
+                console.log("Weather does not continue");
+            }
+        }
+
         // Step 9: Compile notes
         console.log(`%cSTEP 9a: Compile weather notes`, "color: green; font-weight: bold");
         console.log("weatherData.notes is calling compileWeatherNotes with: ", weatherData.precipitationType.type, settings.terrain, GlobalWeatherConfig.month, GlobalWeatherConfig.day);
@@ -2717,8 +2767,8 @@ function resetWeatherData(weatherConfig) {
     // Resetting event-specific details
     weatherConfig.initialWeatherEvent = "none";
     weatherConfig.initialWeatherEventDuration = 0;
-    weatherConfig.continuingWeatherEvent = "none";
-    weatherConfig.continuingWeatherEventDuration = 0;
+    //weatherConfig.continuingWeatherEvent = "none";
+    //weatherConfig.continuingWeatherEventDuration = 0;
 	
 	// Reset special weather event
 	weatherConfig.specialWeather = false;
@@ -3075,6 +3125,9 @@ function determineWeatherContinuation(currentWeatherType) {
     const weatherDetails = GlobalWeatherConfig.precipitationTable.find(p => p.type === currentWeatherType);
     if (!weatherDetails) {
         console.log("Weather type not found in precipitation table:", currentWeatherType);
+        // Reset the global weather continuation variables if the type isn't found
+        GlobalWeatherConfig.continuingWeatherEvent = "none";
+        GlobalWeatherConfig.continuingWeatherEventDuration = 0;
         return {
             continues: false,
             newWeatherType: currentWeatherType,
@@ -3082,12 +3135,10 @@ function determineWeatherContinuation(currentWeatherType) {
         };
     }
 
-    // Roll to see if the weather continues
     const continuationRoll = Math.floor(Math.random() * 100) + 1;
-    console.log(`Rolled for weather continuation: ${continuationRoll} vs continuation chance: ${weatherDetails.contChance}%`);
+    console.log(`Rolled for weather continuation: ${continuationRoll} vs weather: ${weatherDetails.type} continuation chance: ${weatherDetails.contChance}%`);
 
     if (continuationRoll <= weatherDetails.contChance) {
-        // Determine if the type of precipitation changes
         const changeTypeRoll = Math.floor(Math.random() * 10) + 1;
         console.log(`Roll for type of precipitation change: ${changeTypeRoll}`);
 
@@ -3100,18 +3151,39 @@ function determineWeatherContinuation(currentWeatherType) {
             console.log(`Weather type moves down one line in the precipitation table to: ${newWeatherType}`);
         }
 
+        GlobalWeatherConfig.continuingWeatherEvent = newWeatherType;
+        GlobalWeatherConfig.continuingWeatherEventDuration = determineDuration(newWeatherType);
+
         return {
             continues: true,
             newWeatherType: newWeatherType,
             continuationChance: weatherDetails.contChance
         };
     } else {
+        // Reset the global weather continuation variables if the weather does not continue
+        GlobalWeatherConfig.continuingWeatherEvent = "none";
+        GlobalWeatherConfig.continuingWeatherEventDuration = 0;
         return {
             continues: false,
             newWeatherType: currentWeatherType,
             continuationChance: weatherDetails.contChance
         };
     }
+}
+
+
+function determineDuration(weatherType) {
+    const weatherDetails = GlobalWeatherConfig.standardWeatherTable.find(p => p.name === weatherType);
+    if (!weatherDetails) {
+        console.log("Weather type not found in standard weather table:", weatherType);
+        return "unknown duration";
+    }
+
+    // Assuming weatherDetails has a duration field in dice notation
+    const duration = evalDice(weatherDetails.duration);
+    console.log(`Determined duration for weather type ${weatherType}: ${duration} ${weatherDetails.durationUnit || 'units'}`);
+
+    return `${duration} ${weatherDetails.durationUnit || 'units'}`;
 }
 
 function moveUpOneLine(currentWeatherType) {
