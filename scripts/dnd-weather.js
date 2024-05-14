@@ -25,8 +25,8 @@ var GlobalWeatherConfig = {
     day: "11",
     latitude: 32,	// City of Greyhawk is at 35 deg. latitude
 	latitudeTempAdj: 0,
-    terrain: "Mountains",
-    altitude: 6000,
+    terrain: "Forest",
+    altitude: 1000,
 	altitudeTempAdj: 0,
     baseDailyTemp: 0,
     dailyHighTemp: 0,
@@ -1223,9 +1223,6 @@ function determineSkyConditions(month) {
     else if (roll <= partlyCloudy[1]) skyCondition = "Partly cloudy";
     else skyCondition = "Cloudy";
 
-    //console.log(`Sky condition for ${month}: ${skyCondition}`);
-    //console.log(`Initial wind speed set to: ${d20roll} mph`);
-
     return { skyCondition };
 }
 
@@ -1781,7 +1778,7 @@ async function generateWeather() {
             
             return { highTemp: dailyHigh, lowTemp: dailyLow };
         }
-        
+       
         // Step 1: Determine Temperature Extremes and Adjustments
         console.log(`%cSTEP 1: DETERMINE TEMPERATURES`, "color: green; font-weight: bold");
 
@@ -1802,13 +1799,14 @@ async function generateWeather() {
 
         // Step 2: Determine Sky Conditions
         console.log(`%cSTEP 2: DETERMINE SKY CONDITIONS`, "color: green; font-weight: bold");
-        if (GlobalWeatherConfig.continuingWeatherEvent !== "none") {
+        if (GlobalWeatherConfig.precipContinues) {
             weatherData.skyCondition = "Cloudy";
             console.log(`%cSky conditions set to 'Cloudy' due to continuing weather event.`, "color:blue; font-weight: italic");
         } else {
             weatherData.skyCondition = await determineSkyConditions(settings.month);
             console.log("Sky conditions determined:", weatherData.skyCondition);
         }
+
 
         // Initial check for continuing weather
         console.log(`%cCHECK FOR CONTINUING WEATHER`, "color: blue; font-weight: bold");
@@ -1977,6 +1975,7 @@ async function generateWeather() {
         resetWeatherData(GlobalWeatherConfig);
         console.log("Weather data reset.");
 
+ 
     } catch (error) {
         console.error("An error occurred during weather generation:", error.message);
     }
@@ -2332,7 +2331,10 @@ async function requestWeatherSettings() {
                         GlobalWeatherConfig.latitude = settings.latitude;
                         GlobalWeatherConfig.continuingWeatherEvent = settings.continuingWeather;
                         GlobalWeatherConfig.precipContinues = settings.continuingWeather !== 'none';
-                                                
+
+                        // Log the updated settings for verification
+                        console.log("Updated GlobalWeatherConfig:", GlobalWeatherConfig);
+                        
                         resolve(settings);
                     }
                 },
@@ -2348,6 +2350,7 @@ async function requestWeatherSettings() {
         dialog.render(true);
     });
 }
+
 
 function updateGlobalWeatherConfig(month, terrain, altitude, latitude) {
     //GlobalWeatherConfig.year = year;
@@ -3038,7 +3041,7 @@ function determineWeatherContinuation(currentWeatherType) {
     }
 
     const continuationRoll = Math.floor(Math.random() * 100) + 1;
-    console.log(`Rolled for weather continuation: ${continuationRoll} vs weather: ${weatherDetails.type} continuation chance: ${weatherDetails.contChance}%`);
+    console.log(`%cRolled for weather continuation: ${continuationRoll} vs weather: ${weatherDetails.type} continuation chance: ${weatherDetails.contChance}`, "color: blue; font-weight: bold");
 
     if (continuationRoll <= weatherDetails.contChance) {
         const changeTypeRoll = Math.floor(Math.random() * 10) + 1;
