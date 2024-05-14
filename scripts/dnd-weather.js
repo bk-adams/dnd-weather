@@ -2298,6 +2298,13 @@ async function requestWeatherSettings() {
                     <label for="latitude">Latitude or Distance:</label>
                     <input type="text" id="latitude" name="latitude" value="${GlobalWeatherConfig.latitude}">
                 </div>
+                <div>
+                    <label for="continuingWeather">Continuing Weather:</label>
+                    <select id="continuingWeather" name="continuingWeather">
+                        <option value="none" ${GlobalWeatherConfig.continuingWeatherEvent === 'none' ? 'selected' : ''}>None</option>
+                        ${GlobalWeatherConfig.precipitationTable.map(weather => `<option value="${weather.type}" ${GlobalWeatherConfig.continuingWeatherEvent === weather.type ? 'selected' : ''}>${weather.type}</option>`).join('')}
+                    </select>
+                </div>
             </form>
             <script>
                 function updateDayOptions(selectedMonth) {
@@ -2348,7 +2355,8 @@ async function requestWeatherSettings() {
                             terrain: html.find('#terrain').val(),
                             altitude: parseFloat(html.find('#altitude').val()) * 1000,
                             latitudeType: html.find('#latitudeType').val(),
-                            latitudeInput: html.find('#latitude').val().trim()
+                            latitudeInput: html.find('#latitude').val().trim(),
+                            continuingWeather: html.find('#continuingWeather').val()
                         };
 
                         // Calculate adjusted latitude if needed
@@ -2368,7 +2376,9 @@ async function requestWeatherSettings() {
                         GlobalWeatherConfig.terrain = settings.terrain;
                         GlobalWeatherConfig.altitude = settings.altitude;
                         GlobalWeatherConfig.latitude = settings.latitude;
-                        
+                        GlobalWeatherConfig.continuingWeatherEvent = settings.continuingWeather;
+                        GlobalWeatherConfig.precipContinues = settings.continuingWeather !== 'none';
+                                                
                         resolve(settings);
                     }
                 },
