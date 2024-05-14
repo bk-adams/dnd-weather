@@ -1371,7 +1371,7 @@ function getEffectsByWindSpeed(windSpeed) {
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // STEP 4
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function applyWeatherEffects(weatherType, terrainName, altitude) {
+/* function applyWeatherEffects(weatherType, terrainName, altitude) {
     const weatherTypeName = weatherType;
     console.log(`Applying weather effects for type: ${weatherTypeName}`);
 
@@ -1396,6 +1396,16 @@ function applyWeatherEffects(weatherType, terrainName, altitude) {
     let precipitationAmount = weatherDetails.precipDice ? evalDice(weatherDetails.precipDice) : 0;
     let precipitationDuration = weatherDetails.duration ? `${evalDice(weatherDetails.duration)} ${weatherDetails.durationUnit || "hours"}` : "0 hours";
 
+    // Check for terrain-specific conditions and modify the duration if necessary
+    const terrainDetails = GlobalWeatherConfig.terrainEffects[terrainName] || {};
+    if (terrainDetails.notes && terrainDetails.notes.includes("Duration of fog and mist doubled.") &&
+        (weatherTypeName === 'Fog' || weatherTypeName === 'Mist')) {
+        const durationValue = weatherDetails.duration ? evalDice(weatherDetails.duration) : 0;
+        const doubledDuration = durationValue * 2;
+        precipitationDuration = `${doubledDuration} ${weatherDetails.durationUnit || "hours"}`;
+        console.log(`Duration for ${weatherTypeName} doubled to: ${precipitationDuration}`);
+    }
+
     console.log(`Wind speed adjusted for ${weatherTypeName}: ${totalWindSpeed} mph`);
     console.log(`Precipitation for ${weatherTypeName}: ${precipitationAmount} over ${precipitationDuration}`);
 
@@ -1405,7 +1415,50 @@ function applyWeatherEffects(weatherType, terrainName, altitude) {
         precipitationDuration: precipitationDuration
     };
 }
+ */
+function applyWeatherEffects(weatherType, terrainName, altitude) {
+    const weatherTypeName = weatherType;
+    console.log(`Applying weather effects for type: ${weatherTypeName}`);
 
+    if (!weatherTypeName) {
+        console.log("No specific weather effect found. Default effects will be applied.");
+        return {
+            windSpeed: calculateWindSpeed(weatherType, 'Plains', 0),  // Using default terrain if undefined
+            precipitationAmount: 0,
+            precipitationDuration: "0 hours"
+        };
+    }
+    
+    // Access the standard weather table from the global configuration
+    const weatherDetails = GlobalWeatherConfig.standardWeatherTable.find(item => item.name === weatherTypeName) || {};
+    console.log("Weather details found:", weatherDetails);
+
+    // Determine wind speed using the calculated function
+    console.log(`Inside applyWeatherEffects(), calculateWindSpeed() parameters = weatherType/terrainName/altitude = ${weatherType} ${terrainName} ${altitude}`);
+    let totalWindSpeed = calculateWindSpeed(weatherType, terrainName, altitude);
+
+    // Determine duration and precipitation if available
+    let precipitationAmount = weatherDetails.precipDice ? evalDice(weatherDetails.precipDice) : 0;
+    let precipitationDuration = weatherDetails.duration ? evalDice(weatherDetails.duration) : 0;
+
+    // Check for terrain-specific conditions and modify the duration if necessary
+    const terrainDetails = GlobalWeatherConfig.terrainEffects[terrainName] || {};
+    if (terrainDetails.notes && terrainDetails.notes.includes("Duration of fog and mist doubled.") &&
+        (weatherTypeName === 'Fog' || weatherTypeName.includes('Fog') || weatherTypeName === 'Mist' || weatherTypeName.includes('Mist'))) {
+        precipitationDuration *= 2;
+        console.log(`Duration for ${weatherTypeName} doubled to: ${precipitationDuration} hours`);
+    }
+    let precipitationDurationString = `${precipitationDuration} ${weatherDetails.durationUnit || "hours"}`;
+
+    console.log(`Wind speed adjusted for ${weatherTypeName}: ${totalWindSpeed} mph`);
+    console.log(`Precipitation for ${weatherTypeName}: ${precipitationAmount} over ${precipitationDurationString}`);
+
+    return {
+        windSpeed: Math.floor(totalWindSpeed),
+        precipitationAmount: precipitationAmount,
+        precipitationDuration: precipitationDurationString
+    };
+}
 
 function precipChanceOfContinuing(weatherEffect) {
     // More detailed logging to debug the issue
