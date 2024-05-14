@@ -1778,7 +1778,7 @@ async function generateWeather() {
             
             return { highTemp: dailyHigh, lowTemp: dailyLow };
         }
-       
+/*        
         // Step 1: Determine Temperature Extremes and Adjustments
         console.log(`%cSTEP 1: DETERMINE TEMPERATURES`, "color: green; font-weight: bold");
 
@@ -1975,7 +1975,200 @@ async function generateWeather() {
         resetWeatherData(GlobalWeatherConfig);
         console.log("Weather data reset.");
 
- 
+ */ 
+        // Step 1: Determine Temperature Extremes and Adjustments
+        console.log(`%cSTEP 1: DETERMINE TEMPERATURES`, "color: green; font-weight: bold");
+
+        // Check if there is a record temperature event before proceeding
+        if (GlobalWeatherConfig.recordTemperatureType !== 'none') {
+            console.log(`%cRecord temperature day detected: ${GlobalWeatherConfig.recordTemperatureType}`, "color: red; font-weight: bold");
+            const recordTemperatures = calculateRecordTemperatures(settings.month, settings.latitude, settings.altitude, settings.terrain, season);
+            weatherData.highTemp = recordTemperatures.highTemp;
+            weatherData.lowTemp = recordTemperatures.lowTemp;
+        } else {
+            const temperatures = await calculateInitialDailyTemperatures(settings.month, settings.latitude, settings.altitude, settings.terrain, season);
+            weatherData.highTemp = temperatures.highTemp;
+            weatherData.lowTemp = temperatures.lowTemp;
+        }
+
+        console.log("Temperatures determined:", weatherData.highTemp, weatherData.lowTemp);
+
+        // Step 2: Determine Sky Conditions
+        console.log(`%cSTEP 2: DETERMINE SKY CONDITIONS`, "color: green; font-weight: bold");
+        if (GlobalWeatherConfig.precipContinues) {
+            weatherData.skyCondition = "Cloudy";
+            console.log(`%cSky conditions set to 'Cloudy' due to continuing weather event.`, "color:blue; font-weight: italic");
+        } else {
+            weatherData.skyCondition = await determineSkyConditions(settings.month);
+            console.log("Sky conditions determined:", weatherData.skyCondition);
+        }
+
+        // Initial check for continuing weather
+        console.log(`%cCHECK FOR CONTINUING WEATHER`, "color: blue; font-weight: bold");
+        if (GlobalWeatherConfig.precipContinues) {
+            console.log(`Continuing weather detected: ${GlobalWeatherConfig.continuingWeatherEvent}`);
+            weatherData.precipitationFlag = true;
+            weatherData.precipitationType = { type: GlobalWeatherConfig.continuingWeatherEvent };
+
+            // Recalculate the effects for the continuing weather
+            const weatherEffects = applyWeatherEffects(weatherData.precipitationType.type, settings.terrain, settings.altitude);
+            weatherData.precipitationAmount = weatherEffects.precipitationAmount;
+            weatherData.precipitationDuration = weatherEffects.precipitationDuration;
+            weatherData.windSpeed = weatherEffects.windSpeed;
+            console.log(`Continuing weather effects: Amount: ${weatherData.precipitationAmount}, Duration: ${weatherData.precipitationDuration}, Wind Speed: ${weatherData.windSpeed}`);
+        }
+
+        // Step 3a: Check for Precipitation
+        console.log(`%cSTEP 3a: DETERMINE IF PRECIP OCCURS`, "color: green; font-weight: bold");
+
+        if (GlobalWeatherConfig.precipContinues) {
+            weatherData.precipitationFlag = true;
+            weatherData.precipitationType = { type: GlobalWeatherConfig.continuingWeatherEvent };
+            console.log(`Continuing weather detected. Type: ${weatherData.precipitationType.type}`);
+        } else {
+            const precipitationCheck = await checkForPrecipitation(settings.month, settings.terrain);
+            weatherData.precipitationFlag = precipitationCheck.hasPrecipitation;
+            weatherData.precipitationType = precipitationCheck.type;
+            console.log("Precipitation flag set to: ", weatherData.precipitationFlag);
+            console.log("Precipitation type determined as: ", weatherData.precipitationType);
+        }
+
+        // Step 3b: Determine Precipitation Type if flag is true and there is no ongoing weather continuation
+        console.log(`%cSTEP 3b: Determine precip type or if no precip, skip to wind speed only`, "color: green; font-weight: bold");
+
+        if (weatherData.precipitationFlag && !GlobalWeatherConfig.precipContinues) {
+            const precipTypeResult = determinePrecipitationType(settings.terrain, weatherData.highTemp);
+            if (precipTypeResult.precipitationFlag) {
+                if (precipTypeResult.type === "special") {
+                    const specialWeatherData = determineSpecialWeather(settings.terrain);
+                    console.log("specialWeatherData =", specialWeatherData);
+                    if (specialWeatherData.type !== "none") {
+                        const specialWeatherDetails = findSpecialWeatherData(specialWeatherData.type);
+                        if (specialWeatherDetails) {
+                            weatherData.precipitationType = { type: specialWeatherDetails.phenomenon };
+                            weatherData.precipitationAmount = specialWeatherDetails.precipitation;
+                            weatherData.precipitationDuration = `${evalDice(specialWeatherDetails.duration)} ${specialWeatherDetails.durationUnit}`;
+                            weatherData.windSpeed = calculateWindSpeed(specialWeatherData.type, settings.terrain, settings.altitude);
+                            console.log("Special weather effects applied:", weatherData.precipitationType.type, weatherData.precipitationAmount, weatherData.precipitationDuration, weatherData.windSpeed);
+                        } else {
+                            console.log("Special weather details not found for", specialWeatherData.type);
+                        }
+                    }
+                } else {
+                    weatherData.precipitationType = { type: precipTypeResult.type.type };
+                    console.log("Precipitation type determined and flag:", weatherData.precipitationType.type, weatherData.precipitationFlag);
+
+                    // Step 3c: Determine precip amount, duration, and wind speed if precip is still true
+                    console.log(`%cSTEP 3c: DETERMINE PRECIP AMT, DURATION & WIND SPEED`, "color: green; font-weight: bold");
+                    const weatherEffects = applyWeatherEffects(weatherData.precipitationType.type, settings.terrain, settings.altitude);
+                    weatherData.precipitationAmount = weatherEffects.precipitationAmount;
+                    weatherData.precipitationDuration = weatherEffects.precipitationDuration;
+                    weatherData.windSpeed = weatherEffects.windSpeed; // Wind speed calculated here
+                    console.log("Weather effects determined:", weatherData.precipitationAmount, weatherData.precipitationDuration, weatherData.windSpeed);
+                }
+            } else {
+                console.log("Precipitation type is 'none', skipping related effects.");
+                // Skip to calculating wind speed if no valid precipitation type was determined
+                console.log(`%cSTEP 3d: No valid precip found, calculating wind speed`, "color: red; font-weight: bold");
+                weatherData.windSpeed = calculateWindSpeed("none", settings.terrain, settings.altitude);
+                console.log("Wind speed set to:", weatherData.windSpeed);
+            }
+        } else {
+            // Directly calculate wind speed if no precipitation is anticipated
+            console.log(`%cSTEP 3d: No precip found, calculating wind speed`, "color: red; font-weight: bold");
+            const weatherType = "none";
+            console.log("About to calculate wind speed with:", weatherType);
+            weatherData.windSpeed = calculateWindSpeed(weatherType, settings.terrain, settings.altitude);
+            console.log("Wind speed set to:", weatherData.windSpeed);
+        }
+
+        // Step 4: Update Heat and Humidity Effects
+        console.log(`%cSTEP 4: CHECK FOR HUMIDITY`, "color: blue; font-weight: bold");
+        if (weatherData.highTemp) {
+            const { humidity, effectsDescription } = await updateHumidityAndEffects(weatherData.highTemp);
+            weatherData.humidity = humidity;
+            weatherData.humidityEffects = effectsDescription;
+            console.log("Humidity and effects updated:", humidity, effectsDescription);
+        } else {
+            console.log("High temperature not set. Unable to update humidity and its effects.");
+        }
+
+        // Step 5: Wind Chill Calculation
+        console.log(`%cSTEP 5: CALCULATE WIND CHILL`, "color: blue; font-weight: bold");
+        weatherData.windChill = await applyWindChill(weatherData.lowTemp, weatherData.windSpeed, GlobalWeatherConfig.windChillTable);
+
+        // Step 6: Rainbows Check
+        console.log(`%cSTEP 6: RAINBOW CHECK`, "color: green; font-weight: bold");
+        if (weatherData.precipitationType) {
+            console.log("weatherData.precipitationType = ", weatherData.precipitationType.type);
+            weatherData.rainbow = await checkForRainbows(weatherData.precipitationType.type);
+        } else {
+            console.log("No precipitation type set, skipping rainbow check.");
+            weatherData.rainbow = { hasRainbow: false, rainbowType: "None" };
+        }
+        console.log("Rainbow check:", weatherData.rainbow);
+
+        // Step 7: Wind Direction
+        console.log(`%cSTEP 7: CHECK FOR WIND DIRECTION`, "color: green; font-weight: bold");
+        weatherData.windDirection = await setPrevailingWindDirection(season);
+        console.log("Wind direction determined:", weatherData.windDirection);
+
+        // Step 8: Sunrise and Sunset Times
+        console.log(`%cSTEP 8: DETERMINE SUNRISE/SUNSET`, "color: green; font-weight: bold");
+        const sunTimes = adjustSunTimesForLatitude(settings.latitude, settings.month);
+        weatherData.sunrise = sunTimes.sunrise;
+        weatherData.sunset = sunTimes.sunset;
+        console.log("Sunrise and sunset times:", sunTimes);
+
+        // Step 8.5: Check for continuing weather before proceeding with new weather generation
+        console.log(`%cSTEP 8.5: CHECK FOR CONTINUING WEATHER`, "color: green; font-weight: bold");
+
+        console.log("Current GlobalWeatherConfig.continuingWeatherEvent:", GlobalWeatherConfig.continuingWeatherEvent);
+        console.log("Current GlobalWeatherConfig.precipContinues:", GlobalWeatherConfig.precipContinues);
+        console.log("Current GlobalWeatherConfig.continuingWeatherEventDuration:", GlobalWeatherConfig.continuingWeatherEventDuration);
+
+        if (GlobalWeatherConfig.continuingWeatherEvent === weatherData.precipitationType.type || GlobalWeatherConfig.continuingWeatherEvent === "none") {
+            const continuationResult = determineWeatherContinuation(weatherData.precipitationType.type);
+            GlobalWeatherConfig.precipContinues = continuationResult.continues;
+            GlobalWeatherConfig.continuingWeatherEvent = continuationResult.newWeatherType;
+            GlobalWeatherConfig.continuingWeatherEventDuration = continuationResult.continuationChance;
+
+            console.log("Updated GlobalWeatherConfig.continuingWeatherEvent:", GlobalWeatherConfig.continuingWeatherEvent);
+            console.log("Updated GlobalWeatherConfig.precipContinues:", GlobalWeatherConfig.precipContinues);
+            console.log("Updated GlobalWeatherConfig.continuingWeatherEventDuration:", GlobalWeatherConfig.continuingWeatherEventDuration);
+
+            if (continuationResult.continues) {
+                console.log(`Weather continues as ${continuationResult.newWeatherType}. Generate this weather?`);
+            } else {
+                console.log(`%cWeather does not continue`, "color: red; font-weight: bold");
+            }
+        }
+
+        // Step 9: Compile notes
+        console.log(`%cSTEP 9a: Compile weather notes`, "color: green; font-weight: bold");
+        console.log("weatherData.notes is calling compileWeatherNotes with: ", weatherData.precipitationType.type, settings.terrain, GlobalWeatherConfig.month, GlobalWeatherConfig.day);
+        weatherData.notes = compileWeatherNotes(weatherData.precipitationType.type, settings.terrain, GlobalWeatherConfig.month, GlobalWeatherConfig.day, weatherData.windChill, season, GlobalWeatherConfig.skyCondition);
+
+        console.log(`%cSTEP 9b: Compile wind notes`, "color: green; font-weight: bold");
+        weatherData.windEffects = compileWindNotes(weatherData.windSpeed);
+
+        // Step 10: Display Weather Report
+        console.log(`%cSTEP 10: COMPLETE WEATHER REPORT`, "color: green; font-weight: bold");
+        if (!weatherData.precipitationType || typeof weatherData.precipitationType !== 'object') {
+            console.log("Precipitation type is not properly set, using default values.");
+            weatherData.precipitationType = { type: 'None' }; // Ensure it's always an object
+        }
+        
+        // Then you can safely use weatherData.precipitationType.type elsewhere in the code.
+        
+        await displayWeatherConditions(weatherData, season, settings);
+        console.log("Weather data object: ", weatherData);
+
+        // Step 10: Reset Data
+        console.log(`%cSTEP 10: RESET DATA`, "color: green; font-weight: bold");
+        resetWeatherData(GlobalWeatherConfig);
+        console.log("Weather data reset.");
+
     } catch (error) {
         console.error("An error occurred during weather generation:", error.message);
     }
@@ -2350,7 +2543,6 @@ async function requestWeatherSettings() {
         dialog.render(true);
     });
 }
-
 
 function updateGlobalWeatherConfig(month, terrain, altitude, latitude) {
     //GlobalWeatherConfig.year = year;
@@ -3035,7 +3227,7 @@ function determineWeatherContinuation(currentWeatherType) {
         GlobalWeatherConfig.continuingWeatherEventDuration = 0;
         return {
             continues: false,
-            newWeatherType: currentWeatherType,
+            newWeatherType: "none",
             continuationChance: 0
         };
     }
@@ -3070,7 +3262,7 @@ function determineWeatherContinuation(currentWeatherType) {
         GlobalWeatherConfig.continuingWeatherEventDuration = 0;
         return {
             continues: false,
-            newWeatherType: currentWeatherType,
+            newWeatherType: "none",
             continuationChance: weatherDetails.contChance
         };
     }
