@@ -22,10 +22,10 @@ Hooks.once('ready', async function() {
 var GlobalWeatherConfig = {
     year: 568,
     month: "Coldeven",
-    day: 11,
+    day: 1,
     latitude: 32,	// City of Greyhawk is at 35 deg. latitude
 	latitudeTempAdj: 0,
-    terrain: "Forest",
+    terrain: "Mountains",
     altitude: 1000,
 	altitudeTempAdj: 0,
     baseDailyTemp: 0,
@@ -33,6 +33,7 @@ var GlobalWeatherConfig = {
     dailyLowTemp: 0,
     temperature: { high: 0, low: 0, effective: 0 }, // Initialize effective temperature
 	//temperature: { high: 0, low: 0 },
+    useRecordTemperatures: "",
 	recordTemperatureType: "none",
     tempRecordLow: false,
     tempRecordHigh: false,
@@ -721,7 +722,7 @@ highWindsTable: [
             temperatureAdjustment: { day: 0, night: 0 },
             windSpeedAdjustment: -5,
             specialWeather: [],
-            notes: "Influenced by Faerie, ensuring temperate conditions and minimal precipitation."
+            notes: "Influenced by Faerie, ensuring temperate conditions and minimal precipitation"
         },
         "Jungle": {
             precipAdj: 10,
@@ -1815,7 +1816,7 @@ async function generateWeather() {
             
             return { highTemp: dailyHigh, lowTemp: dailyLow };
         }
-
+/* 
         // Step 1: Determine Temperature Extremes and Adjustments
         console.log(`%cSTEP 1: DETERMINE TEMPERATURES`, "color: green; font-weight: bold");
 
@@ -1832,21 +1833,50 @@ async function generateWeather() {
         }
 
         console.log("Temperatures determined:", weatherData.highTemp, weatherData.lowTemp);
+ */
 
-/*         // Step 2: Determine Sky Conditions
-        console.log(`%cSTEP 2: DETERMINE SKY CONDITIONS`, "color: green; font-weight: bold");
-        if (GlobalWeatherConfig.precipContinues) {
-            weatherData.skyCondition = "Cloudy";
-            console.log(`%cSky conditions set to 'Cloudy' due to continuing weather event.`, "color:blue; font-weight: italic");
+        // Step 1: Determine Temperature Extremes and Adjustments
+        console.log(`%cSTEP 1: DETERMINE TEMPERATURES`, "color: green; font-weight: bold");
+
+        // Check if the useRecordTemperatures flag is enabled
+        if (useRecordTemperatures) {
+            // Check if there is a record temperature event before proceeding
+            if (GlobalWeatherConfig.recordTemperatureType !== 'none') {
+                console.log(`%cRecord temperature day detected: ${GlobalWeatherConfig.recordTemperatureType}`, "color: red; font-weight: bold");
+                const recordTemperatures = calculateRecordTemperatures(settings.month, settings.latitude, settings.altitude, settings.terrain, season);
+                weatherData.highTemp = recordTemperatures.highTemp;
+                weatherData.lowTemp = recordTemperatures.lowTemp;
+
+                // Decrease the duration of the ongoing temperature extreme
+                GlobalWeatherConfig.tempRecordDuration--;
+                if (GlobalWeatherConfig.tempRecordDuration === 0) {
+                    GlobalWeatherConfig.recordTemperatureType = 'none';
+                }
+            } else {
+                const temperatures = await calculateInitialDailyTemperatures(settings.month, settings.latitude, settings.altitude, settings.terrain, season);
+                weatherData.highTemp = temperatures.highTemp;
+                weatherData.lowTemp = temperatures.lowTemp;
+
+                // Determine if a new temperature extreme occurs
+                const temperatureExtremes = determineTemperatureExtremes(temperatures.baseTemp, settings.maxHigh, settings.maxLow, settings.terrain);
+                if (temperatureExtremes.extremeType !== 'none') {
+                    GlobalWeatherConfig.recordTemperatureType = temperatureExtremes.extremeType;
+                    GlobalWeatherConfig.tempRecordDuration = temperatureExtremes.duration;
+                }
+            }
         } else {
-            weatherData.skyCondition = await determineSkyConditions(settings.month);
-            console.log("Sky conditions determined:", weatherData.skyCondition);
-        } */
+            // If useRecordTemperatures flag is not enabled, proceed with normal temperature calculations
+            const temperatures = await calculateInitialDailyTemperatures(settings.month, settings.latitude, settings.altitude, settings.terrain, season);
+            weatherData.highTemp = temperatures.highTemp;
+            weatherData.lowTemp = temperatures.lowTemp;
+        }
+
+        console.log("Temperatures determined:", weatherData.highTemp, weatherData.lowTemp);
+
         // Step 2: Determine Sky Conditions
         console.log(`%cSTEP 2: DETERMINE SKY CONDITIONS`, "color: green; font-weight: bold");
         weatherData.skyCondition = await determineSkyConditions(settings.month);
         console.log("Sky conditions determined:", weatherData.skyCondition);
-
 
         // Initial check for continuing weather
         console.log(`%cCHECK FOR CONTINUING WEATHER`, "color: blue; font-weight: bold");
@@ -3171,6 +3201,8 @@ function advanceDate() {
 }
 Hooks.once('init', () => {
     // Existing settings
+    console.log("Initializing weather module");
+
     game.settings.register('dnd-weather', 'useSimpleCalendar', {
         name: "Use Simple Calendar for Dates",
         hint: "Check this box to use Simple Calendar for date management instead of manual month selection.",
@@ -3223,20 +3255,20 @@ Hooks.once('init', () => {
         config: true,
         type: String,
         choices: {
-            "rough terrain or hills": "Rough terrain or hills",
+            "rough terrain or hills": "Rough terrain or Hills",
             "forest": "Forest",
             "forest, slyvan": "Forest, Sylvan",
             "jungle": "Jungle",
             "swamp or marsh": "Swamp or marsh",
-            "swamp or marsh, cold": "Swamp or Marsh, cold",
+            "swamp or marsh, cold": "Swamp or marsh, cold",
             "dust": "Dust",
             "plains": "Plains",
             "desert": "Desert",
             "mountains": "Mountains",
-            "seacoast, warm current": "Seacoast, Warm Current",
-            "seacoast, cold current": "Seacoast, Cold Current",
-            "at sea, warm current": "At Sea, Warm Current",
-            "at sea, cold current": "At Sea, Cold Current"
+            "seacoast, warm current": "Seacoast, warm current",
+            "seacoast, cold current": "Seacoast, cold current",
+            "at sea, warm current": "At Sea, warm current",
+            "at sea, cold current": "At Sea, cold current"
         },
         default: "plains",
     });
@@ -3278,7 +3310,7 @@ Hooks.once('init', () => {
     });
     // New settings
     game.settings.register('dnd-weather', 'useExtremeTemperatures', {
-        name: "Use Extreme Temperatures",
+        name: "Use Record Temperatures",
         hint: "Check this box to include extreme temperatures in the weather generation.",
         scope: 'world',
         config: true,
@@ -3297,7 +3329,7 @@ Hooks.once('init', () => {
 
     game.settings.register('dnd-weather', 'realisticWindSpeedInMountains', {
         name: "Realistic Wind Speed in Mountains",
-        hint: "Check this box to use realistic wind speeds for mountainous terrains.",
+        hint: "Check this box to use more realistic wind speeds for mountainous terrain.",
         scope: 'world',
         config: true,
         type: Boolean,
@@ -3306,7 +3338,7 @@ Hooks.once('init', () => {
 
     game.settings.register('dnd-weather', 'realisticHumidity', {
         name: "Realistic Humidity",
-        hint: "Check this box to use realistic humidity calculations.",
+        hint: "Check this box to use a more realistic humidity calculation.",
         scope: 'world',
         config: true,
         type: Boolean,
@@ -3321,4 +3353,29 @@ Hooks.once('init', () => {
         type: Boolean,
         default: false,
     });
+
+    // Initialize the global flags
+    useRecordTemperatures = game.settings.get('dnd-weather', 'useExtremeTemperatures');
+    GlobalWeatherConfig.year = game.settings.get('dnd-weather', 'defaultYear');
+    GlobalWeatherConfig.month = game.settings.get('dnd-weather', 'defaultMonth');
+    GlobalWeatherConfig.day = game.settings.get('dnd-weather', 'defaultDay');
+    GlobalWeatherConfig.latitude = game.settings.get('dnd-weather', 'defaultLatitude');
+    GlobalWeatherConfig.altitude = game.settings.get('dnd-weather', 'defaultAltitude');
+    GlobalWeatherConfig.terrain = game.settings.get('dnd-weather', 'defaultTerrain');
+    GlobalWeatherConfig.advanceDate = game.settings.get('dnd-weather', 'advanceDateEachTime');
+    GlobalWeatherConfig.useRealisticWind = game.settings.get('dnd-weather', 'realisticWindSpeedInMountains');
+
 });
+
+// Add a hook to update the flag when the setting changes
+Hooks.on('renderSettingsConfig', (app, html, data) => {
+    useRecordTemperatures = game.settings.get('dnd-weather', 'useExtremeTemperatures');
+    GlobalWeatherConfig.year = game.settings.get('dnd-weather', 'defaultYear');
+    GlobalWeatherConfig.month = game.settings.get('dnd-weather', 'defaultMonth');
+    GlobalWeatherConfig.day = game.settings.get('dnd-weather', 'defaultDay');
+    GlobalWeatherConfig.latitude = game.settings.get('dnd-weather', 'defaultLatitude');
+    GlobalWeatherConfig.altitude = game.settings.get('dnd-weather', 'defaultAltitude');
+    GlobalWeatherConfig.terrain = game.settings.get('dnd-weather', 'defaultTerrain');
+    GlobalWeatherConfig.advanceDate = game.settings.get('dnd-weather', 'advanceDateEachTime');
+});
+
