@@ -973,7 +973,7 @@ Hooks.once('init', () => {
         default: false,
     });
 
-    game.settings.register('adnd-greyhawk-weather', 'defaultMonth', {
+    game.settings.register('dnd-weather', 'defaultMonth', {
         name: "Default Month",
         hint: "Set the default month if Simple Calendar is not used.",
         scope: 'world',
@@ -1001,7 +1001,7 @@ Hooks.once('init', () => {
         default: "needfest",
     });
 
-    game.settings.register('adnd-greyhawk-weather', 'defaultTerrain', {
+    game.settings.register('dnd-weather', 'defaultTerrain', {
         name: "Default Terrain",
         hint: "Select the default terrain type for weather conditions.",
         scope: 'world',
@@ -1025,9 +1025,9 @@ Hooks.once('init', () => {
 });
 
 function applyWeatherSettings() {
-    const useSimpleCalendar = game.settings.get('adnd-greyhawk-weather', 'useSimpleCalendar');
-    const defaultMonth = game.settings.get('adnd-greyhawk-weather', 'defaultMonth');
-    const defaultTerrain = game.settings.get('adnd-greyhawk-weather', 'defaultTerrain');
+    const useSimpleCalendar = game.settings.get('dnd-weather', 'useSimpleCalendar');
+    const defaultMonth = game.settings.get('dnd-weather', 'defaultMonth');
+    const defaultTerrain = game.settings.get('dnd-weather', 'defaultTerrain');
 
     console.log(`Using Simple Calendar: ${useSimpleCalendar}`);
     console.log(`Default Month: ${defaultMonth}`);
@@ -1037,7 +1037,7 @@ function applyWeatherSettings() {
 
 Hooks.on('renderSettingsConfig', (app, html, data) => {
     // You can use this to react to settings changes and update your module's behavior accordingly.
-    if (game.settings.get('adnd-greyhawk-weather', 'useSimpleCalendar')) {
+    if (game.settings.get('dnd-weather', 'useSimpleCalendar')) {
         // Hide or show elements based on this setting
         html.find('[name="defaultMonth"]').closest('.form-group').hide();
     } else {
@@ -3169,3 +3169,156 @@ function advanceDate() {
     }
     console.log("Date advanced to:", GlobalWeatherConfig.month, GlobalWeatherConfig.day, GlobalWeatherConfig.year);
 }
+Hooks.once('init', () => {
+    // Existing settings
+    game.settings.register('dnd-weather', 'useSimpleCalendar', {
+        name: "Use Simple Calendar for Dates",
+        hint: "Check this box to use Simple Calendar for date management instead of manual month selection.",
+        scope: 'world',  // This setting is stored on a per-world basis.
+        config: true,  // This setting provides a configuration UI.
+        type: Boolean,
+        default: false,
+    });
+
+    game.settings.register('dnd-weather', 'advanceDateEachTime', {
+        name: "Advance Date Each Time",
+        hint: "Check this box to automatically advance the date each time weather is generated.",
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        default: true,
+    });
+
+    game.settings.register('dnd-weather', 'defaultMonth', {
+        name: "Default Month",
+        hint: "Set the default month if Simple Calendar is not used.",
+        scope: 'world',
+        config: true,
+        type: String,
+        choices: {
+            "needfest": "Needfest",
+            "fireseek": "Fireseek",
+            "readying": "Readying",
+            "coldeven": "Coldeven",
+            "growfest": "Growfest",
+            "planting": "Planting",
+            "flocktime": "Flocktime",
+            "wealsun":  "Wealsun",
+            "richfest": "Richfest",
+            "reaping":  "Reaping",
+            "goodmonth": "Goodmonth",
+            "harvester": "Harvester",
+            "brewfest": "Brewfest",
+            "patchwall": "Patchwall",
+            "readyreat": "Readyreat",
+            "sunsebb":  "Sunsebb"
+        },
+        default: "needfest",
+    });
+
+    game.settings.register('dnd-weather', 'defaultTerrain', {
+        name: "Default Terrain",
+        hint: "Select the default terrain type for weather conditions.",
+        scope: 'world',
+        config: true,
+        type: String,
+        choices: {
+            "rough terrain or hills": "Rough terrain or hills",
+            "forest": "Forest",
+            "forest, slyvan": "Forest, Sylvan",
+            "jungle": "Jungle",
+            "swamp or marsh": "Swamp or marsh",
+            "swamp or marsh, cold": "Swamp or Marsh, cold",
+            "dust": "Dust",
+            "plains": "Plains",
+            "desert": "Desert",
+            "mountains": "Mountains",
+            "seacoast, warm current": "Seacoast, Warm Current",
+            "seacoast, cold current": "Seacoast, Cold Current",
+            "at sea, warm current": "At Sea, Warm Current",
+            "at sea, cold current": "At Sea, Cold Current"
+        },
+        default: "plains",
+    });
+
+    game.settings.register('dnd-weather', 'defaultYear', {
+        name: "Default Year",
+        hint: "Set the default year for weather generation.",
+        scope: 'world',
+        config: true,
+        type: Number,
+        default: 568,
+    });
+
+    game.settings.register('dnd-weather', 'defaultDay', {
+        name: "Default Day",
+        hint: "Set the default day if Simple Calendar is not used.",
+        scope: 'world',
+        config: true,
+        type: Number,
+        default: 1,
+    });
+
+    game.settings.register('dnd-weather', 'defaultLatitude', {
+        name: "Default Latitude",
+        hint: "Set the default latitude for weather generation.",
+        scope: 'world',
+        config: true,
+        type: Number,
+        default: 32,
+    });
+
+    game.settings.register('dnd-weather', 'defaultAltitude', {
+        name: "Default Altitude",
+        hint: "Set the default altitude for weather generation (in feet).",
+        scope: 'world',
+        config: true,
+        type: Number,
+        default: 0,
+    });
+    // New settings
+    game.settings.register('dnd-weather', 'useExtremeTemperatures', {
+        name: "Use Extreme Temperatures",
+        hint: "Check this box to include extreme temperatures in the weather generation.",
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        default: false,
+    });
+
+    game.settings.register('dnd-weather', 'useSpecialWeather', {
+        name: "Use Special Weather",
+        hint: "Check this box to include special weather events in the weather generation.",
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        default: false,
+    });
+
+    game.settings.register('dnd-weather', 'realisticWindSpeedInMountains', {
+        name: "Realistic Wind Speed in Mountains",
+        hint: "Check this box to use realistic wind speeds for mountainous terrains.",
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        default: false,
+    });
+
+    game.settings.register('dnd-weather', 'realisticHumidity', {
+        name: "Realistic Humidity",
+        hint: "Check this box to use realistic humidity calculations.",
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        default: false,
+    });
+
+    game.settings.register('dnd-weather', 'addNotesToSimpleCalendar', {
+        name: "Add Notes to Simple Calendar",
+        hint: "Check this box to add weather notes to Simple Calendar.",
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        default: false,
+    });
+});
