@@ -22,7 +22,7 @@ Hooks.once('ready', async function() {
 var GlobalWeatherConfig = {
     year: 568,
     month: "Coldeven",
-    day: 11,
+    day: 25,
     latitude: 32,	// City of Greyhawk is at 35 deg. latitude
 	latitudeTempAdj: 0,
     terrain: "Forest",
@@ -721,7 +721,7 @@ highWindsTable: [
             temperatureAdjustment: { day: 0, night: 0 },
             windSpeedAdjustment: -5,
             specialWeather: [],
-            notes: "Influenced by Faerie, ensuring temperate conditions and minimal precipitation."
+            notes: "Influenced by Faerie, ensuring temperate conditions and minimal precipitation"
         },
         "Jungle": {
             precipAdj: 10,
@@ -1383,51 +1383,6 @@ function getEffectsByWindSpeed(windSpeed) {
             precipitationDuration: "0 hours"
         };
     }
-
-    // Access the standard weather table from the global configuration
-    const weatherDetails = GlobalWeatherConfig.standardWeatherTable.find(item => item.name === weatherTypeName) || {};
-    console.log("Weather details found:", weatherDetails);
-
-    // Determine wind speed using the calculated function
-    console.log(`Inside applyWeatherEffects(), calculateWindSpeed() parameters = weatherType/terrainName/altitude = ${weatherType} ${terrainName} ${altitude}`);
-    let totalWindSpeed = calculateWindSpeed(weatherType, terrainName, altitude);
-
-    // Determine duration and precipitation if available
-    let precipitationAmount = weatherDetails.precipDice ? evalDice(weatherDetails.precipDice) : 0;
-    let precipitationDuration = weatherDetails.duration ? `${evalDice(weatherDetails.duration)} ${weatherDetails.durationUnit || "hours"}` : "0 hours";
-
-    // Check for terrain-specific conditions and modify the duration if necessary
-    const terrainDetails = GlobalWeatherConfig.terrainEffects[terrainName] || {};
-    if (terrainDetails.notes && terrainDetails.notes.includes("Duration of fog and mist doubled.") &&
-        (weatherTypeName === 'Fog' || weatherTypeName === 'Mist')) {
-        const durationValue = weatherDetails.duration ? evalDice(weatherDetails.duration) : 0;
-        const doubledDuration = durationValue * 2;
-        precipitationDuration = `${doubledDuration} ${weatherDetails.durationUnit || "hours"}`;
-        console.log(`Duration for ${weatherTypeName} doubled to: ${precipitationDuration}`);
-    }
-
-    console.log(`Wind speed adjusted for ${weatherTypeName}: ${totalWindSpeed} mph`);
-    console.log(`Precipitation for ${weatherTypeName}: ${precipitationAmount} over ${precipitationDuration}`);
-
-    return {
-        windSpeed: Math.floor(totalWindSpeed),
-        precipitationAmount: precipitationAmount,
-        precipitationDuration: precipitationDuration
-    };
-}
- */
-function applyWeatherEffects(weatherType, terrainName, altitude) {
-    const weatherTypeName = weatherType;
-    console.log(`Applying weather effects for type: ${weatherTypeName}`);
-
-    if (!weatherTypeName) {
-        console.log("No specific weather effect found. Default effects will be applied.");
-        return {
-            windSpeed: calculateWindSpeed(weatherType, 'Plains', 0),  // Using default terrain if undefined
-            precipitationAmount: 0,
-            precipitationDuration: "0 hours"
-        };
-    }
     
     // Access the standard weather table from the global configuration
     const weatherDetails = GlobalWeatherConfig.standardWeatherTable.find(item => item.name === weatherTypeName) || {};
@@ -1457,6 +1412,49 @@ function applyWeatherEffects(weatherType, terrainName, altitude) {
         windSpeed: Math.floor(totalWindSpeed),
         precipitationAmount: precipitationAmount,
         precipitationDuration: precipitationDurationString
+    };
+}
+ */
+function applyWeatherEffects(weatherType, terrainName, altitude) {
+    const weatherTypeName = weatherType;
+    console.log(`Applying weather effects for type: ${weatherTypeName}`);
+
+    if (!weatherTypeName) {
+        console.log("No specific weather effect found. Default effects will be applied.");
+        return {
+            windSpeed: calculateWindSpeed(weatherType, 'Plains', 0),  // Using default terrain if undefined
+            precipitationAmount: 0,
+            precipitationDuration: "0 hours"
+        };
+    }
+
+    // Access the standard weather table from the global configuration
+    const weatherDetails = GlobalWeatherConfig.standardWeatherTable.find(item => item.name === weatherTypeName) || {};
+    console.log("Weather details found:", weatherDetails);
+
+    // Determine wind speed using the calculated function
+    console.log(`Inside applyWeatherEffects(), calculateWindSpeed() parameters = weatherType/terrainName/altitude = ${weatherType} ${terrainName} ${altitude}`);
+    let totalWindSpeed = calculateWindSpeed(weatherType, terrainName, altitude);
+
+    // Determine duration and precipitation if available
+    let precipitationAmount = weatherDetails.precipDice ? evalDice(weatherDetails.precipDice) : 0;
+    let precipitationDuration = weatherDetails.duration ? `${evalDice(weatherDetails.duration)} ${weatherDetails.durationUnit || "hours"}` : "0 hours";
+
+    // Double the duration for fog and mist in specific terrains
+    if ((terrainName.includes("Seacoast") || terrainName.includes("At sea")) && (weatherTypeName.includes("Fog") || weatherTypeName.includes("Mist"))) {
+        if (weatherDetails.durationUnit === "hours") {
+            console.log(`Duration for ${weatherTypeName} doubled to: ${precipitationDuration} hours`, "font-weight: bold");
+            precipitationDuration = `${evalDice(weatherDetails.duration) * 2} ${weatherDetails.durationUnit}`;
+        }
+    }
+
+    console.log(`Wind speed adjusted for ${weatherTypeName}: ${totalWindSpeed} mph`);
+    console.log(`Precipitation for ${weatherTypeName}: ${precipitationAmount} over ${precipitationDuration}`);
+
+    return {
+        windSpeed: Math.floor(totalWindSpeed),
+        precipitationAmount: precipitationAmount,
+        precipitationDuration: precipitationDuration
     };
 }
 
