@@ -22,7 +22,7 @@ Hooks.once('ready', async function() {
 var GlobalWeatherConfig = {
     year: 568,
     month: "Coldeven",
-    day: 11,
+    day: 25,
     latitude: 32,	// City of Greyhawk is at 35 deg. latitude
 	latitudeTempAdj: 0,
     terrain: "Forest",
@@ -721,7 +721,7 @@ highWindsTable: [
             temperatureAdjustment: { day: 0, night: 0 },
             windSpeedAdjustment: -5,
             specialWeather: [],
-            notes: "Influenced by Faerie, ensuring temperate conditions and minimal precipitation."
+            notes: "Influenced by Faerie, ensuring temperate conditions and minimal precipitation"
         },
         "Jungle": {
             precipAdj: 10,
