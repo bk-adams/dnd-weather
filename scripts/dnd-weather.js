@@ -21,8 +21,9 @@ Hooks.once('ready', async function() {
 
 var GlobalWeatherConfig = {
     year: 568,
+    //year: game.settings.get('dnd-weather', 'defaultYear') || 598,
     month: "Coldeven",
-    day: 1,
+    day: 25,
     latitude: 32,	// City of Greyhawk is at 35 deg. latitude
 	latitudeTempAdj: 0,
     terrain: "Mountains",
@@ -919,9 +920,16 @@ highWindsTable: [
 // event.altKey
 // event.ctrlKey
 
-document.addEventListener('keydown', function(event) {
+/* document.addEventListener('keydown', function(event) {
     if (event.altKey && event.key === 'g') { // Ensure key detection is lowercase
         console.log("Alt+G was pressed");
+        generateWeather();  // Call the generateWeather function
+    }
+});
+ */
+document.addEventListener('keydown', function(event) {
+    if (event.shiftKey && event.key.toLowerCase() === 'g') {
+        console.log("Shift+G was pressed");
         generateWeather();  // Call the generateWeather function
     }
 });
@@ -2254,6 +2262,7 @@ function calculateLatitude(type, value) {
 
     return adjustedLatitude;
 }
+// ${Object.keys(GlobalWeatherConfig.calendarLabels).map(month => `<option value="${month}" ${GlobalWeatherConfig.month === month ? 'selected' : ''}>${GlobalWeatherConfig.calendarLabels[month]}</option>`).join('')}
 
 async function requestWeatherSettings() {
     return new Promise((resolve, reject) => {
@@ -2293,7 +2302,7 @@ async function requestWeatherSettings() {
                 <div>
                     <label for="month">Month/Festival:</label>
                     <select id="month" name="month" onchange="updateDayOptions(this.value)">
-                        ${Object.keys(GlobalWeatherConfig.calendarLabels).map(month => `<option value="${month}" ${GlobalWeatherConfig.month === month ? 'selected' : ''}>${GlobalWeatherConfig.calendarLabels[month]}</option>`).join('')}
+                        ${Object.keys(monthDays).map(month => `<option value="${month}" ${GlobalWeatherConfig.month === month ? 'selected' : ''}>${month}</option>`).join('')}
                     </select>
                 </div>
                 <div>
@@ -3282,7 +3291,7 @@ Hooks.once('init', () => {
         default: 568,
     });
 
-    game.settings.register('dnd-weather', 'defaultDay', {
+    /* game.settings.register('dnd-weather', 'defaultDay', {
         name: "Default Day",
         hint: "Set the default day if Simple Calendar is not used.",
         scope: 'world',
@@ -3290,7 +3299,7 @@ Hooks.once('init', () => {
         type: Number,
         default: 1,
     });
-
+ */
     game.settings.register('dnd-weather', 'defaultLatitude', {
         name: "Default Latitude",
         hint: "Set the default latitude for weather generation.",
@@ -3358,7 +3367,7 @@ Hooks.once('init', () => {
     useRecordTemperatures = game.settings.get('dnd-weather', 'useExtremeTemperatures');
     GlobalWeatherConfig.year = game.settings.get('dnd-weather', 'defaultYear');
     GlobalWeatherConfig.month = game.settings.get('dnd-weather', 'defaultMonth');
-    GlobalWeatherConfig.day = game.settings.get('dnd-weather', 'defaultDay');
+    //GlobalWeatherConfig.day = game.settings.get('dnd-weather', 'defaultDay');
     GlobalWeatherConfig.latitude = game.settings.get('dnd-weather', 'defaultLatitude');
     GlobalWeatherConfig.altitude = game.settings.get('dnd-weather', 'defaultAltitude');
     GlobalWeatherConfig.terrain = game.settings.get('dnd-weather', 'defaultTerrain');
@@ -3372,10 +3381,13 @@ Hooks.on('renderSettingsConfig', (app, html, data) => {
     useRecordTemperatures = game.settings.get('dnd-weather', 'useExtremeTemperatures');
     GlobalWeatherConfig.year = game.settings.get('dnd-weather', 'defaultYear');
     GlobalWeatherConfig.month = game.settings.get('dnd-weather', 'defaultMonth');
-    GlobalWeatherConfig.day = game.settings.get('dnd-weather', 'defaultDay');
+    //GlobalWeatherConfig.day = game.settings.get('dnd-weather', 'defaultDay');
     GlobalWeatherConfig.latitude = game.settings.get('dnd-weather', 'defaultLatitude');
     GlobalWeatherConfig.altitude = game.settings.get('dnd-weather', 'defaultAltitude');
     GlobalWeatherConfig.terrain = game.settings.get('dnd-weather', 'defaultTerrain');
     GlobalWeatherConfig.advanceDate = game.settings.get('dnd-weather', 'advanceDateEachTime');
+    GlobalWeatherConfig.useSimpleCalendar = game.settings.get('dnd-weather', 'useSimpleCalendar');
+    GlobalWeatherConfig.useRealisticWind = game.settings.get('dnd-weather', 'useRealisticWind');
+    GlobalWeatherConfig.specialWeather = game.settings.get('dnd-weather', 'enableSpecialWeather');
 });
 
