@@ -34,7 +34,7 @@ var GlobalWeatherConfig = {
     dailyLowTemp: 0,
     temperature: { high: 0, low: 0, effective: 0 }, // Initialize effective temperature
 	//temperature: { high: 0, low: 0 },
-    useRecordTemperatures: "",
+    useRecordTemperatures: false,
 	recordTemperatureType: "none",
     tempRecordLow: false,
     tempRecordHigh: false,
@@ -1749,14 +1749,14 @@ async function generateWeather() {
         }
         
         // Example Usage
-        const monthlyBaseTemp = 50;  // Example base temperature for a month
+/*         const monthlyBaseTemp = 50;  // Example base temperature for a month
         const maxHigh = 10;  // Maximum possible high adjustment
         const maxLow = 10;  // Maximum possible low adjustment
         
         const temperatureExtremes = determineTemperatureExtremes(monthlyBaseTemp, maxHigh, maxLow, settings.terrain);
         console.log("Adjusted Base Temperature:", temperatureExtremes.adjustedBaseTemp);
         console.log("Type of Extreme:", temperatureExtremes.extremeType);
-        console.log("Duration of Extreme Temperatures (days):", temperatureExtremes.duration);
+        console.log("Duration of Extreme Temperatures (days):", temperatureExtremes.duration); */
         
         //////////////////////////////////////////////////////////////////////////////////////////////////////
         function calculateRecordTemperatures(month, latitude, altitude, terrain, season) {
@@ -1847,7 +1847,8 @@ async function generateWeather() {
         console.log(`%cSTEP 1: DETERMINE TEMPERATURES`, "color: green; font-weight: bold");
 
         // Check if the useRecordTemperatures flag is enabled
-        if (useRecordTemperatures) {
+        console.log("recordTemperatures flag is ", GlobalWeatherConfig.useRecordTemperatures);
+        if (GlobalWeatherConfig.useRecordTemperatures) {
             // Check if there is a record temperature event before proceeding
             if (GlobalWeatherConfig.recordTemperatureType !== 'none') {
                 console.log(`%cRecord temperature day detected: ${GlobalWeatherConfig.recordTemperatureType}`, "color: red; font-weight: bold");
@@ -3229,7 +3230,7 @@ Hooks.once('init', () => {
         type: Boolean,
         default: true,
     });
-
+/* 
     game.settings.register('dnd-weather', 'defaultMonth', {
         name: "Default Month",
         hint: "Set the default month if Simple Calendar is not used.",
@@ -3281,7 +3282,7 @@ Hooks.once('init', () => {
         },
         default: "plains",
     });
-
+ */
     game.settings.register('dnd-weather', 'defaultYear', {
         name: "Default Year",
         hint: "Set the default year for weather generation.",
@@ -3366,7 +3367,7 @@ Hooks.once('init', () => {
     // Initialize the global flags
     useRecordTemperatures = game.settings.get('dnd-weather', 'useExtremeTemperatures');
     GlobalWeatherConfig.year = game.settings.get('dnd-weather', 'defaultYear');
-    GlobalWeatherConfig.month = game.settings.get('dnd-weather', 'defaultMonth');
+    //GlobalWeatherConfig.month = game.settings.get('dnd-weather', 'defaultMonth');
     //GlobalWeatherConfig.day = game.settings.get('dnd-weather', 'defaultDay');
     GlobalWeatherConfig.latitude = game.settings.get('dnd-weather', 'defaultLatitude');
     GlobalWeatherConfig.altitude = game.settings.get('dnd-weather', 'defaultAltitude');
@@ -3380,7 +3381,7 @@ Hooks.once('init', () => {
 Hooks.on('renderSettingsConfig', (app, html, data) => {
     useRecordTemperatures = game.settings.get('dnd-weather', 'useExtremeTemperatures');
     GlobalWeatherConfig.year = game.settings.get('dnd-weather', 'defaultYear');
-    GlobalWeatherConfig.month = game.settings.get('dnd-weather', 'defaultMonth');
+    //GlobalWeatherConfig.month = game.settings.get('dnd-weather', 'defaultMonth');
     //GlobalWeatherConfig.day = game.settings.get('dnd-weather', 'defaultDay');
     GlobalWeatherConfig.latitude = game.settings.get('dnd-weather', 'defaultLatitude');
     GlobalWeatherConfig.altitude = game.settings.get('dnd-weather', 'defaultAltitude');
