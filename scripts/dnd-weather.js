@@ -124,7 +124,7 @@ specialWeatherTable: [
         tracking: "No",
         lostChance: "+80%",
         windSpeed: "5d10",
-		notes: "50% chance of d4 damage every 3 turns, no saving throw, until shelter is found."
+		notes: "50% chance of d4 damage every 3 turns, no saving throw, until shelter is found"
     },
     {
         phenomenon: "Duststorm",
@@ -138,7 +138,7 @@ specialWeatherTable: [
         tracking: "No",
         lostChance: "+80%",
         windSpeed: "5d10",
-		notes: "50% chance of d4 damage every 3 turns, no saving throw, until shelter is found."
+		notes: "50% chance of d4 damage every 3 turns, no saving throw, until shelter is found"
     },
     {
         phenomenon: "Windstorm",
@@ -153,7 +153,7 @@ specialWeatherTable: [
         lostChance: "+30%",
         windSpeed: "8d10+20",
 		notes: "50% chance of 2d6 of rock damage every 3 turns. Characters must roll dexterity or " +
-				"less on d20 to save for 1/2 damage; monsters must save vs. pertrifaction."
+				"less on d20 to save for 1/2 damage; monsters must save vs. pertrifaction"
     },
     {
         phenomenon: "Earthquake",
@@ -173,7 +173,7 @@ specialWeatherTable: [
 				"bolt in fear and run for open ground. After a delay of 1-6	rounds, the first " +
 				"shock wave reaches the party, and there are 1-6 shock waves in an earthquake. " +
 				"Roll d20 to determine the number of rounds between	each of the shock waves. " +
-				"Each shock wave causes damage as the 7th level cleric spell Earthquake."
+				"Each shock wave causes damage as the 7th level cleric spell Earthquake"
     },
     {
         phenomenon: "Earthquake, Undersea",
@@ -194,7 +194,7 @@ specialWeatherTable: [
 				"bolt in fear and run for open ground. After a delay of 1-6	rounds, the first " +
 				"shock wave reaches the party, and there are 1-6 shock waves in an earthquake. " +
 				"Roll d20 to determine the number of rounds between	each of the shock waves. " +
-				"Each shock wave causes damage as the 7th level cleric spell Earthquake."
+				"Each shock wave causes damage as the 7th level cleric spell Earthquake"
     },
     {
         phenomenon: "Rock Avalanche",
@@ -209,7 +209,7 @@ specialWeatherTable: [
         lostChance: "+10% if trail is covered",
         windSpeed: "d20",
 		notes: "Damage is 2d2O pts., with save (vs. dexterity or petrification) for 1/2 damage. " +
-				"Victims taking more than 20 points of damage are buried and will suffocate in 6 rounds unless rescued."
+				"Victims taking more than 20 points of damage are buried and will suffocate in 6 rounds unless rescued"
     },
     {
         phenomenon: "Snow Avalanche",
@@ -224,7 +224,7 @@ specialWeatherTable: [
         lostChance: "+10% if trail is covered",
         windSpeed: "d20",
 		notes: "Damage is 2d2O pts., with save (vs. dexterity or petrification) for 1/2 damage. " +
-				"Victims taking more than 20 points of damage are buried and will suffocate in 6 rounds unless rescued."
+				"Victims taking more than 20 points of damage are buried and will suffocate in 6 rounds unless rescued"
     },
     {
         phenomenon: "Volcano",
@@ -243,7 +243,7 @@ specialWeatherTable: [
 				"continues to erupt, the base temperature will rise 1 degree in a 60-mile-diameter " +
 				"area. This overheating will lapse after 7-12 months, as particles of ash in the air " +
 				"bring the temperature backdown, but the chance of clear skies in the area will be " +
-				"cut by 50% for anadditonal 1-6	months thereafter."
+				"cut by 50% for anadditonal 1-6	months thereafter"
     },
     {
         phenomenon: "Volcano, Undersea",
@@ -263,7 +263,7 @@ specialWeatherTable: [
 				"continues to erupt, the base temperature will rise 1 degree in a 60-mile-diameter " +
 				"area. This overheating will lapse after 7-12 months, as particles of ash in the air " +
 				"bring the temperature backdown, but the chance of clear skies in the area will be " +
-				"cut by 50% for anadditonal 1-6	months thereafter."
+				"cut by 50% for anadditonal 1-6	months thereafter"
     },
     {
         phenomenon: "Tsunami",
@@ -277,7 +277,7 @@ specialWeatherTable: [
         tracking: "No",
         lostChance: "Normal",
         windSpeed: "5d10+10",
-		notes: "Wave height is 10d20 feet. Save vs. Dexterity/Petrification or drown. If save is made, victim takes d20 damage."
+		notes: "Wave height is 10d20 feet. Save vs. Dexterity/Petrification or drown. If save is made, victim takes d20 damage"
     },
     {
         phenomenon: "Quicksand",
@@ -296,7 +296,7 @@ specialWeatherTable: [
 				"and discards all heavy items. Other characters will be dragged under at the rate of 1 foot " +
 				"per round if motionless or 2 feet per round if attempting to escape. Drowning occurs 3 rounds " +
 				"after the head is submerged. If a victim is rescued after his head has been submerged, assess " +
-				"damage of d6 per round of submersion once character is resuscitated."
+				"damage of d6 per round of submersion once character is resuscitated"
     },
     {
         phenomenon: "Flash Flood",
@@ -315,7 +315,7 @@ specialWeatherTable: [
 				"duration is over, at which point all low areas will be covered with running water to a depth " +
 				"which is triple the amount of rainfall. This water will remain for 6-10 turns, and then " +
 				"disappear at a rate of 3 inches per hour. The current will vary from 5-50 mph, increasing when " +
-				"water flows in narrow gullies."
+				"water flows in narrow gullies"
     },
     {
         phenomenon: "Rain Forest Downpour",
@@ -330,7 +330,7 @@ specialWeatherTable: [
         lostChance: "+20%",
         windSpeed: "d6-1",
 		notes: "Precipitation is 1 inch per hour. The ground will absorb up to 6 inches of water; then mud will form, converting the area to a " +
-				"swamp for travel purposes."
+				"swamp for travel purposes"
     },
     {
         phenomenon: "Sun Shower",
@@ -344,7 +344,7 @@ specialWeatherTable: [
         tracking: "No",
         lostChance: "Normal",
         windSpeed: "d20",
-		notes: "95% chance of a rainbow; see note under Precipitation Occurrence Table."
+		notes: "95% chance of a rainbow; see note under Precipitation Occurrence Table"
     },
     {
         phenomenon: "Tornado or Cyclone",
@@ -359,7 +359,7 @@ specialWeatherTable: [
         lostChance: "+40%",
         windSpeed: "300",
 		notes: "Precipitation is 1 inch per hour. 10% chance party will be transported to the Ethereal Plane. Otherwise, treat " +
-				"as a triple-strength hurricane for damage."
+				"as a triple-strength hurricane for damage"
     },
     {
         phenomenon: "Oasis",
@@ -377,7 +377,7 @@ specialWeatherTable: [
 				"oasis is currently populated (determine population type via the Wilderness " +
 				"Encounter Charts in the DMG), while a 20 indicates that the last visitor has " +
 				"poisoned all the wells. If the oasis is a mirage, anyone who drinks must " +
-				"save vs. spell or take d6 damage from swallowed sand."
+				"save vs. spell or take d6 damage from swallowed sand"
     },
     {
         phenomenon: "Mirage oasis",
@@ -395,7 +395,7 @@ specialWeatherTable: [
 				"oasis is currently populated (determine population type via the Wilderness " +
 				"Encounter Charts in the DMG), while a 20 indicates that the last visitor has " +
 				"poisoned all the wells. If the oasis is a mirage, anyone who drinks must " +
-				"save vs. spell or take d6 damage from swallowed sand."
+				"save vs. spell or take d6 damage from swallowed sand"
     }
 ],
 	
@@ -647,7 +647,7 @@ standardWeatherTable: [
 highWindsTable: [
     {
         minSpeed: 0,
-        maxSpeed: 29,
+        maxSpeed: 31,
         effects: {
             onLand: "No effect",
             atSea: "No effect",
@@ -656,8 +656,8 @@ highWindsTable: [
         }
     },
     {
-        minSpeed: 30,
-        maxSpeed: 44,
+        minSpeed: 32,
+        maxSpeed: 54,
         effects: {
             onLand: "All travel slowed by 25%; torches will be blown out",
             atSea: "Sailing difficult; rowing impossible",
@@ -666,8 +666,8 @@ highWindsTable: [
         }
     },
     {
-        minSpeed: 45,
-        maxSpeed: 59,
+        minSpeed: 55,
+        maxSpeed: 72,
         effects: {
             onLand: "All travel slowed by 50%; torches and small fires will be blown out",
             atSea: "Minor ship damage (d4 structural points) may occur; wave height 3d6 ft.",
@@ -676,8 +676,8 @@ highWindsTable: [
         }
     },
     {
-        minSpeed: 60,
-        maxSpeed: 74,
+        minSpeed: 73,
+        maxSpeed: 136,
         effects: {
             onLand: "Small trees are uprooted; all travel slowed by 75%; roofs may be torn off; torches and medium-sized fires will be blown out.",
             atSea: "Ships are endangered (d10 structural damage) and blown off course; wave height d10+20 ft.",
@@ -686,7 +686,7 @@ highWindsTable: [
         }
     },
     {
-        minSpeed: 75,
+        minSpeed: 137,
         maxSpeed: 500,
         effects: {
             onLand: "Only strong stone buildings will be undamaged; travel is impossible; up to large trees are damaged or uprooted; roofs will be torn off; torches and large fires will be blown out.",
@@ -2558,7 +2558,7 @@ function getWindSpeedLabel(mph) {
     } else if (mph >= 19 && mph <= 31) {
         return "Strong Breeze";
     } else if (mph >= 32 && mph <= 54) {
-        return "Strong Gale";
+        return "Strong 'Gale'";
     } else if (mph >= 55 && mph <= 72) {
         return "Storm Winds";
     } else if (mph >= 73 && mph <= 136) {
