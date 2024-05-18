@@ -2208,19 +2208,30 @@ function determineRainbowType(rainbowTypeRoll) {
 }
 
 function setWindDirection() {
-    const direction = ["North", "Northeast", "East", "Southeast", "South", "Southwest", "West", "Northwest"];
+    const direction = ["South", "Southwest", "West", "Northwest", "North", "Northeast", "East", "Southeast"];
     const index = Math.floor(Math.random() * direction.length);
     GlobalWeatherConfig.windDirection = direction[index];
 
     console.log(`Wind direction: ${GlobalWeatherConfig.windDirection}`);
 }
 
+//Wind Direction Table: roll d20, wind blows from the direction shown
+//  Direction   Fall    Winter  Spring  Summer
+//  S           1        1      1-2     1-2
+//  SW          2        2      3       3
+//  W           3        3      4       4
+//  NW          4-5      4-6    5       5
+//  N           6-10     7-15   6       6
+//  NE          11-17    16-17  7-8     7
+//  E           18-19    18-19  9-13    8-14
+//  SE          20       20     14-20   15-20
+
 function setPrevailingWindDirection(season, roll = Math.floor(Math.random() * 20) + 1) {
     console.log("season is: ", season);
     const windChart = {
-        "Winter": [1, 2, 3, 6, 15, 18, 19, 20],
-        "Spring": [2, 3, 4, 5, 7, 10, 17, 20],
-        "Summer": [2, 3, 4, 5, 7, 10, 17, 20], // Mapped both Low Summer and High Summer to "Summer"
+        "Winter": [1, 2, 3, 6, 15, 17, 19, 20],
+        "Spring": [2, 3, 4, 5, 6, 8, 13, 20],
+        "Summer": [2, 3, 4, 5, 6, 7, 14, 20], // Mapped both Low Summer and High Summer to "Summer"
         "Autumn": [1, 2, 3, 5, 10, 17, 19, 20]
     };
     const directions = ["South", "Southwest", "West", "Northwest", "North", "Northeast", "East", "Southeast"];
