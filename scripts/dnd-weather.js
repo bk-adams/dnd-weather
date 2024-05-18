@@ -660,7 +660,8 @@ highWindsTable: [
         maxSpeed: 54,
         effects: {
             onLand: "All travel slowed by 25%; torches will be blown out",
-            atSea: "Sailing difficult; rowing impossible",
+            //atSea: "Sailing difficult; rowing impossible",
+            atSea: "Strong Gale; sailing difficult; rowing impossible; check for damage every 6 hours:\n- 1% chance of capsizing\n- 5% chance of broken mast\n- 10% chance of broken beams\n- 20% chance of torn sail and/or fouled rigging\n- 10% chance of man overboard",
             inAir: "Creatures eagle-size and below can't fly",
             inBattle: "Missiles at 1/2 range and -1 to hit"
         }
@@ -670,7 +671,8 @@ highWindsTable: [
         maxSpeed: 72,
         effects: {
             onLand: "All travel slowed by 50%; torches and small fires will be blown out",
-            atSea: "Minor ship damage (d4 structural points) may occur; wave height 3d6 ft.",
+            //atSea: "Minor ship damage (d4 structural points) may occur; wave height 3d6 ft.",
+            atSea: "Storm; minor ship damage (d4 structural points); wave height d10+20 ft.; check for damage every 6 hours:\n- 20% chance of capsizing\n- 25% chance of broken mast\n- 35% chance of broken beams\n- 45% chance of torn sail and/or fouled rigging\n- 50% chance of man overboard",
             inAir: "Man-sized creatures cannot fly",
             inBattle: "Missiles at 1/4 range and -3 to hit"
         }
@@ -680,7 +682,8 @@ highWindsTable: [
         maxSpeed: 136,
         effects: {
             onLand: "Small trees are uprooted; all travel slowed by 75%; roofs may be torn off; torches and medium-sized fires will be blown out.",
-            atSea: "Ships are endangered (d10 structural damage) and blown off course; wave height d10+20 ft.",
+            //atSea: "Ships are endangered (d10 structural damage) and blown off course; wave height d10+20 ft.",
+            atSea: "Hurricane; ships are endangered (d10 structural damage) and blown off course; wave height d20+20 ft.; check for damage every 6 hours:\n- 40% chance of capsizing\n- 45% chance of broken mast\n- 50% chance of broken beams\n- 65% chance of torn sail and/or fouled rigging\n- 70% chance of man overboard",
             inAir: "No creatures can fly, except those from the Elemental Plane of Air",
             inBattle: "No missile fire permitted; all non-magical weapon attacks are -1 to hit; dexterity bonuses to AC cancelled"
         }
